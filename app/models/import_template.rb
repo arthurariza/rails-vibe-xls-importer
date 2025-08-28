@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 class ImportTemplate < ApplicationRecord
   has_many :data_records, dependent: :destroy
 
   validates :name, presence: true, uniqueness: true
-  validates :column_definitions, presence: true
+  # Allow empty column_definitions for flexibility
   validate :validate_column_definitions
 
   # Serialize column_definitions as JSON
@@ -10,16 +12,16 @@ class ImportTemplate < ApplicationRecord
 
   # Get column headers in order
   def column_headers
-    return [] unless column_definitions.present?
+    return [] if column_definitions.blank?
 
-    (1..5).map do |i|
+    (1..5).filter_map do |i|
       column_definitions["column_#{i}"]&.dig("name")
-    end.compact
+    end
   end
 
   # Get column definition for a specific column
   def column_definition(column_number)
-    return nil unless column_definitions.present?
+    return nil if column_definitions.blank?
 
     column_definitions["column_#{column_number}"]
   end

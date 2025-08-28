@@ -1,7 +1,8 @@
+# frozen_string_literal: true
+
 class DataRecord < ApplicationRecord
   belongs_to :import_template
 
-  validates :import_template, presence: true
   validate :at_least_one_column_has_data
 
   # Get value for a specific column
@@ -21,12 +22,12 @@ class DataRecord < ApplicationRecord
 
   # Get column values as hash with template headers as keys
   def data_hash
-    return {} unless import_template.present?
+    return {} if import_template.blank?
 
     result = {}
     (1..5).each do |i|
       column_def = import_template.column_definition(i)
-      next unless column_def.present?
+      next if column_def.blank?
 
       header = column_def["name"]
       value = column_value(i)

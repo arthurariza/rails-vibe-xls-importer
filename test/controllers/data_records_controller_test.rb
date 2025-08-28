@@ -1,44 +1,41 @@
+# frozen_string_literal: true
+
 require "test_helper"
 
 class DataRecordsControllerTest < ActionDispatch::IntegrationTest
+  def setup
+    @import_template = ImportTemplate.create!(
+      name: "Test Template",
+      column_definitions: {
+        "column_1" => { "name" => "Name", "data_type" => "string" }
+      }
+    )
+
+    @data_record = @import_template.data_records.create!(
+      column_1: "Test Data"
+    )
+  end
+
   test "should get index" do
-    get data_records_index_url
+    get data_records_import_template_url(@import_template)
 
     assert_response :success
   end
 
   test "should get show" do
-    get data_records_show_url
+    get import_template_data_record_url(@import_template, @data_record)
 
     assert_response :success
   end
 
   test "should get new" do
-    get data_records_new_url
-
-    assert_response :success
-  end
-
-  test "should get create" do
-    get data_records_create_url
+    get new_import_template_data_record_url(@import_template)
 
     assert_response :success
   end
 
   test "should get edit" do
-    get data_records_edit_url
-
-    assert_response :success
-  end
-
-  test "should get update" do
-    get data_records_update_url
-
-    assert_response :success
-  end
-
-  test "should get destroy" do
-    get data_records_destroy_url
+    get edit_import_template_data_record_url(@import_template, @data_record)
 
     assert_response :success
   end

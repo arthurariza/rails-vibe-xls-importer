@@ -7,6 +7,11 @@ Rails.application.routes.draw do
     resources :data_records, except: [:index]
     member do
       get :data_records, to: "data_records#index"
+      get :export_template
+      get :export_data
+      get :export_sample
+      get :import_form
+      post :import_file
     end
   end
 

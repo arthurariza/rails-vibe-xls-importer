@@ -42,7 +42,7 @@ class DataRecordsController < ApplicationController
   private
 
   def set_import_template
-    @import_template = ImportTemplate.find(params[:import_template_id])
+    @import_template = ImportTemplate.find(params[:import_template_id] || params[:id])
   end
 
   def set_data_record
@@ -50,6 +50,6 @@ class DataRecordsController < ApplicationController
   end
 
   def data_record_params
-    params.require(:data_record).permit(:column_1, :column_2, :column_3, :column_4, :column_5, :import_batch_id)
+    params.expect(data_record: %i[column_1 column_2 column_3 column_4 column_5 import_batch_id])
   end
 end
