@@ -57,3 +57,4 @@ group :test do
   gem "selenium-webdriver"
 end
 gem "vite_rails"
+gem "pundit"
