@@ -46,11 +46,8 @@ group :development, :test do
 
   # Static analysis for security vulnerabilities [https://brakemanscanner.org/]
   gem "brakeman", require: false
-end
-
-group :development do
-  # Use console on exceptions pages [https://github.com/rails/web-console]
-  gem "web-console"
+  gem "bullet"
+  gem "dotenv-rails"
 end
 
 group :test do
@@ -62,15 +59,10 @@ gem "pagy"
 gem "pundit"
 gem "vite_rails"
 
-group :development, :test do
-  gem "bullet"
-  gem "dotenv-rails"
-end
-
 # Excel file handling
 gem "caxlsx"
-gem "roo", "~> 2.10.0"
 gem "csv"
+gem "roo", "~> 2.10.0"
 
 group :development do
   gem "rubocop", require: false
@@ -79,4 +71,5 @@ group :development do
   gem "rubocop-performance", require: false
   gem "rubocop-rails", require: false
   gem "rubocop-thread_safety", require: false
+  gem "web-console"
 end

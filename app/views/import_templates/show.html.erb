@@ -39,81 +39,152 @@
     </div>
 
     <!-- Column Configuration -->
-    <div class="bg-white shadow rounded-lg p-6 mb-8">
-      <h2 class="text-xl font-semibold text-gray-900 mb-4">Column Configuration</h2>
+    <div class="bg-white shadow-sm rounded-xl border border-gray-200 p-8 mb-8">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="h-8 w-8 bg-indigo-100 rounded-lg flex items-center justify-center">
+          <svg class="h-5 w-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+          </svg>
+        </div>
+        <h2 class="text-xl font-semibold text-gray-900">Column Configuration</h2>
+      </div>
       <% if @import_template.column_headers.any? %>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <% (1..5).each do |i| %>
             <% column_def = @import_template.column_definition(i) %>
             <% if column_def.present? %>
-              <div class="border border-gray-200 rounded-lg p-4">
-                <h3 class="font-medium text-gray-900">Column <%= i %></h3>
-                <p class="text-sm text-gray-600 mt-1">
-                  <strong>Name:</strong> <%= column_def["name"] %>
-                </p>
-                <p class="text-sm text-gray-600">
-                  <strong>Type:</strong> <%= column_def["data_type"]&.capitalize %>
-                </p>
+              <div class="bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-200 rounded-xl p-6 hover:shadow-md transition-all duration-200">
+                <div class="flex items-center justify-between mb-3">
+                  <span class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Column <%= i %></span>
+                  <div class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                    <%= column_def["data_type"]&.capitalize %>
+                  </div>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2"><%= column_def["name"] %></h3>
+                <div class="text-sm text-gray-600">
+                  <div class="flex items-center gap-1">
+                    <svg class="h-3 w-3 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                    </svg>
+                    <span>Active column</span>
+                  </div>
+                </div>
               </div>
             <% end %>
           <% end %>
         </div>
       <% else %>
-        <p class="text-gray-500">No columns configured yet.</p>
+        <div class="text-center py-8">
+          <div class="mx-auto h-12 w-12 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+            <svg class="h-6 w-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+            </svg>
+          </div>
+          <h3 class="text-sm font-medium text-gray-900">No columns configured yet</h3>
+          <p class="mt-1 text-sm text-gray-500">Edit this template to add column definitions.</p>
+        </div>
       <% end %>
     </div>
 
     <!-- Data Records Section -->
-    <div class="bg-white shadow rounded-lg">
-      <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-        <h2 class="text-xl font-semibold text-gray-900">
-          Data Records (<%= @data_records_count %>)
-        </h2>
-        <div class="flex flex-wrap gap-3">
-          <%= link_to "Add Record", new_import_template_data_record_path(@import_template), 
-              class: "bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" %>
-          <%= link_to "Import Excel", import_form_import_template_path(@import_template), 
-              class: "bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" %>
-          <%= link_to "View All Records", import_template_data_records_path(@import_template), 
-              class: "bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded" %>
+    <div class="bg-white shadow-sm rounded-xl border border-gray-200">
+      <div class="px-8 py-6 border-b border-gray-200">
+        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+          <div class="flex items-center gap-3">
+            <div class="h-8 w-8 bg-blue-100 rounded-lg flex items-center justify-center">
+              <svg class="h-5 w-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+              </svg>
+            </div>
+            <div>
+              <h2 class="text-xl font-semibold text-gray-900">
+                Data Records
+              </h2>
+              <p class="text-sm text-gray-500 mt-1"><%= @data_records_count %> total records</p>
+            </div>
+          </div>
+          <div class="flex flex-col sm:flex-row gap-3">
+            <%= link_to new_import_template_data_record_path(@import_template), 
+                class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors" do %>
+              <svg class="-ml-1 mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+              </svg>
+              Add Record
+            <% end %>
+            <%= link_to import_form_import_template_path(@import_template), 
+                class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors" do %>
+              <svg class="-ml-1 mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
+              </svg>
+              Import Excel
+            <% end %>
+            <%= link_to import_template_data_records_path(@import_template), 
+                class: "inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors" do %>
+              <svg class="-ml-1 mr-2 h-4 w-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+              </svg>
+              View All Records
+            <% end %>
+          </div>
         </div>
-      </div>
-
-      <div class="p-6">
+      <div class="p-8">
         <% if @data_records.any? %>
           <!-- Records Preview Table -->
-          <div class="overflow-x-auto">
+          <div class="overflow-x-auto rounded-lg border border-gray-200">
             <table class="min-w-full divide-y divide-gray-200">
-              <thead class="bg-gray-50">
+              <thead class="bg-gradient-to-r from-gray-50 to-gray-100">
                 <tr>
                   <% @import_template.column_headers.each do |header| %>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                       <%= header %>
                     </th>
                   <% end %>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
               </thead>
               <tbody class="bg-white divide-y divide-gray-200">
-                <% @data_records.each do |record| %>
-                  <tr class="hover:bg-gray-50">
+                <% @data_records.each_with_index do |record, index| %>
+                  <tr class="hover:bg-blue-50 transition-colors duration-150 <%= 'bg-gray-50' if index.even? %>">
                     <% (1..5).each do |i| %>
                       <% if @import_template.column_definition(i).present? %>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          <%= record.column_value(i) || "-" %>
+                          <% value = record.column_value(i) %>
+                          <% if value.present? %>
+                            <span class="font-medium"><%= value %></span>
+                          <% else %>
+                            <span class="text-gray-400 italic">Empty</span>
+                          <% end %>
                         </td>
                       <% end %>
                     <% end %>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                      <%= link_to "View", [@import_template, record], 
-                          class: "text-blue-600 hover:text-blue-900" %>
-                      <%= link_to "Edit", edit_import_template_data_record_path(@import_template, record), 
-                          class: "text-green-600 hover:text-green-900" %>
-                      <%= link_to "Delete", [@import_template, record], 
-                          method: :delete, confirm: "Are you sure?",
-                          class: "text-red-600 hover:text-red-900" %>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <div class="flex items-center gap-3">
+                        <%= link_to [@import_template, record], 
+                            class: "inline-flex items-center text-blue-600 hover:text-blue-900 transition-colors" do %>
+                          <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                          </svg>
+                          View
+                        <% end %>
+                        <%= link_to edit_import_template_data_record_path(@import_template, record), 
+                            class: "inline-flex items-center text-green-600 hover:text-green-900 transition-colors" do %>
+                          <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                          </svg>
+                          Edit
+                        <% end %>
+                        <%= link_to [@import_template, record], 
+                            method: :delete, confirm: "Are you sure?",
+                            class: "inline-flex items-center text-red-600 hover:text-red-900 transition-colors" do %>
+                          <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                          </svg>
+                          Delete
+                        <% end %>
+                      </div>
                     </td>
                   </tr>
                 <% end %>
@@ -122,21 +193,48 @@
           </div>
 
           <% if @data_records_count > @data_records.count %>
-            <div class="mt-4 text-center">
-              <p class="text-sm text-gray-500 mb-3">
-                Showing first <%= @data_records.count %> of <%= @data_records_count %> records
-              </p>
-              <%= link_to "View All Records", import_template_data_records_path(@import_template), 
-                  class: "bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" %>
+            <div class="mt-6 text-center">
+              <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                <p class="text-sm text-blue-700 mb-3">
+                  <svg class="inline h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                  Showing first <%= @data_records.count %> of <%= @data_records_count %> records
+                </p>
+                <%= link_to import_template_data_records_path(@import_template), 
+                    class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors" do %>
+                  <svg class="-ml-1 mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+                  </svg>
+                  View All Records
+                <% end %>
+              </div>
             </div>
           <% end %>
         <% else %>
-          <div class="text-center py-8">
-            <h3 class="text-sm font-medium text-gray-900">No records yet</h3>
-            <p class="mt-1 text-sm text-gray-500">Add your first data record to get started.</p>
-            <div class="mt-6">
-              <%= link_to "Add Record", new_import_template_data_record_path(@import_template), 
-                  class: "bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" %>
+          <div class="text-center py-16">
+            <div class="mx-auto h-16 w-16 bg-gray-100 rounded-full flex items-center justify-center mb-6">
+              <svg class="h-8 w-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+              </svg>
+            </div>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">No records yet</h3>
+            <p class="text-gray-500 mb-8 max-w-sm mx-auto">Get started by adding your first data record or importing an Excel file with data.</p>
+            <div class="flex flex-col sm:flex-row gap-3 justify-center">
+              <%= link_to new_import_template_data_record_path(@import_template), 
+                  class: "inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors" do %>
+                <svg class="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                </svg>
+                Add First Record
+              <% end %>
+              <%= link_to import_form_import_template_path(@import_template), 
+                  class: "inline-flex items-center px-6 py-3 border border-gray-300 shadow-sm text-base font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors" do %>
+                <svg class="-ml-1 mr-2 h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
+                </svg>
+                Import Excel File
+              <% end %>
             </div>
           </div>
         <% end %>

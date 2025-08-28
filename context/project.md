@@ -7,8 +7,11 @@
 - We will need to verify headers, and go trough each row of the sheet and update or create data
 - The headers should be dynamic
 - The data can be whatever you want (we can keep at 5 columns)
+
+## Frontend
 - A frontend will be needed to create the xls sheet and later when the user inputs the file back into the app it will need to reflect the data
-- Use **HTML + ERB and maybe hotwire** for frontend don't reach for manual JavaScript
+- Use **HTML + ERB and hotwire** for frontend don't reach for manual JavaScript
+- Use the playwright MCP when dealing with frontend tasks
 
 ## Testing
 - This project uses minitest with default fixtures
