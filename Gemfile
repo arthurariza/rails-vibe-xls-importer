@@ -69,7 +69,8 @@ end
 
 # Excel file handling
 gem "caxlsx"
-gem "roo"
+gem "roo", "~> 2.10.0"
+gem "csv"
 
 group :development do
   gem "rubocop", require: false
