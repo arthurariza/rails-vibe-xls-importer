@@ -1,0 +1,11 @@
+#!/usr/bin/env ruby
+
+# Remove git repository
+system "rm -rf .git"
+
+basedir = File.expand_path('..', File.dirname(__FILE__))
+project_name = "."
+
+command = "rails new #{project_name} --rc=#{basedir}/railsrc --template=#{basedir}/template.rb"
+puts command
+exec command

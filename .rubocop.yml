@@ -1,0 +1,42 @@
+plugins:
+  - rubocop-capybara
+  - rubocop-minitest
+  - rubocop-performance
+  - rubocop-rails
+  - rubocop-thread_safety
+
+inherit_mode:
+  merge:
+    - Exclude
+
+AllCops:
+  NewCops: enable
+
+Style/Documentation:
+  Enabled: false
+
+Rails/I18nLocaleTexts:
+  Enabled: false
+
+Metrics/BlockLength:
+  Exclude:
+    - "config/**/*"
+
+Layout/LineLength:
+  Exclude:
+    - "config/**/*"
+
+Style/ClassAndModuleChildren:
+  Enabled: true
+  EnforcedStyle: compact
+  SafeAutoCorrect: true
+  Exclude:
+    - config/**/*
+
+Style/StringLiterals:
+  Enabled: true
+  EnforcedStyle: double_quotes
+
+Metrics/ClassLength:
+  Exclude:
+    - "test/**/*"

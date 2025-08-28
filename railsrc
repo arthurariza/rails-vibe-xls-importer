@@ -1,0 +1,4 @@
+--database=sqlite3
+--javascript=esbuild
+--skip-jbuilder
+--skip-rubocop
