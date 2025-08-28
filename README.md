@@ -3,6 +3,7 @@
 A template for creating new Rails applications with esbuild, Vite and Docker and a pre-configured set of gems and tools.
 
 ## Usage
+
 Create a new directory with the name of your project and change directory into it.
 
 ```
@@ -10,15 +11,19 @@ mkdir project_name && cd project_name
 ```
 
 Clone this repository into the directory
+
 ```
 git clone git@github.com:arthurariza/rails-new.git .
 ```
 
 Run the script (with Docker)
+
 ```
 bin/rails-new-docker
 ```
+
 Run the script (without Docker)
+
 ```
 bin/rails-new
 ```
@@ -35,6 +40,7 @@ This template uses the following Rails configuration options:
 ```
 
 These options configure your Rails application with:
+
 - SQLite database
 - esbuild as the JavaScript runtime
 - Vite as the JavaScript and asset bundler with Hot Module Reload

@@ -3,8 +3,8 @@ x-ruby: &ruby
     context: .
     dockerfile: ./Dockerfile.dev
     args:
-      RUBY_VERSION: '3.4.1'
-      NODE_MAJOR: '20'
+      RUBY_VERSION: "3.4.1"
+      NODE_MAJOR: "20"
   environment:
     RAILS_ENV: development
     NODE_ENV: development
@@ -38,7 +38,7 @@ services:
       vite:
         condition: service_started
     ports:
-      - '3000:3000'
+      - "3000:3000"
     env_file:
       - .env
 
@@ -65,7 +65,7 @@ services:
       bundler:
         condition: service_completed_successfully
     environment:
-      DEBUG: '*vite*'
+      DEBUG: "*vite*"
       VITE_RUBY_HOST: 0.0.0.0
       YARN_CACHE_FOLDER: /app/node_modules/.yarn-cache
     volumes:
@@ -76,7 +76,7 @@ services:
       - vite_test:/app/public/vite-test
     ports:
       - "3036:3036"
-  
+
 volumes:
   bundle:
   node_modules:
@@ -84,4 +84,3 @@ volumes:
   rails_cache:
   vite_dev:
   vite_test:
-  
