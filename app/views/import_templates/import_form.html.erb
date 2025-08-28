@@ -66,7 +66,10 @@
                       class: "space-y-6" do |form| %>
           
           <!-- File Upload Area -->
-          <div id="upload-area" class="relative border-2 border-dashed border-gray-300 rounded-xl p-16 text-center hover:border-blue-400 hover:bg-blue-50 transition-all duration-200 cursor-pointer group">
+          <div id="upload-area" 
+               data-controller="file-upload"
+               data-action="click->file-upload#clickToUpload dragover->file-upload#dragOver dragleave->file-upload#dragLeave drop->file-upload#drop"
+               class="relative border-2 border-dashed border-gray-300 rounded-xl p-16 text-center hover:border-blue-400 hover:bg-blue-50 transition-all duration-200 cursor-pointer group">
             <div class="space-y-6">
               <div class="mx-auto h-16 w-16 bg-gray-100 rounded-full flex items-center justify-center group-hover:bg-blue-100 transition-colors">
                 <svg class="h-8 w-8 text-gray-400 group-hover:text-blue-500" stroke="currentColor" fill="none" viewBox="0 0 48 48">
@@ -90,9 +93,14 @@
                   required: true,
                   class: "absolute inset-0 w-full h-full opacity-0 cursor-pointer",
                   id: "excel_file_input",
-                  onchange: "updateFileName(this)" %>
+                  data: { 
+                    file_upload_target: "fileInput",
+                    action: "change->file-upload#updateFileName"
+                  } %>
               
-              <div id="file-name" class="text-sm font-medium text-green-600 hidden mt-4 p-3 bg-green-50 rounded-lg border border-green-200"></div>
+              <div id="file-name" 
+                   data-file-upload-target="fileName"
+                   class="text-sm font-medium text-green-600 hidden mt-4 p-3 bg-green-50 rounded-lg border border-green-200"></div>
             </div>
           </div>
 
@@ -182,70 +190,3 @@
   </div>
 </div>
 
-<!-- JavaScript for enhanced file upload UI -->
-<script>
-function updateFileName(input) {
-  const fileNameDiv = document.getElementById('file-name');
-  const uploadArea = document.getElementById('upload-area');
-  
-  if (input.files && input.files[0]) {
-    const file = input.files[0];
-    const fileSize = (file.size / (1024 * 1024)).toFixed(2); // MB
-    
-    fileNameDiv.innerHTML = `
-      <div class="flex items-center gap-2">
-        <svg class="h-5 w-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-        </svg>
-        <span><strong>${file.name}</strong> (${fileSize} MB)</span>
-      </div>
-    `;
-    fileNameDiv.classList.remove('hidden');
-    
-    // Update upload area appearance
-    uploadArea.classList.add('border-green-300', 'bg-green-50');
-    uploadArea.classList.remove('border-gray-300', 'hover:border-blue-400', 'hover:bg-blue-50');
-  } else {
-    fileNameDiv.classList.add('hidden');
-    uploadArea.classList.remove('border-green-300', 'bg-green-50');
-    uploadArea.classList.add('border-gray-300', 'hover:border-blue-400', 'hover:bg-blue-50');
-  }
-}
-
-// Enhanced drag and drop functionality
-document.addEventListener('DOMContentLoaded', function() {
-  const uploadArea = document.getElementById('upload-area');
-  const fileInput = document.getElementById('excel_file_input');
-  
-  if (uploadArea && fileInput) {
-    // Drag and drop events
-    uploadArea.addEventListener('dragover', function(e) {
-      e.preventDefault();
-      uploadArea.classList.add('border-blue-500', 'bg-blue-100');
-    });
-    
-    uploadArea.addEventListener('dragleave', function(e) {
-      e.preventDefault();
-      uploadArea.classList.remove('border-blue-500', 'bg-blue-100');
-    });
-    
-    uploadArea.addEventListener('drop', function(e) {
-      e.preventDefault();
-      uploadArea.classList.remove('border-blue-500', 'bg-blue-100');
-      
-      const files = e.dataTransfer.files;
-      if (files.length > 0) {
-        fileInput.files = files;
-        updateFileName(fileInput);
-      }
-    });
-    
-    // Click to upload
-    uploadArea.addEventListener('click', function(e) {
-      if (e.target.tagName !== 'BUTTON') {
-        fileInput.click();
-      }
-    });
-  }
-});
-</script>
