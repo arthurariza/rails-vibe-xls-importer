@@ -1,6 +1,6 @@
 class DataRecord < ApplicationRecord
   belongs_to :import_template
-  
+
   validates :import_template, presence: true
   validate :at_least_one_column_has_data
 
@@ -9,7 +9,7 @@ class DataRecord < ApplicationRecord
     send("column_#{column_number}")
   end
 
-  # Set value for a specific column  
+  # Set value for a specific column
   def set_column_value(column_number, value)
     send("column_#{column_number}=", value)
   end
@@ -22,12 +22,12 @@ class DataRecord < ApplicationRecord
   # Get column values as hash with template headers as keys
   def data_hash
     return {} unless import_template.present?
-    
+
     result = {}
     (1..5).each do |i|
       column_def = import_template.column_definition(i)
       next unless column_def.present?
-      
+
       header = column_def["name"]
       value = column_value(i)
       result[header] = value if value.present?
@@ -38,8 +38,8 @@ class DataRecord < ApplicationRecord
   private
 
   def at_least_one_column_has_data
-    if column_values.all?(&:blank?)
-      errors.add(:base, "At least one column must have data")
-    end
+    return unless column_values.all?(&:blank?)
+
+    errors.add(:base, "At least one column must have data")
   end
 end

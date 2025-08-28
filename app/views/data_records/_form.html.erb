@@ -1,0 +1,90 @@
+<%= form_with(model: [@import_template, data_record], local: true) do |form| %>
+  <% if data_record.errors.any? %>
+    <div class="bg-red-50 border border-red-200 rounded-md p-4 mb-6">
+      <h3 class="text-sm font-medium text-red-800">
+        <%= pluralize(data_record.errors.count, "error") %> prohibited this record from being saved:
+      </h3>
+      <ul class="mt-2 text-sm text-red-700 list-disc pl-5">
+        <% data_record.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="space-y-6">
+    <!-- Template Information -->
+    <div class="bg-gray-50 rounded-lg p-4 mb-6">
+      <h3 class="text-lg font-medium text-gray-900 mb-2">Template: <%= @import_template.name %></h3>
+      <p class="text-sm text-gray-600"><%= @import_template.description %></p>
+    </div>
+
+    <!-- Dynamic Form Fields -->
+    <div class="space-y-4">
+      <h3 class="text-lg font-medium text-gray-900">Record Data</h3>
+      
+      <% (1..5).each do |i| %>
+        <% column_def = @import_template.column_definition(i) %>
+        <% if column_def.present? %>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              <%= column_def["name"] %>
+              <span class="text-gray-500 text-xs">(<%= column_def["data_type"]&.capitalize %>)</span>
+            </label>
+            
+            <% case column_def["data_type"] %>
+            <% when "string" %>
+              <%= form.text_field "column_#{i}".to_sym, 
+                  class: "block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500",
+                  placeholder: "Enter #{column_def['name'].downcase}" %>
+            <% when "number" %>
+              <%= form.number_field "column_#{i}".to_sym, 
+                  class: "block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500",
+                  step: :any,
+                  placeholder: "Enter #{column_def['name'].downcase}" %>
+            <% when "date" %>
+              <%= form.date_field "column_#{i}".to_sym, 
+                  class: "block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" %>
+            <% when "boolean" %>
+              <div class="flex items-center space-x-3 mt-1">
+                <label class="flex items-center">
+                  <%= form.radio_button "column_#{i}".to_sym, "true", class: "focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300" %>
+                  <span class="ml-2 text-sm text-gray-700">Yes</span>
+                </label>
+                <label class="flex items-center">
+                  <%= form.radio_button "column_#{i}".to_sym, "false", class: "focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300" %>
+                  <span class="ml-2 text-sm text-gray-700">No</span>
+                </label>
+                <label class="flex items-center">
+                  <%= form.radio_button "column_#{i}".to_sym, "", checked: data_record.send("column_#{i}").blank?, class: "focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300" %>
+                  <span class="ml-2 text-sm text-gray-700">Not set</span>
+                </label>
+              </div>
+            <% else %>
+              <%= form.text_area "column_#{i}".to_sym, 
+                  rows: 3,
+                  class: "block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500",
+                  placeholder: "Enter #{column_def['name'].downcase}" %>
+            <% end %>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+
+    <!-- Import Batch ID (optional) -->
+    <div>
+      <%= form.label :import_batch_id, class: "block text-sm font-medium text-gray-700" %>
+      <%= form.text_field :import_batch_id, 
+          class: "mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500",
+          placeholder: "Optional batch identifier" %>
+      <p class="mt-1 text-sm text-gray-500">Use this to group related records together</p>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="flex justify-end space-x-3 pt-6 border-t border-gray-200">
+      <%= link_to "Cancel", import_template_data_records_path(@import_template), 
+          class: "bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded" %>
+      <%= form.submit class: "bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" %>
+    </div>
+  </div>
+<% end %>

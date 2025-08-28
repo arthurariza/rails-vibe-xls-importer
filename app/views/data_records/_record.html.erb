@@ -1,0 +1,26 @@
+<tr class="hover:bg-gray-50">
+  <% (1..5).each do |i| %>
+    <% if import_template.column_definition(i).present? %>
+      <td class="px-6 py-4 text-sm text-gray-900">
+        <div class="max-w-xs truncate">
+          <%= record.column_value(i) || "-" %>
+        </div>
+      </td>
+    <% end %>
+  <% end %>
+  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+    <%= record.created_at.strftime("%m/%d/%Y") %>
+  </td>
+  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+    <div class="flex space-x-2">
+      <%= link_to "View", [import_template, record], 
+          class: "text-blue-600 hover:text-blue-900" %>
+      <%= link_to "Edit", edit_import_template_data_record_path(import_template, record), 
+          class: "text-green-600 hover:text-green-900" %>
+      <%= link_to "Delete", [import_template, record], 
+          method: :delete, 
+          confirm: "Are you sure you want to delete this record?",
+          class: "text-red-600 hover:text-red-900" %>
+    </div>
+  </td>
+</tr>

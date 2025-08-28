@@ -68,8 +68,8 @@ group :development, :test do
 end
 
 # Excel file handling
-gem "roo"
 gem "caxlsx"
+gem "roo"
 
 group :development do
   gem "rubocop", require: false

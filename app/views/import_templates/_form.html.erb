@@ -1,0 +1,64 @@
+<%= form_with(model: import_template, local: true) do |form| %>
+  <% if import_template.errors.any? %>
+    <div class="bg-red-50 border border-red-200 rounded-md p-4 mb-6">
+      <h3 class="text-sm font-medium text-red-800">
+        <%= pluralize(import_template.errors.count, "error") %> prohibited this template from being saved:
+      </h3>
+      <ul class="mt-2 text-sm text-red-700 list-disc pl-5">
+        <% import_template.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="space-y-6">
+    <div>
+      <%= form.label :name, class: "block text-sm font-medium text-gray-700" %>
+      <%= form.text_field :name, class: "mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" %>
+    </div>
+
+    <div>
+      <%= form.label :description, class: "block text-sm font-medium text-gray-700" %>
+      <%= form.text_area :description, rows: 3, class: "mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" %>
+    </div>
+
+    <div>
+      <h3 class="text-lg font-medium text-gray-900 mb-4">Column Configuration</h3>
+      <div class="space-y-4">
+        <% (1..5).each do |i| %>
+          <div class="border border-gray-200 rounded-lg p-4">
+            <h4 class="font-medium text-gray-900 mb-3">Column <%= i %></h4>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                <input type="text" 
+                       name="import_template[column_definitions][column_<%= i %>][name]" 
+                       value="<%= import_template.column_definition(i)&.dig('name') %>"
+                       class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Data Type</label>
+                <select name="import_template[column_definitions][column_<%= i %>][data_type]" 
+                        class="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                  <option value="">Select type...</option>
+                  <% %w[string number date boolean].each do |type| %>
+                    <option value="<%= type %>" 
+                            <%= 'selected' if import_template.column_definition(i)&.dig('data_type') == type %>>
+                      <%= type.capitalize %>
+                    </option>
+                  <% end %>
+                </select>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="flex justify-end space-x-3">
+      <%= link_to "Cancel", import_templates_path, class: "bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded" %>
+      <%= form.submit class: "bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" %>
+    </div>
+  </div>
+<% end %>
