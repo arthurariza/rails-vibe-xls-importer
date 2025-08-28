@@ -59,3 +59,8 @@ end
 gem "vite_rails"
 gem "pundit"
 gem "pagy"
+
+group :development, :test do
+  gem "bullet"
+  gem "dotenv-rails"
+end
