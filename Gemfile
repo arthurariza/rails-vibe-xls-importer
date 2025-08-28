@@ -69,7 +69,7 @@ end
 
 # Excel file handling
 gem "roo"
-gem "axlsx"
+gem "caxlsx"
 
 group :development do
   gem "rubocop", require: false

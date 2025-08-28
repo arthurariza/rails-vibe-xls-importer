@@ -1,0 +1,19 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  import_template: one
+  column_1: MyText
+  column_2: MyText
+  column_3: MyText
+  column_4: MyText
+  column_5: MyText
+  import_batch_id: MyString
+
+two:
+  import_template: two
+  column_1: MyText
+  column_2: MyText
+  column_3: MyText
+  column_4: MyText
+  column_5: MyText
+  import_batch_id: MyString
