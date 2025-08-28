@@ -64,3 +64,12 @@ group :development, :test do
   gem "bullet"
   gem "dotenv-rails"
 end
+
+group :development do
+  gem "rubocop", require: false
+  gem "rubocop-capybara", require: false
+  gem "rubocop-minitest", require: false
+  gem "rubocop-performance", require: false
+  gem "rubocop-rails", require: false
+  gem "rubocop-thread_safety", require: false
+end
