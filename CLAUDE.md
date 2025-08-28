@@ -69,4 +69,4 @@ The app uses a dual build system:
 ## Plan Mode
 - **Every time** you formulate a plan you should add a step 0 to create a product requirement file under the folder @context/prds/
 - You should create the PRD for every feature we are planning
-- Each prd should come prefixed with a number so we can keep the order we built things EX: 1-gems.md 2-models.md
+- Each prd should come prefixed with a number-prd so we can keep the order we built things EX: 1-prd-gems.md 2-prd-models.md
