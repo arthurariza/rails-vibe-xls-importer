@@ -1,0 +1,112 @@
+---
+resource: turbo
+base_url: https://raw.githubusercontent.com/hotwired/turbo-site/refs/heads/main/_source
+description: Turbo Hotwire framework documentation
+version: latest
+files:
+  handbook/01_introduction.md:
+    hash: 46d96b32c4a54897a3c2940ebef8b5772c0f334ccb849bce4922f896ebcdb76d
+    size: 12361
+    downloaded_at: '2025-08-27 14:19:15 -0300'
+    title: Introduction
+    description: Turbo bundles several techniques for creating fast, modern, progressively
+      enhanced web applications without using much JavaScript. It offers a simpler
+      alternative to the prevailing client-side...
+  handbook/02_drive.md:
+    hash: 9dfcf80b57f2a1b615d79482138cf1494212c7bf42f400aef00e2aa6451324aa
+    size: 24116
+    downloaded_at: '2025-08-27 14:19:15 -0300'
+    title: Navigate with Turbo Drive
+    description: Turbo Drive is the part of Turbo that enhances page-level navigation.
+      It watches for link clicks and form submissions, performs them in the background,
+      and updates the page without doing a full...
+  handbook/03_page_refreshes.md:
+    hash: d1c939254568906309aa6cca1a4b5af2c89e6dae1de53f8f5c51df1c1118c97c
+    size: 3286
+    downloaded_at: '2025-08-27 14:19:15 -0300'
+    title: Smooth page refreshes with morphing
+    description: "[Turbo Drive](/handbook/drive.html) makes navigation faster by avoiding
+      full-page reloads. But there is a scenario where Turbo can raise the fidelity
+      bar further: loading the current page again (page..."
+  handbook/04_frames.md:
+    hash: 9d6c859fd39db53ea89d0b8be2f2393319810974f40c288d701baa2ccde5bff1
+    size: 15164
+    downloaded_at: '2025-08-27 14:19:16 -0300'
+    title: Decompose with Turbo Frames
+    description: Turbo Frames allow predefined parts of a page to be updated on request.
+      Any links and forms inside a frame are captured, and the frame contents automatically
+      update after receiving a response....
+  handbook/05_streams.md:
+    hash: 8cb35fb33f962db5d800cae610e0ed6d59b6b353ea4a27c0526b9d621c0f2b4b
+    size: 14531
+    downloaded_at: '2025-08-27 14:19:16 -0300'
+    title: Come Alive with Turbo Streams
+    description: Turbo Streams deliver page changes as fragments of HTML wrapped in
+      `<turbo-stream>` elements. Each stream element specifies an action together
+      with a target ID to declare what should happen to the...
+  handbook/06_native.md:
+    hash: '059d43ff7331e2894516a82600046560f441fa3e89bc2498bb0c6052e79b8ff5'
+    size: 1200
+    downloaded_at: '2025-08-27 14:19:17 -0300'
+    title: Go Native on iOS & Android
+    description: Hotwire Native for iOS provides the tooling to wrap your Turbo-enabled
+      web app in a native iOS shell. It manages a single WKWebView instance across
+      multiple view controllers, giving you native...
+  handbook/07_building.md:
+    hash: 33e532ba5e874477bb03ed8b41f68d776f70729655eea50c322569ac0131ca33
+    size: 12243
+    downloaded_at: '2025-08-27 14:19:17 -0300'
+    title: Building Your Turbo Application
+    description: Turbo is fast because it prevents the whole page from reloading when
+      you follow a link or submit a form. Your application becomes a persistent, long-running
+      process in the browser. This requires you...
+  handbook/08_installing.md:
+    hash: 02dad4287461ed35898baffdc3a5ac761096d7cf305092923392e42d075d069d
+    size: 1590
+    downloaded_at: '2025-08-27 14:19:17 -0300'
+    title: Installing Turbo in Your Application
+    description: 'Turbo can either be referenced in compiled form via the Turbo distributable
+      script directly in the `<head>` of your application or through npm via a bundler
+      like esbuild. ## In Compiled Form You can...'
+  reference/attributes.md:
+    hash: bc31203ffdcd25e0b4ebfff6049193ddaeba15acc40ca4ad57ae91b6d05c3eb5
+    size: 5585
+    downloaded_at: '2025-08-27 14:19:18 -0300'
+    title: Attributes and Meta Tags
+    description: '## Data Attributes The following data attributes can be applied
+      to elements to customize Turbo''s behaviour. * `data-turbo="false"` disables
+      Turbo Drive on links and forms including descendants. To...'
+  reference/drive.md:
+    hash: ebab6aca906fc7cecc00186a6be58e9b8e5fc3e86861e0a5131cc3ae59d8bebc
+    size: 9231
+    downloaded_at: '2025-08-27 14:19:18 -0300'
+    title: Drive
+    description: "## Turbo.visit ```js Turbo.visit(location) Turbo.visit(location,
+      { action: action }) Turbo.visit(location, { frame: frame }) ``` Performs an
+      [Application Visit][] to the given _location_ (a string..."
+  reference/events.md:
+    hash: 7204496b11e84756b2d197767f5340ff2e5a854f8cca06afb1e2790a98c9f21f
+    size: 15817
+    downloaded_at: '2025-08-27 14:19:18 -0300'
+    title: Events
+    description: 'Turbo emits a variety of [Custom Events][] types, dispatched from
+      the following sources: * [Document](#document) * [Page Refreshes](#page-refreshes)
+      * [Forms](#forms) * [Frames](#frames) *...'
+  reference/frames.md:
+    hash: 8e4d4dbdaafd91bf68c4d3f04bc827cd7d08e9f9c8d953c53cea1dea905c59a4
+    size: 6300
+    downloaded_at: '2025-08-27 14:19:19 -0300'
+    title: Frames
+    description: '## Basic frame Confines all navigation within the frame by expecting
+      any followed link or form submission to return a response including a matching
+      frame tag: ```html <turbo-frame id="messages"> <a...'
+  reference/streams.md:
+    hash: cf843aa20b48f95a3dc40180a28a19078f9976f963bd91928f5336eafbeb1dc4
+    size: 5104
+    downloaded_at: '2025-08-27 14:19:19 -0300'
+    title: Streams
+    description: '## The eight actions ### Append Appends the content within the template
+      tag to the container designated by the target dom id. ```html <turbo-stream
+      action="append" target="dom_id"> <template> Content...'
+created_at: '2025-08-27 14:19:14 -0300'
+updated_at: '2025-08-27 14:19:19 -0300'

@@ -1,0 +1,441 @@
+---
+resource: rails
+base_url: https://raw.githubusercontent.com/rails/rails/v8.0.2/guides/source
+description: Official Ruby on Rails documentation guides
+version: 8.0.2
+files:
+  getting_started.md:
+    hash: 4f610ed4c5a64ad73f7ad0fefc1ae7c00fd7b2dfdfe4384a64149b7a1fd41ba9
+    size: 93376
+    downloaded_at: '2025-08-27 14:18:07 -0300'
+    title: "..."
+    description: "**DO NOT READ THIS FILE ON GITHUB, GUIDES ARE PUBLISHED ON https://guides.rubyonrails.org.**
+      This guide covers getting up and running with Ruby on Rails. After reading this
+      guide, you will know: * How..."
+  install_ruby_on_rails.md:
+    hash: 8cc1653938a1a7c97f39083b267d186d877345fc73fb85b225d8e88c7f49895d
+    size: 4319
+    downloaded_at: '2025-08-27 14:18:07 -0300'
+    title: Install Xcode Command Line Tools
+    description: "**DO NOT READ THIS FILE ON GITHUB, GUIDES ARE PUBLISHED ON https://guides.rubyonrails.org.**
+      This guide will walk you through installing the Ruby programming language and
+      the Rails framework on your..."
+  getting_started_with_devcontainer.md:
+    hash: fd5703da23a6894f5d04828b840b97b8d8858640b0e1c67272b70dd68dc5c41c
+    size: 5683
+    downloaded_at: '2025-08-27 14:18:07 -0300'
+    title: Getting Started with Dev Containers
+    description: "**DO NOT READ THIS FILE ON GITHUB, GUIDES ARE PUBLISHED ON https://guides.rubyonrails.org.**
+      After reading this guide, you will know: * How to create a new Rails application
+      with the `rails-new` tool...."
+  active_record_basics.md:
+    hash: f35e60da1c86e3aa370d466fdd1dff16576169c14f370abe81714f0b32b7abb4
+    size: 24782
+    downloaded_at: '2025-08-27 14:18:08 -0300'
+    title: 'Note:'
+    description: "**DO NOT READ THIS FILE ON GITHUB, GUIDES ARE PUBLISHED ON https://guides.rubyonrails.org.**
+      This guide is an introduction to Active Record. After reading this guide, you
+      will know: * How Active..."
+  active_record_migrations.md:
+    hash: cf33123a5d8e0423fa806a82aa216ef24905e418e50e4e437ceb3bf8c95af509
+    size: 63884
+    downloaded_at: '2025-08-27 14:18:08 -0300'
+    title: db/migrate/20240502100843_create_products.rb
+    description: "**DO NOT READ THIS FILE ON GITHUB, GUIDES ARE PUBLISHED ON https://guides.rubyonrails.org.**
+      Migrations are a feature of Active Record that allows you to evolve your database
+      schema over time. Rather..."
+  active_record_validations.md:
+    hash: 2168d456fef9dff304cdf699ec5540e601d066d04f5a3077c5367cf543131cbd
+    size: 66474
+    downloaded_at: '2025-08-27 14:18:08 -0300'
+    title: Value _must_ be true or false
+    description: "**DO NOT READ THIS FILE ON GITHUB, GUIDES ARE PUBLISHED ON https://guides.rubyonrails.org.**
+      This guide teaches you how to validate Active Record objects before saving them
+      to the database using..."
+  active_record_callbacks.md:
+    hash: 513aa8106c86ed8307caaed4805d5ea28dc6f64898e7892b6de69de6dae3c7a1
+    size: 43389
+    downloaded_at: '2025-08-27 14:18:09 -0300'
+    title: ":on takes an array as well"
+    description: "**DO NOT READ THIS FILE ON GITHUB, GUIDES ARE PUBLISHED ON https://guides.rubyonrails.org.**
+      This guide teaches you how to hook into the life cycle of your Active Record
+      objects. After reading this..."
+  active_record_querying.md:
+    hash: 9040fb2940df27649612523e6495304f12e3342d11044bd71d7acbf78587de02
+    size: 92705
+    downloaded_at: '2025-08-27 14:18:09 -0300'
+    title: Find the customer with primary key (id) 10.
+    description: "**DO NOT READ THIS FILE ON GITHUB, GUIDES ARE PUBLISHED ON https://guides.rubyonrails.org.**
+      This guide covers different ways to retrieve data from the database using Active
+      Record. After reading this..."
+  active_record_encryption.md:
+    hash: 28ed715cb7b59b6d8585037689dc4bdbc9d6e1778717b61a5022f9f0031018d3
+    size: 27942
+    downloaded_at: '2025-08-27 14:18:09 -0300'
+    title: CORRECT
+    description: "**DO NOT READ THIS FILE ON GITHUB, GUIDES ARE PUBLISHED ON https://guides.rubyonrails.org.**
+      This guide covers encrypting your database information using Active Record.
+      After reading this guide, you..."
+  active_record_multiple_databases.md:
+    hash: 29e6a8a2abf21791bc26dc1e283c73d05c86afc37249a4c2899156e30cd7ca2d
+    size: 25157
+    downloaded_at: '2025-08-27 14:18:10 -0300'
+    title: Talks automatically to the animals database.
+    description: "**DO NOT READ THIS FILE ON GITHUB, GUIDES ARE PUBLISHED ON https://guides.rubyonrails.org.**
+      This guide covers using multiple databases with your Rails application. After
+      reading this guide you will..."
+  active_record_postgresql.md:
+    hash: 4640bf723a3b78025b2d1f3a575a54a9ee4d5fa32a0bf02fe77750419c3a3f1e
+    size: 22662
+    downloaded_at: '2025-08-27 14:18:10 -0300'
+    title: db/migrate/20140207133952_create_documents.rb
+    description: "**DO NOT READ THIS FILE ON GITHUB, GUIDES ARE PUBLISHED ON https://guides.rubyonrails.org.**
+      This guide covers PostgreSQL specific usage of Active Record. After reading
+      this guide, you will know: *..."
+  active_record_composite_primary_keys.md:
+    hash: '053409c932073cf5b34084ffc9f7e41b71ce7d3bbd2052096d28628bc62ac44d'
+    size: 9951
+    downloaded_at: '2025-08-27 14:18:11 -0300'
+    title: Find the product with store_id 3 and sku "XYZ12345"
+    description: "**DO NOT READ THIS FILE ON GITHUB, GUIDES ARE PUBLISHED ON https://guides.rubyonrails.org.**
+      This guide is an introduction to composite primary keys for database tables.
+      After reading this guide you..."
+  association_basics.md:
+    hash: e436402f75d90031cec7dafd5b4bcf781ac3e4d9f43709a8200d3834adad75d4
+    size: 106666
+    downloaded_at: '2025-08-27 14:18:11 -0300'
+    title: "..."
+    description: "**DO NOT READ THIS FILE ON GITHUB, GUIDES ARE PUBLISHED ON https://guides.rubyonrails.org.**
+      This guide covers the association features of Active Record. After reading this
+      guide, you will know how..."
+  action_controller_overview.md:
+    hash: c26cef09957d8841a425646f423137008c239c83b08f148d8fcf49038c63851a
+    size: 50458
+    downloaded_at: '2025-08-27 14:18:11 -0300'
+    title: This action receives query string parameters from an HTTP GET request
+    description: "**DO NOT READ THIS FILE ON GITHUB, GUIDES ARE PUBLISHED ON https://guides.rubyonrails.org.**
+      In this guide, you will learn how controllers work and how they fit into the
+      request cycle in your..."
+  action_controller_advanced_topics.md:
+    hash: d6eaa11b9251957bccc3ccfd86e72f27fc731f1e4a9265f66327e0536c806f7b
+    size: 25569
+    downloaded_at: '2025-08-27 14:18:12 -0300'
+    title: 'Only allow modern browsers supporting webp images, web push, badges, import
+      # maps, CSS nesting, and CSS :has.'
+    description: "**DO NOT READ THIS FILE ON GITHUB, GUIDES ARE PUBLISHED ON https://guides.rubyonrails.org.**
+      In this guide, you will learn about some advanced topics related to controllers.
+      After reading this guide,..."
+  action_view_overview.md:
+    hash: 00e46993c61d75b568cb7e1ac3312ba0e287649b50d16ee952ded3bf53dda9e2
+    size: 28641
+    downloaded_at: '2025-08-27 14:18:12 -0300'
+    title: "<h1>A widget</h1>"
+    description: "**DO NOT READ THIS FILE ON GITHUB, GUIDES ARE PUBLISHED ON https://guides.rubyonrails.org.**
+      After reading this guide, you will know: * What Action View is and how to use
+      it with Rails. * How best to..."
+  action_view_helpers.md:
+    hash: 53a2aff2673fbd8234d5c0a37243a8150af242e8c897b3213d07c66b41cf1ad6
+    size: 31766
+    downloaded_at: '2025-08-27 14:18:13 -0300'
+    title: "=> less than a minute"
+    description: "**DO NOT READ THIS FILE ON GITHUB, GUIDES ARE PUBLISHED ON https://guides.rubyonrails.org.**
+      After reading this guide, you will know: * How to format dates, strings, and
+      numbers. * How to work with..."
+  layouts_and_rendering.md:
+    hash: ede7d174e4661741a9a265e1b076131cfe02de893b3444476793fcc295678620
+    size: 54602
+    downloaded_at: '2025-08-27 14:18:13 -0300'
+    title: => "Hello World"
+    description: "**DO NOT READ THIS FILE ON GITHUB, GUIDES ARE PUBLISHED ON https://guides.rubyonrails.org.**
+      This guide covers the basic layout features of Action Controller and Action
+      View. After reading this guide,..."
+  form_helpers.md:
+    hash: 0a9e91e7e24d55e83808d6fb571078bf91805513e52e41aa9bb63ec38118d3f7
+    size: 55398
+    downloaded_at: '2025-08-27 14:18:13 -0300'
+    title: "=> #<Book id: nil, title: nil, author: nil>"
+    description: "**DO NOT READ THIS FILE ON GITHUB, GUIDES ARE PUBLISHED ON https://guides.rubyonrails.org.**
+      Forms are a common interface for user input in web applications. However, form
+      markup can be tedious to..."
+  routing.md:
+    hash: 82d11905da748d8ee8a31fa1e81725532e4adad53906460d0ee62d23c3abbdbc
+    size: 66526
+    downloaded_at: '2025-08-27 14:18:14 -0300'
+    title: "...Same as the example above"
+    description: "**DO NOT READ THIS FILE ON GITHUB, GUIDES ARE PUBLISHED ON https://guides.rubyonrails.org.**
+      This guide covers the user-facing features of Rails routing. After reading this
+      guide, you will know: * How..."
+  action_mailer_basics.md:
+    hash: 4c8bd49e1e150e2037084b0e413efbcdfb4d939190c9a85607fcddcd91ed9bb5
+    size: 36870
+    downloaded_at: '2025-08-27 14:18:14 -0300'
+    title: app/mailers/user_mailer.rb
+    description: "**DO NOT READ THIS FILE ON GITHUB, GUIDES ARE PUBLISHED ON https://guides.rubyonrails.org.**
+      This guide covers sending emails from your Rails application. After reading
+      this guide, you will know: *..."
+  action_cable_overview.md:
+    hash: 566329da36098171e9b21e063c0bd6b3438b2e147e9f2ee34b5fbd1f6263f143
+    size: 33258
+    downloaded_at: '2025-08-27 14:18:15 -0300'
+    title: app/channels/application_cable/connection.rb
+    description: "**DO NOT READ THIS FILE ON GITHUB, GUIDES ARE PUBLISHED ON https://guides.rubyonrails.org.**
+      In this guide, you will learn how Action Cable works and how to use WebSockets
+      to incorporate real-time..."
+  action_text_overview.md:
+    hash: 3696095003c4f0a6360b50cc82b4735f0115b08a96d9c7aeef1878c0cd686961
+    size: 17413
+    downloaded_at: '2025-08-27 14:18:15 -0300'
+    title: app/models/article.rb
+    description: "**DO NOT READ THIS FILE ON GITHUB, GUIDES ARE PUBLISHED ON https://guides.rubyonrails.org.**
+      This guide provides you with all you need to get started in handling rich text
+      content. After reading this..."
+  action_mailbox_basics.md:
+    hash: 0b9d9b2a90f34e19e8ed2cb43da71c4a6fcf7c325f2932142819d0d3e739e5ee
+    size: 18818
+    downloaded_at: '2025-08-27 14:18:15 -0300'
+    title: config/environments/production.rb
+    description: "**DO NOT READ THIS FILE ON GITHUB, GUIDES ARE PUBLISHED ON https://guides.rubyonrails.org.**
+      This guide provides you with all you need to get started in receiving emails
+      to your application. After..."
+  active_job_basics.md:
+    hash: c6ff755c57150a555fd21e4f068e42bd4d7671982a2da6ada9d6d7e3b3a43f17
+    size: 35996
+    downloaded_at: '2025-08-27 14:18:16 -0300'
+    title: Do something later
+    description: "**DO NOT READ THIS FILE ON GITHUB, GUIDES ARE PUBLISHED ON https://guides.rubyonrails.org.**
+      This guide provides you with all you need to get started in creating, enqueuing
+      and executing background..."
+  active_storage_overview.md:
+    hash: 42aa6da42653866b77cb50125375a4ef2ccfbca3db7414271c6ebf901d0c490c
+    size: 59303
+    downloaded_at: '2025-08-27 14:18:16 -0300'
+    title: Use bin/rails credentials:edit to set the AWS secrets (as aws:access_key_id|secret_access_key)
+    description: "**DO NOT READ THIS FILE ON GITHUB, GUIDES ARE PUBLISHED ON https://guides.rubyonrails.org.**
+      This guide covers how to attach files to your Active Record models. After reading
+      this guide, you will..."
+  active_support_core_extensions.md:
+    hash: 7725e1f06bc3fd15acd363d391b26abb4f85d5b0aa4969faa02a929bf982f4d8
+    size: 145156
+    downloaded_at: '2025-08-27 14:18:16 -0300'
+    title: "..."
+    description: "**DO NOT READ THIS FILE ON GITHUB, GUIDES ARE PUBLISHED ON https://guides.rubyonrails.org.**
+      Active Support is the Ruby on Rails component responsible for providing Ruby
+      language extensions and..."
+  active_support_instrumentation.md:
+    hash: b9fdeac8781e6b94a42be3a48c5aceb0aa810ee85a32bb07b48612e4b4934024
+    size: 35585
+    downloaded_at: '2025-08-27 14:18:17 -0300'
+    title: your own custom stuff
+    description: "**DO NOT READ THIS FILE ON GITHUB, GUIDES ARE PUBLISHED ON https://guides.rubyonrails.org.**
+      Active Support is a part of core Rails that provides Ruby language extensions,
+      utilities, and other things...."
+  active_model_basics.md:
+    hash: 1861bae2635ba1b97738889687dac7f601d5adab1534a396e39e089e76c21bfe
+    size: 43702
+    downloaded_at: '2025-08-27 14:18:17 -0300'
+    title: Deliver email
+    description: "**DO NOT READ THIS FILE ON GITHUB, GUIDES ARE PUBLISHED ON https://guides.rubyonrails.org.**
+      This guide will provide you with what you need to get started using Active Model.
+      Active Model provides a..."
+  configuring.md:
+    hash: 05adb419a58432671c694c85b1131c2892f6fb87d5228e774c0c4f3ea3313ad2
+    size: 186613
+    downloaded_at: '2025-08-27 14:18:18 -0300'
+    title: Code that does something with Rails.application.routes
+    description: "**DO NOT READ THIS FILE ON GITHUB, GUIDES ARE PUBLISHED ON https://guides.rubyonrails.org.**
+      This guide covers the configuration and initialization features available to
+      Rails applications. After..."
+  command_line.md:
+    hash: d76c44d5dec6742f0eaa45f430a25965522133207229f55521f389779c885d63
+    size: 27280
+    downloaded_at: '2025-08-27 14:18:18 -0300'
+    title: PostgreSQL. Versions 9.3 and up are supported.
+    description: "**DO NOT READ THIS FILE ON GITHUB, GUIDES ARE PUBLISHED ON https://guides.rubyonrails.org.**
+      After reading this guide, you will know: * How to create a Rails application.
+      * How to generate models,..."
+  asset_pipeline.md:
+    hash: 11077fa8a3a63f429690f2dc7aa5c736c5e0f52b624fde0928acc92fe64b64b1
+    size: 46108
+    downloaded_at: '2025-08-27 14:18:18 -0300'
+    title: Add additional assets to the asset load path.
+    description: "**DO NOT READ THIS FILE ON GITHUB, GUIDES ARE PUBLISHED ON https://guides.rubyonrails.org.**
+      This guide explains how to handle essential asset management tasks. After reading
+      this guide, you will..."
+  working_with_javascript_in_rails.md:
+    hash: 06bd5e3ce24257086aaa4cda5af5043b3b07bb6991361b27e36e18a9cb111b62
+    size: 13234
+    downloaded_at: '2025-08-27 14:18:19 -0300'
+    title: Working with JavaScript in Rails
+    description: "**DO NOT READ THIS FILE ON GITHUB, GUIDES ARE PUBLISHED ON https://guides.rubyonrails.org.**
+      This guide covers the options for integrating JavaScript functionality into
+      your Rails application,..."
+  autoloading_and_reloading_constants.md:
+    hash: 2968e4c565d924367ee087581d15b21abbe6198aa05f253b5c24779a1742848b
+    size: 30579
+    downloaded_at: '2025-08-27 14:18:19 -0300'
+    title: DO NOT DO THIS.
+    description: "**DO NOT READ THIS FILE ON GITHUB, GUIDES ARE PUBLISHED ON https://guides.rubyonrails.org.**
+      This guide documents how autoloading and reloading works in `zeitwerk` mode.
+      After reading this guide, you..."
+  initialization.md:
+    hash: 170bc532d84b339b5c0d6403974c87135724c326b2018f8d67c494cbab6ebd52
+    size: 19610
+    downloaded_at: '2025-08-27 14:18:19 -0300'
+    title: Require application after server sets environment to propagate
+    description: "**DO NOT READ THIS FILE ON GITHUB, GUIDES ARE PUBLISHED ON https://guides.rubyonrails.org.**
+      This guide explains the internals of the initialization process in Rails. It
+      is an extremely in-depth guide..."
+  rails_on_rack.md:
+    hash: 2cf5aed1d550d97b8ba54db6f77b6d9ea5d7713305466b4777d29ee0ac6bc182
+    size: 11161
+    downloaded_at: '2025-08-27 14:18:20 -0300'
+    title: "..."
+    description: "**DO NOT READ THIS FILE ON GITHUB, GUIDES ARE PUBLISHED ON https://guides.rubyonrails.org.**
+      This guide covers Rails integration with Rack and interfacing with other Rack
+      components. After reading..."
+  engines.md:
+    hash: c5c2db2e4a2bfb3788cc9bad59c11195eb498abb41ac4707e7c040c3ad70f2fc
+    size: 49942
+    downloaded_at: '2025-08-27 14:18:20 -0300'
+    title: "..."
+    description: "**DO NOT READ THIS FILE ON GITHUB, GUIDES ARE PUBLISHED ON https://guides.rubyonrails.org.**
+      In this guide you will learn about engines and how they can be used to provide
+      additional functionality to..."
+  threading_and_code_execution.md:
+    hash: 04f96982bc6a532697afd06630d1145a1f03f6342b7a22f294ae9809e6cd6be2
+    size: 12417
+    downloaded_at: '2025-08-27 14:18:20 -0300'
+    title: call application code here
+    description: "**DO NOT READ THIS FILE ON GITHUB, GUIDES ARE PUBLISHED ON https://guides.rubyonrails.org.**
+      After reading this guide, you will know: * What code Rails will automatically
+      execute concurrently * How to..."
+  api_app.md:
+    hash: c2618b5722ec5d89f06fc9b60242f168fdc8bd658a9a7c77b20736ce1f9ccd78
+    size: 20699
+    downloaded_at: '2025-08-27 14:18:21 -0300'
+    title: app/controllers/groups_controller.rb
+    description: "**DO NOT READ THIS FILE ON GITHUB, GUIDES ARE PUBLISHED ON https://guides.rubyonrails.org.**
+      In this guide you will learn: * What Rails provides for API-only applications
+      * How to configure Rails to..."
+  generators.md:
+    hash: 246532b8a5911fc3b9e2ce45dd1af3145a667ebc643fe30396be53219aabf176
+    size: 19782
+    downloaded_at: '2025-08-27 14:18:21 -0300'
+    title: Add initialization content here
+    description: "**DO NOT READ THIS FILE ON GITHUB, GUIDES ARE PUBLISHED ON https://guides.rubyonrails.org.**
+      Rails generators are an essential tool for improving your workflow. With this
+      guide you will learn how to..."
+  plugins.md:
+    hash: 16177e9da55146ea545c19dabd280e528d5151d565e22a0c02d39ae30de1ac91
+    size: 14049
+    downloaded_at: '2025-08-27 14:18:22 -0300'
+    title: yaffle/test/core_ext_test.rb
+    description: "**DO NOT READ THIS FILE ON GITHUB, GUIDES ARE PUBLISHED ON https://guides.rubyonrails.org.**
+      A Rails plugin is either an extension or a modification of the core framework.
+      Plugins provide: * A way for..."
+  caching_with_rails.md:
+    hash: f89cef8a71445890e49301f6625d8ac10b5ec645b6b5038beabb3c23a0fa4c8e
+    size: 35916
+    downloaded_at: '2025-08-27 14:18:22 -0300'
+    title: Store a value in the cache
+    description: "**DO NOT READ THIS FILE ON GITHUB, GUIDES ARE PUBLISHED ON https://guides.rubyonrails.org.**
+      This guide is an introduction to speeding up your Rails application with caching.
+      After reading this guide,..."
+  testing.md:
+    hash: 4627835543f2e20d0a6ceb9898f0f28bb9e906c9a12eebd831b2e69dd7bc2ea3
+    size: 98488
+    downloaded_at: '2025-08-27 14:18:22 -0300'
+    title: test "the truth" do
+    description: "**DO NOT READ THIS FILE ON GITHUB, GUIDES ARE PUBLISHED ON https://guides.rubyonrails.org.**
+      This guide explores how to write tests in Rails. After reading this guide, you
+      will know: * Rails testing..."
+  debugging_rails_applications.md:
+    hash: f41f0b078be95a38db9d14b225503ec89ddbdda0e22893a722c4554a0cd60ac3
+    size: 39853
+    downloaded_at: '2025-08-27 14:18:23 -0300'
+    title: "..."
+    description: "**DO NOT READ THIS FILE ON GITHUB, GUIDES ARE PUBLISHED ON https://guides.rubyonrails.org.**
+      This guide introduces techniques for debugging Ruby on Rails applications. After
+      reading this guide, you..."
+  development_dependencies_install.md:
+    hash: 2d163299dc468149c04783bfac9133bf64e6e6a6816756e497839a0d061221e9
+    size: 8390
+    downloaded_at: '2025-08-27 14:18:23 -0300'
+    title: Install Yarn
+    description: "**DO NOT READ THIS FILE ON GITHUB, GUIDES ARE PUBLISHED ON https://guides.rubyonrails.org.**
+      This guide covers how to set up an environment for Ruby on Rails core development.
+      After reading this..."
+  error_reporting.md:
+    hash: e05d06a348a9251a1631d7f89ce4b7571a0a861a649ea5ae85a51592d5053924
+    size: 9724
+    downloaded_at: '2025-08-27 14:18:23 -0300'
+    title: config/initializers/error_subscriber.rb
+    description: "**DO NOT READ THIS FILE ON GITHUB, GUIDES ARE PUBLISHED ON https://guides.rubyonrails.org.**
+      This guide introduces ways to manage errors in a Rails application. After reading
+      this guide, you will..."
+  tuning_performance_for_deployment.md:
+    hash: 1eee484808a9d74d687bc3b4c0a192d62fea3c74f093d9168b4e69e84950390a
+    size: 14626
+    downloaded_at: '2025-08-27 14:18:24 -0300'
+    title: Tuning Performance for Deployment
+    description: "**DO NOT READ THIS FILE ON GITHUB, GUIDES ARE PUBLISHED ON https://guides.rubyonrails.org.**
+      This guide covers performance and concurrency configuration for deploying your
+      production Ruby on Rails..."
+  upgrading_ruby_on_rails.md:
+    hash: f21617c3cc4d5900feeaceb116892202c36c035ec502868511babf9242a9d83a
+    size: 114559
+    downloaded_at: '2025-08-27 14:18:24 -0300'
+    title: Print autoload paths.
+    description: "**DO NOT READ THIS FILE ON GITHUB, GUIDES ARE PUBLISHED ON https://guides.rubyonrails.org.**
+      This guide provides steps to be followed when you upgrade your applications
+      to a newer version of Ruby on..."
+  security.md:
+    hash: c0800829f6a558c51227f7dec4581058d68c629eef136fc836ec616ab1d04abd
+    size: 97982
+    downloaded_at: '2025-08-27 14:18:25 -0300'
+    title: app/views/passwords_mailer/reset.html.erb
+    description: "**DO NOT READ THIS FILE ON GITHUB, GUIDES ARE PUBLISHED ON https://guides.rubyonrails.org.**
+      This guide describes common security problems in web applications and how to
+      avoid them with Rails. After..."
+  i18n.md:
+    hash: 9fa23b7c38cbdf395441cdb65c7ca375ca0282f0d57e0cafa6cc0aab1d8b2087
+    size: 56357
+    downloaded_at: '2025-08-27 14:18:25 -0300'
+    title: config/initializers/locale.rb
+    description: "**DO NOT READ THIS FILE ON GITHUB, GUIDES ARE PUBLISHED ON https://guides.rubyonrails.org.**
+      The Ruby I18n (shorthand for _internationalization_) gem which is shipped with
+      Ruby on Rails (starting from..."
+  contributing_to_ruby_on_rails.md:
+    hash: 4d7b31b18cab1adebc515a73ff126044822cc1d18321a3f8934420ae37a6645c
+    size: 38282
+    downloaded_at: '2025-08-27 14:18:25 -0300'
+    title: Existing behavior
+    description: "**DO NOT READ THIS FILE ON GITHUB, GUIDES ARE PUBLISHED ON https://guides.rubyonrails.org.**
+      This guide covers how _you_ can become a part of the ongoing development of
+      Ruby on Rails. After reading..."
+  api_documentation_guidelines.md:
+    hash: 9cd5d57d3d4b1de71a50bf79cf657126d16c0c480e943eedd8247bbdd2f92d6c
+    size: 15125
+    downloaded_at: '2025-08-27 14:18:26 -0300'
+    title: BAD
+    description: "**DO NOT READ THIS FILE ON GITHUB, GUIDES ARE PUBLISHED ON https://guides.rubyonrails.org.**
+      This guide documents the Ruby on Rails API documentation guidelines. After reading
+      this guide, you will..."
+  ruby_on_rails_guides_guidelines.md:
+    hash: e318a67b1db487d9c1eca7f58642841f26c0ef8d9df824c81fe5730447b14cc1
+    size: 7415
+    downloaded_at: '2025-08-27 14:18:26 -0300'
+    title: BAD
+    description: "**DO NOT READ THIS FILE ON GITHUB, GUIDES ARE PUBLISHED ON https://guides.rubyonrails.org.**
+      This guide documents guidelines for writing Ruby on Rails Guides. This guide
+      follows itself in a graceful..."
+  maintenance_policy.md:
+    hash: c6dd20a0a50df69bed433471f2fee9273e270f6ce753f7a257f149111483bbfe
+    size: 4338
+    downloaded_at: '2025-08-27 14:18:27 -0300'
+    title: Maintenance Policy for Ruby on Rails
+    description: "**DO NOT READ THIS FILE ON GITHUB, GUIDES ARE PUBLISHED ON https://guides.rubyonrails.org.**
+      Support of the Rails framework is divided into three groups: New features, bug
+      fixes, and security issues...."
+created_at: '2025-08-27 14:18:06 -0300'
+updated_at: '2025-08-27 14:18:27 -0300'

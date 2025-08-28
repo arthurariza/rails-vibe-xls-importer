@@ -1,0 +1,134 @@
+---
+resource: stimulus
+base_url: https://raw.githubusercontent.com/hotwired/stimulus/refs/heads/main/docs
+description: Stimulus JavaScript framework documentation
+version: latest
+files:
+  handbook/00_the_origin_of_stimulus.md:
+    hash: 1ba3e199641be541b6dda6db9fc178b9114403c6fadf9dec645a954ff9f51a29
+    size: 9328
+    downloaded_at: '2025-08-27 14:18:59 -0300'
+    title: The Origin of Stimulus
+    description: We write a lot of JavaScript at [Basecamp](https://basecamp.com),
+      but we don’t use it to create “JavaScript applications” in the contemporary
+      sense. All our applications have server-side rendered HTML...
+  handbook/01_introduction.md:
+    hash: 5d1d2ffde2506dca869261c1101ec98e62ef59aef386b5e35de1244c3672ac7b
+    size: 2303
+    downloaded_at: '2025-08-27 14:19:00 -0300'
+    title: Introduction
+    description: '## About Stimulus Stimulus is a JavaScript framework with modest
+      ambitions. Unlike other front-end frameworks, Stimulus is designed to enhance
+      _static_ or _server-rendered_ HTML—the "HTML you already...'
+  handbook/02_hello_stimulus.md:
+    hash: 1abaae9c7a917c616e1c8f660d3a6290b42c21685cf575f3008f08d54cb1704b
+    size: 7249
+    downloaded_at: '2025-08-27 14:19:00 -0300'
+    title: Hello, Stimulus
+    description: 'The best way to learn how Stimulus works is to build a simple controller.
+      This chapter will show you how. ## Prerequisites To follow along, you''ll need
+      a running copy of the...'
+  handbook/03_building_something_real.md:
+    hash: 29ec81dac6e75de19e218b7d7cc5faa4ab91fffb5bd5148dc15ab170f0d33e19
+    size: 6855
+    downloaded_at: '2025-08-27 14:19:01 -0300'
+    title: Building Something Real
+    description: We've implemented our first controller and learned how Stimulus connects
+      HTML to JavaScript. Now let's take a look at something we can use in a real
+      application by recreating a controller from...
+  handbook/04_designing_for_resilience.md:
+    hash: fbb922e6117c645739eb7f625db54d77fb0fa5afa8a7a6d239bbcc3b5e0ebd63
+    size: 3438
+    downloaded_at: '2025-08-27 14:19:01 -0300'
+    title: Designing For Resilience
+    description: Although the clipboard API is [well-supported in current browsers](https://caniuse.com/#feat=clipboard),
+      we might still expect to have a small number of people with older browsers using
+      our...
+  handbook/05_managing_state.md:
+    hash: 3bd27f3589fc7de620bd60e1a5a07503d0216dfcb5a7ec3f2c3982125304ea60
+    size: 8807
+    downloaded_at: '2025-08-27 14:19:01 -0300'
+    title: Managing State
+    description: Most contemporary frameworks encourage you to keep state in JavaScript
+      at all times. They treat the DOM as a write-only rendering target, reconciled
+      by client-side templates consuming JSON from the...
+  handbook/06_working_with_external_resources.md:
+    hash: 5f1487c08b9f995b1de48c5c84930d15858d5ecd2f809ee73a7b116f6539e77a
+    size: 6691
+    downloaded_at: '2025-08-27 14:19:02 -0300'
+    title: Working With External Resources
+    description: In the last chapter we learned how to load and persist a controller's
+      internal state using values. Sometimes our controllers need to track the state
+      of external resources, where by _external_ we mean...
+  handbook/07_installing_stimulus.md:
+    hash: e850c10e7a84a43ae2e69f7692f4a51ed83fe90c68edfb9d8c723f4fad05d749
+    size: 5649
+    downloaded_at: '2025-08-27 14:19:02 -0300'
+    title: Installing Stimulus in Your Application
+    description: To install Stimulus in your application, add the [`@hotwired/stimulus`
+      npm package](https://www.npmjs.com/package/@hotwired/stimulus) to your JavaScript
+      bundle. Or, import...
+  reference/actions.md:
+    hash: ba85fa5fb24ae7a5156c16c36026a8d2d347af89316156616d9c4eb8ef49d115
+    size: 12690
+    downloaded_at: '2025-08-27 14:19:02 -0300'
+    title: Actions
+    description: _Actions_ are how you handle DOM events in your controllers. <meta
+      data-controller="callout" data-callout-text-value="click->gallery#next"> ```html
+      <div data-controller="gallery"> <button...
+  reference/controllers.md:
+    hash: 63958331eaedb4e4c23c21c9968dcea1ee851dbf7a590b41290f913a90bb5bce
+    size: 10923
+    downloaded_at: '2025-08-27 14:19:03 -0300'
+    title: Controllers
+    description: A _controller_ is the basic organizational unit of a Stimulus application.
+      ```js import { Controller } from "@hotwired/stimulus" export default class extends
+      Controller { // … } ``` Controllers are...
+  reference/css_classes.md:
+    hash: 9b3643bc08b2810c902b48dd74105cb2cab6c27991b179ffcb04a8f231b9b46a
+    size: 5287
+    downloaded_at: '2025-08-27 14:19:03 -0300'
+    title: CSS Classes
+    description: In HTML, a _CSS class_ defines a set of styles which can be applied
+      to elements using the `class` attribute. CSS classes are a convenient tool for
+      changing styles and playing animations...
+  reference/lifecycle_callbacks.md:
+    hash: f3c1f003c47815e1aef4c8daff16e67e84b5d9131544934141b17689b7a303e6
+    size: 4621
+    downloaded_at: '2025-08-27 14:19:04 -0300'
+    title: Lifecycle Callbacks
+    description: Special methods called _lifecycle callbacks_ allow you to respond
+      whenever a controller or certain targets connects to and disconnects from the
+      document. <meta data-controller="callout"...
+  reference/outlets.md:
+    hash: 0121fb05493608e9def3dcfb6f2986f9f8eeb130d05ef2a7da531d7e24b7fe95
+    size: 6808
+    downloaded_at: '2025-08-27 14:19:04 -0300'
+    title: Outlets
+    description: _Outlets_ let you reference Stimulus _controller instances_ and their
+      _controller element_ from within another Stimulus Controller by using CSS selectors.
+      The use of Outlets helps with...
+  reference/targets.md:
+    hash: f290e599f8a92f0218e85324c445fe253773fff40c1ade80e39c52d1dd75d58a
+    size: 4679
+    downloaded_at: '2025-08-27 14:19:04 -0300'
+    title: Targets
+    description: _Targets_ let you reference important elements by name. <meta data-controller="callout"
+      data-callout-text-value="search.query"> <meta data-controller="callout"...
+  reference/using_typescript.md:
+    hash: 7803e24f21b432dd82f19a7e6746a43b7e8ecc8b2887b9cf577ef5ccfb337f1e
+    size: 2762
+    downloaded_at: '2025-08-27 14:19:05 -0300'
+    title: Using Typescript
+    description: Stimulus itself is written in [TypeScript](https://www.typescriptlang.org/)
+      and provides types directly over its package. The following documentation shows
+      how to define types for Stimulus properties....
+  reference/values.md:
+    hash: daee55c287191df7c53e8906695d427d5735f433bb8d5d98423a59f315ab867e
+    size: 5117
+    downloaded_at: '2025-08-27 14:19:05 -0300'
+    title: Values
+    description: You can read and write [HTML data attributes](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/data-*)
+      on controller elements as typed _values_ using special controller properties....
+created_at: '2025-08-27 14:18:59 -0300'
+updated_at: '2025-08-27 14:19:05 -0300'
