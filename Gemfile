@@ -67,6 +67,10 @@ group :development, :test do
   gem "dotenv-rails"
 end
 
+# Excel file handling
+gem "roo"
+gem "axlsx"
+
 group :development do
   gem "rubocop", require: false
   gem "rubocop-capybara", require: false
