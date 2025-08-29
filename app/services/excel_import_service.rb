@@ -19,7 +19,7 @@ class ExcelImportService < ApplicationService
 
     # Extract headers and validate
     headers = extract_headers(workbook)
-    validation_service = HeaderValidationService.new(headers, import_template)
+    validation_service = HeaderValidationService.new(headers, import_template, @has_id_column)
     header_validation = validation_service.validate_headers
 
     unless header_validation.valid
@@ -84,11 +84,39 @@ class ExcelImportService < ApplicationService
   def extract_headers(workbook)
     # Get the first row as headers
     first_row = workbook.row(workbook.first_row)
-    first_row.compact.map(&:to_s)
+    all_headers = first_row.compact.map(&:to_s)
+    
+    # Check if first column is our hidden ID column
+    if all_headers.first == "__record_id"
+      # Store ID column presence for later use
+      @has_id_column = true
+      # Return headers without the ID column for validation
+      all_headers[1..-1]
+    else
+      @has_id_column = false
+      all_headers
+    end
   end
 
   def process_data_rows(workbook, header_mapping)
-    batch_id = SecureRandom.hex(8)
+    # Build sync plan by parsing all rows first
+    sync_plan = build_sync_plan(workbook, header_mapping)
+    
+    # Validate all data before making any database changes
+    return import_result unless validate_all_data(sync_plan)
+
+    # Execute synchronization within transaction
+    execute_sync_transaction(sync_plan)
+  end
+
+  def build_sync_plan(workbook, header_mapping)
+    sync_plan = {
+      to_update: [],
+      to_create: [],
+      to_delete: [],
+      existing_ids: []
+    }
+
     row_number = 1 # Start counting from data rows (excluding header)
 
     ((workbook.first_row + 1)..workbook.last_row).each do |row_index|
@@ -98,17 +126,119 @@ class ExcelImportService < ApplicationService
       # Skip completely empty rows
       next if row_data.compact.empty?
 
-      begin
-        process_single_row(row_data, header_mapping, batch_id, row_number)
-        import_result.processed_count += 1
-      rescue StandardError => e
-        import_result.add_row_error(row_number, "Error processing row: #{e.message}")
-        import_result.error_count += 1
+      # Extract ID from first column (if ID column exists)
+      record_id = @has_id_column ? row_data[0]&.to_i : nil
+
+      # Build record attributes
+      attributes = build_record_attributes(row_data, header_mapping, row_number)
+
+      if record_id && record_id > 0
+        # Existing record to update
+        sync_plan[:to_update] << { id: record_id, attributes: attributes, row_number: row_number }
+        sync_plan[:existing_ids] << record_id
+      else
+        # New record to create
+        sync_plan[:to_create] << { attributes: attributes, row_number: row_number }
       end
     end
 
-    import_result.success = import_result.error_count.zero?
-    import_result.import_batch_id = batch_id
+    # Find records to delete (existing records not in import file)
+    if @has_id_column
+      all_template_record_ids = import_template.data_records.pluck(:id)
+      sync_plan[:to_delete] = all_template_record_ids - sync_plan[:existing_ids]
+    end
+
+    sync_plan
+  end
+
+  def build_record_attributes(row_data, header_mapping, row_number)
+    attributes = { import_template: import_template }
+
+    # Map Excel columns to our database columns
+    header_mapping.each do |excel_col_index, db_col_number|
+      value = row_data[excel_col_index]
+      next if value.blank?
+
+      # Get column definition for data type conversion
+      column_def = import_template.column_definition(db_col_number)
+      converted_value = convert_value(value, column_def["data_type"], row_number)
+
+      attributes[:"column_#{db_col_number}"] = converted_value
+    end
+
+    attributes
+  end
+
+  def validate_all_data(sync_plan)
+    # Validate all records without saving to database
+    all_operations = sync_plan[:to_update] + sync_plan[:to_create]
+    
+    all_operations.each do |operation|
+      begin
+        if operation[:id]
+          # Validate update operation
+          existing_record = import_template.data_records.find_by(id: operation[:id])
+          unless existing_record
+            import_result.add_row_error(operation[:row_number], "Record with ID #{operation[:id]} not found")
+            next
+          end
+          
+          # Test if attributes are valid
+          existing_record.assign_attributes(operation[:attributes])
+          unless existing_record.valid?
+            import_result.add_row_error(operation[:row_number], "Validation failed: #{existing_record.errors.full_messages.join('; ')}")
+          end
+        else
+          # Validate create operation
+          new_record = DataRecord.new(operation[:attributes])
+          unless new_record.valid?
+            import_result.add_row_error(operation[:row_number], "Validation failed: #{new_record.errors.full_messages.join('; ')}")
+          end
+        end
+      rescue StandardError => e
+        import_result.add_row_error(operation[:row_number], "Error validating row: #{e.message}")
+      end
+    end
+
+    # Return false if any validation errors occurred
+    if import_result.has_errors?
+      import_result.success = false
+      return false
+    end
+
+    true
+  end
+
+  def execute_sync_transaction(sync_plan)
+    batch_id = SecureRandom.hex(8)
+
+    ActiveRecord::Base.transaction do
+      # Delete records not present in import file
+      if sync_plan[:to_delete].any?
+        import_template.data_records.where(id: sync_plan[:to_delete]).delete_all
+        import_result.deleted_count = sync_plan[:to_delete].length
+      end
+
+      # Update existing records
+      sync_plan[:to_update].each do |operation|
+        record = import_template.data_records.find(operation[:id])
+        record.update!(operation[:attributes].merge(import_batch_id: batch_id))
+        import_result.updated_records << record
+      end
+
+      # Create new records
+      sync_plan[:to_create].each do |operation|
+        record = DataRecord.create!(operation[:attributes].merge(import_batch_id: batch_id))
+        import_result.created_records << record
+      end
+
+      import_result.success = true
+      import_result.import_batch_id = batch_id
+      import_result.processed_count = sync_plan[:to_update].length + sync_plan[:to_create].length
+    end
+  rescue StandardError => e
+    import_result.success = false
+    import_result.add_error("Transaction failed: #{e.message}")
   end
 
   def process_single_row(row_data, header_mapping, batch_id, row_number)
@@ -205,7 +335,7 @@ class ExcelImportService < ApplicationService
   end
 
   class ImportResult
-    attr_accessor :success, :errors, :processed_count, :error_count, :created_records, :import_batch_id
+    attr_accessor :success, :errors, :processed_count, :error_count, :created_records, :updated_records, :deleted_count, :import_batch_id
 
     def initialize
       @success = false
@@ -213,6 +343,8 @@ class ExcelImportService < ApplicationService
       @processed_count = 0
       @error_count = 0
       @created_records = []
+      @updated_records = []
+      @deleted_count = 0
       @import_batch_id = nil
     end
 
@@ -228,15 +360,32 @@ class ExcelImportService < ApplicationService
       created_records.count
     end
 
+    def updated_count
+      updated_records.count
+    end
+
+    def total_changes
+      created_records.count + updated_records.count + deleted_count
+    end
+
     def has_errors?
       errors.any?
     end
 
     def summary
       if success
-        "Successfully imported #{success_count} records"
+        parts = []
+        parts << "#{created_records.count} created" if created_records.any?
+        parts << "#{updated_records.count} updated" if updated_records.any?
+        parts << "#{deleted_count} deleted" if deleted_count > 0
+        
+        if parts.any?
+          "Successfully synchronized: #{parts.join(', ')}"
+        else
+          "Import completed - no changes needed"
+        end
       else
-        "Import completed with #{error_count} errors. #{success_count} records imported."
+        "Import failed with #{error_count} errors. No changes made."
       end
     end
   end

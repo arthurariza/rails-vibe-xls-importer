@@ -19,7 +19,7 @@
 
 ## Tasks
 
-- [ ] 1.0 Modify Excel Export Service to include hidden ID column
+- [x] 1.0 Modify Excel Export Service to include hidden ID column
   - [x] 1.1 Add ID column as first column in `add_headers` method
   - [x] 1.2 Update `build_row_data` method to include record ID as first column value
   - [x] 1.3 Update `build_sample_row_data` method to include placeholder ID values
@@ -27,13 +27,13 @@
   - [x] 1.5 Update header styling to accommodate ID column
   
 - [ ] 2.0 Update Excel Import Service for synchronization behavior
-  - [ ] 2.1 Modify `extract_headers` method to detect and handle ID column
-  - [ ] 2.2 Update HeaderValidationService to ignore/validate ID column appropriately  
-  - [ ] 2.3 Modify `process_data_rows` to parse ID values and build sync plan
-  - [ ] 2.4 Replace `process_single_row` with `sync_records` method that handles update/create/delete
-  - [ ] 2.5 Implement transaction-based synchronization logic
-  - [ ] 2.6 Update ImportResult class to track sync operations (updated, created, deleted counts)
-  - [ ] 2.7 Add validation phase that processes entire file before any database changes
+  - [x] 2.1 Modify `extract_headers` method to detect and handle ID column
+  - [x] 2.2 Update HeaderValidationService to ignore/validate ID column appropriately  
+  - [x] 2.3 Modify `process_data_rows` to parse ID values and build sync plan
+  - [x] 2.4 Replace `process_single_row` with `sync_records` method that handles update/create/delete
+  - [x] 2.5 Implement transaction-based synchronization logic
+  - [x] 2.6 Update ImportResult class to track sync operations (updated, created, deleted counts)
+  - [x] 2.7 Add validation phase that processes entire file before any database changes
   
 - [ ] 3.0 Update Import UI to indicate data replacement behavior  
   - [ ] 3.1 Update import form text to clearly state "replace all data" instead of "add data"

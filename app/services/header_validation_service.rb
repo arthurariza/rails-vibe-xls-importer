@@ -3,9 +3,10 @@
 class HeaderValidationService < ApplicationService
   attr_reader :excel_headers, :import_template, :validation_result
 
-  def initialize(excel_headers, import_template)
+  def initialize(excel_headers, import_template, has_id_column = false)
     @excel_headers = normalize_headers(excel_headers)
     @import_template = import_template
+    @has_id_column = has_id_column
     @validation_result = ValidationResult.new
   end
 
@@ -60,7 +61,9 @@ class HeaderValidationService < ApplicationService
       (1..5).each do |col_num|
         column_def = import_template.column_definition(col_num)
         if column_def&.dig("name")&.downcase == excel_header
-          mapping[index] = col_num
+          # Adjust Excel column index to account for ID column (if present)
+          excel_col_index = @has_id_column ? index + 1 : index
+          mapping[excel_col_index] = col_num
           break
         end
       end
