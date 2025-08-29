@@ -40,7 +40,7 @@
   - [x] 3.2 Update import instructions to explain synchronization behavior
   - [x] 3.3 Update import success/error messages to reflect sync operations
   
-- [ ] 4.0 Update tests for new synchronization functionality
+- [x] 4.0 Update tests for new synchronization functionality
   - [x] 4.1 Update ExcelExportService tests to verify ID column inclusion
   - [x] 4.2 Create ExcelImportService tests for synchronization scenarios (update existing, create new, delete missing)
   - [x] 4.3 Add test fixtures with ID columns for import testing
