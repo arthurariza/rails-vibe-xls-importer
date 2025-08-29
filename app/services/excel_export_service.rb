@@ -44,8 +44,15 @@ class ExcelExportService < ApplicationService
     headers = import_template.column_headers
     return if headers.empty?
 
+    # Add hidden ID column as first column, followed by user-defined headers
+    headers_with_id = ["__record_id"] + headers
+
     # Create header row with styling
-    sheet.add_row(headers, style: header_style(sheet))
+    sheet.add_row(headers_with_id, style: header_style(sheet))
+
+    # Hide the ID column from users (column A)
+    sheet.column_info.first.hidden = true
+    sheet.column_info.first.width = 0.1
   end
 
   def add_data_rows(sheet)
@@ -63,21 +70,33 @@ class ExcelExportService < ApplicationService
   end
 
   def build_row_data(record)
-    (1..5).filter_map do |col_num|
+    # Start with record ID as first column
+    row_data = [record.id]
+
+    # Add user-defined column data
+    (1..5).each do |col_num|
       column_def = import_template.column_definition(col_num)
       next if column_def.blank?
 
-      format_cell_value(record.column_value(col_num), column_def["data_type"])
+      row_data << format_cell_value(record.column_value(col_num), column_def["data_type"])
     end
+
+    row_data
   end
 
   def build_sample_row_data(row_number)
-    (1..5).filter_map do |col_num|
+    # Start with placeholder ID (empty for sample data since these aren't real records)
+    row_data = [""]
+
+    # Add sample data for user-defined columns
+    (1..5).each do |col_num|
       column_def = import_template.column_definition(col_num)
       next if column_def.blank?
 
-      generate_sample_value(column_def, row_number)
+      row_data << generate_sample_value(column_def, row_number)
     end
+
+    row_data
   end
 
   def format_cell_value(value, data_type)
@@ -115,13 +134,24 @@ class ExcelExportService < ApplicationService
   end
 
   def header_style(sheet)
-    sheet.styles.add_style(
+    # Create styles for headers
+    hidden_style = sheet.styles.add_style(
+      bg_color: "F2F2F2",
+      fg_color: "666666",
+      sz: 8,
+      b: false
+    )
+    
+    visible_style = sheet.styles.add_style(
       bg_color: "4472C4",
       fg_color: "FFFFFF",
       sz: 12,
       b: true,
       alignment: { horizontal: :center }
     )
+
+    # Return array of styles: hidden style for ID column, visible style for user columns
+    [hidden_style] + Array.new(import_template.column_headers.length, visible_style)
   end
 
   def sanitized_template_name
