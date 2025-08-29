@@ -129,8 +129,13 @@ class ExcelImportService < ApplicationService
       # Extract ID from first column (if ID column exists)
       record_id = @has_id_column ? row_data[0]&.to_i : nil
 
-      # Build record attributes
-      attributes = build_record_attributes(row_data, header_mapping, row_number)
+      # Build record attributes (without validation here)
+      begin
+        attributes = build_record_attributes_raw(row_data, header_mapping, row_number)
+      rescue StandardError => e
+        # Store error for validation phase
+        attributes = { _error: e.message, _row_number: row_number }
+      end
 
       if record_id && record_id > 0
         # Existing record to update
@@ -151,7 +156,7 @@ class ExcelImportService < ApplicationService
     sync_plan
   end
 
-  def build_record_attributes(row_data, header_mapping, row_number)
+  def build_record_attributes_raw(row_data, header_mapping, row_number)
     attributes = { import_template: import_template }
 
     # Map Excel columns to our database columns
@@ -170,10 +175,19 @@ class ExcelImportService < ApplicationService
   end
 
   def validate_all_data(sync_plan)
-    # Validate all records without saving to database
+    # Check for any parsing errors from sync plan building
     all_operations = sync_plan[:to_update] + sync_plan[:to_create]
     
     all_operations.each do |operation|
+      # Check if there was a parsing error during sync plan building
+      if operation[:attributes][:_error]
+        import_result.add_row_error(operation[:row_number], operation[:attributes][:_error])
+        next
+      end
+
+      # Skip validation for operations that had parsing errors
+      next if operation[:attributes][:_error]
+
       begin
         if operation[:id]
           # Validate update operation
@@ -219,15 +233,19 @@ class ExcelImportService < ApplicationService
         import_result.deleted_count = sync_plan[:to_delete].length
       end
 
-      # Update existing records
+      # Update existing records (skip any with errors)
       sync_plan[:to_update].each do |operation|
+        next if operation[:attributes][:_error]
+        
         record = import_template.data_records.find(operation[:id])
         record.update!(operation[:attributes].merge(import_batch_id: batch_id))
         import_result.updated_records << record
       end
 
-      # Create new records
+      # Create new records (skip any with errors)
       sync_plan[:to_create].each do |operation|
+        next if operation[:attributes][:_error]
+        
         record = DataRecord.create!(operation[:attributes].merge(import_batch_id: batch_id))
         import_result.created_records << record
       end

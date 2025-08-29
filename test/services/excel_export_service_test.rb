@@ -90,4 +90,87 @@ class ExcelExportServiceTest < ActiveSupport::TestCase
     # Should not raise error despite special characters in name
     assert_not_nil package
   end
+
+  test "should include ID column as first column in data exports" do
+    service = ExcelExportService.new(@template)
+    package = service.generate_data_file
+
+    # Write to temporary file and read back to verify content
+    temp_file = Tempfile.new(["test_export", ".xlsx"])
+    temp_file.binmode
+    temp_file.write(package.to_stream.string)
+    temp_file.close
+
+    # Read back the Excel file to verify structure
+    require "roo"
+    workbook = Roo::Excelx.new(temp_file.path)
+    
+    # Check headers - first should be __record_id
+    headers = workbook.row(1)
+    assert_equal "__record_id", headers[0]
+    assert_equal "Name", headers[1]
+    assert_equal "Age", headers[2]
+    assert_equal "Active", headers[3]
+
+    # Check first data row has actual record ID
+    first_data_row = workbook.row(2)
+    first_record_id = @template.data_records.first.id
+    assert_equal first_record_id, first_data_row[0].to_i
+    assert_equal "John Doe", first_data_row[1]
+
+    temp_file.unlink
+  end
+
+  test "should include empty ID column in template exports" do
+    service = ExcelExportService.new(@template)
+    package = service.generate_template_file
+
+    # Write to temporary file and read back to verify content
+    temp_file = Tempfile.new(["test_template_export", ".xlsx"])
+    temp_file.binmode
+    temp_file.write(package.to_stream.string)
+    temp_file.close
+
+    # Read back the Excel file to verify structure
+    require "roo"
+    workbook = Roo::Excelx.new(temp_file.path)
+    
+    # Check headers - first should be __record_id
+    headers = workbook.row(1)
+    assert_equal "__record_id", headers[0]
+    assert_equal "Name", headers[1]
+
+    # Should only have header row, no data rows
+    assert_equal 1, workbook.last_row
+
+    temp_file.unlink
+  end
+
+  test "should include empty ID column in sample exports" do
+    service = ExcelExportService.new(@template)
+    package = service.generate_sample_file
+
+    # Write to temporary file and read back to verify content
+    temp_file = Tempfile.new(["test_sample_export", ".xlsx"])
+    temp_file.binmode
+    temp_file.write(package.to_stream.string)
+    temp_file.close
+
+    # Read back the Excel file to verify structure
+    require "roo"
+    workbook = Roo::Excelx.new(temp_file.path)
+    
+    # Check headers - first should be __record_id
+    headers = workbook.row(1)
+    assert_equal "__record_id", headers[0]
+    
+    # Check sample data rows have empty ID values
+    (2..4).each do |row_num|
+      sample_row = workbook.row(row_num)
+      # ID column should be empty for samples (nil or empty string)
+      assert sample_row[0].blank?, "ID column should be empty for sample data"
+    end
+
+    temp_file.unlink
+  end
 end

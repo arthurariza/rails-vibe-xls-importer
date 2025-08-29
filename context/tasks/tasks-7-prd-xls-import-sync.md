@@ -35,15 +35,15 @@
   - [x] 2.6 Update ImportResult class to track sync operations (updated, created, deleted counts)
   - [x] 2.7 Add validation phase that processes entire file before any database changes
   
-- [ ] 3.0 Update Import UI to indicate data replacement behavior  
+- [x] 3.0 Update Import UI to indicate data replacement behavior  
   - [x] 3.1 Update import form text to clearly state "replace all data" instead of "add data"
   - [x] 3.2 Update import instructions to explain synchronization behavior
   - [x] 3.3 Update import success/error messages to reflect sync operations
   
 - [ ] 4.0 Update tests for new synchronization functionality
-  - [ ] 4.1 Update ExcelExportService tests to verify ID column inclusion
-  - [ ] 4.2 Create ExcelImportService tests for synchronization scenarios (update existing, create new, delete missing)
-  - [ ] 4.3 Add test fixtures with ID columns for import testing
-  - [ ] 4.4 Update controller integration tests for new sync behavior
-  - [ ] 4.5 Test transaction rollback scenarios (validation failures)
-  - [ ] 4.6 Test edge cases (duplicate IDs, invalid IDs, missing ID column)
+  - [x] 4.1 Update ExcelExportService tests to verify ID column inclusion
+  - [x] 4.2 Create ExcelImportService tests for synchronization scenarios (update existing, create new, delete missing)
+  - [x] 4.3 Add test fixtures with ID columns for import testing
+  - [x] 4.4 Update controller integration tests for new sync behavior
+  - [x] 4.5 Test transaction rollback scenarios (validation failures)
+  - [x] 4.6 Test edge cases (duplicate IDs, invalid IDs, missing ID column)
