@@ -26,7 +26,7 @@
   - [x] 1.4 Ensure ID column header is not visible to users (use hidden/internal name)
   - [x] 1.5 Update header styling to accommodate ID column
   
-- [ ] 2.0 Update Excel Import Service for synchronization behavior
+- [x] 2.0 Update Excel Import Service for synchronization behavior
   - [x] 2.1 Modify `extract_headers` method to detect and handle ID column
   - [x] 2.2 Update HeaderValidationService to ignore/validate ID column appropriately  
   - [x] 2.3 Modify `process_data_rows` to parse ID values and build sync plan
@@ -36,9 +36,9 @@
   - [x] 2.7 Add validation phase that processes entire file before any database changes
   
 - [ ] 3.0 Update Import UI to indicate data replacement behavior  
-  - [ ] 3.1 Update import form text to clearly state "replace all data" instead of "add data"
-  - [ ] 3.2 Update import instructions to explain synchronization behavior
-  - [ ] 3.3 Update import success/error messages to reflect sync operations
+  - [x] 3.1 Update import form text to clearly state "replace all data" instead of "add data"
+  - [x] 3.2 Update import instructions to explain synchronization behavior
+  - [x] 3.3 Update import success/error messages to reflect sync operations
   
 - [ ] 4.0 Update tests for new synchronization functionality
   - [ ] 4.1 Update ExcelExportService tests to verify ID column inclusion

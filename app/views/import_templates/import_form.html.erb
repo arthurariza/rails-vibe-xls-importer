@@ -9,7 +9,7 @@
           </svg>
         </div>
         <div>
-          <h1 class="text-3xl font-bold text-gray-900">Import Excel File</h1>
+          <h1 class="text-3xl font-bold text-gray-900">Sync Excel File</h1>
           <p class="text-lg text-gray-600 mt-1">Template: <span class="font-semibold"><%= @import_template.name %></span></p>
         </div>
       </div>
@@ -113,27 +113,27 @@
                 </svg>
               </div>
               <div class="flex-1">
-                <h3 class="font-semibold text-gray-900 mb-3">Import Instructions</h3>
+                <h3 class="font-semibold text-gray-900 mb-3">Synchronization Instructions</h3>
                 <ul class="text-sm text-gray-700 space-y-2">
+                  <li class="flex items-start gap-2">
+                    <span class="h-1.5 w-1.5 bg-red-400 rounded-full mt-2 flex-shrink-0"></span>
+                    <span><strong>⚠️ This will replace ALL existing data</strong> for this template with the contents of your Excel file</span>
+                  </li>
                   <li class="flex items-start gap-2">
                     <span class="h-1.5 w-1.5 bg-blue-400 rounded-full mt-2 flex-shrink-0"></span>
                     <span>Ensure your Excel file has headers in the first row that match the expected headers above</span>
                   </li>
                   <li class="flex items-start gap-2">
                     <span class="h-1.5 w-1.5 bg-blue-400 rounded-full mt-2 flex-shrink-0"></span>
-                    <span>Headers are case-insensitive but must match exactly</span>
+                    <span>Files exported from this system will update existing records; new files will create all new records</span>
                   </li>
                   <li class="flex items-start gap-2">
                     <span class="h-1.5 w-1.5 bg-blue-400 rounded-full mt-2 flex-shrink-0"></span>
-                    <span>Empty rows will be skipped during import</span>
+                    <span>All data will be validated before any changes are made - import fails completely if validation errors occur</span>
                   </li>
                   <li class="flex items-start gap-2">
                     <span class="h-1.5 w-1.5 bg-blue-400 rounded-full mt-2 flex-shrink-0"></span>
-                    <span>Data will be validated according to column types</span>
-                  </li>
-                  <li class="flex items-start gap-2">
-                    <span class="h-1.5 w-1.5 bg-blue-400 rounded-full mt-2 flex-shrink-0"></span>
-                    <span>All imported records will be grouped with the same batch ID</span>
+                    <span>Empty rows will be skipped during processing</span>
                   </li>
                 </ul>
               </div>
@@ -149,8 +149,8 @@
               </svg>
               Cancel
             <% end %>
-            <%= form.submit "Import Data", 
-                class: "inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-lg shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors",
+            <%= form.submit "Replace All Data", 
+                class: "inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-lg shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors",
                 id: "import-submit-btn" %>
           </div>
         <% end %>

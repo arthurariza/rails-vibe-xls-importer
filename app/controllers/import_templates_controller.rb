@@ -92,7 +92,7 @@ class ImportTemplatesController < ApplicationController
       redirect_to @import_template,
                   notice: @import_result.summary
     else
-      flash.now[:alert] = "Import failed with errors:"
+      flash.now[:alert] = "Synchronization failed with errors:"
       render :import_result
     end
   end
