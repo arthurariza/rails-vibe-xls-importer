@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class DataRecord < ApplicationRecord
-  belongs_to :import_template
+  belongs_to :import_template, counter_cache: :data_records_count
 
   validate :at_least_one_column_has_data
 

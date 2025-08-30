@@ -25,7 +25,6 @@
         </div>
       </div>
     </div>
-
     <% if @import_templates.any? %>
       <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
         <% @import_templates.each do |template| %>
@@ -43,7 +42,6 @@
                   </h3>
                 </div>
               </div>
-              
               <% if template.description.present? %>
                 <p class="text-gray-600 mb-6 line-clamp-3">
                   <%= truncate(template.description, length: 120) %>
@@ -51,13 +49,12 @@
               <% else %>
                 <p class="text-gray-400 italic mb-6">No description provided</p>
               <% end %>
-              
               <div class="space-y-3 mb-6">
                 <div class="flex items-center gap-2 text-sm text-gray-600">
                   <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
                   </svg>
-                  <span><strong><%= template.data_records.count %></strong> records</span>
+                  <span><strong><%= template.data_records.size %></strong> records</span>
                 </div>
                 <div class="flex items-center gap-2 text-sm text-gray-500">
                   <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -66,7 +63,6 @@
                   <span>Created <%= template.created_at.strftime("%B %d, %Y") %></span>
                 </div>
               </div>
-              
               <div class="flex flex-wrap gap-2">
                 <%= link_to template, class: "inline-flex items-center px-3 py-2 text-sm font-medium rounded-lg text-blue-600 bg-blue-50 hover:bg-blue-100 transition-colors" do %>
                   <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">

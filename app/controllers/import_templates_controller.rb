@@ -6,7 +6,7 @@ class ImportTemplatesController < ApplicationController
                          import_file]
 
   def index
-    @import_templates = ImportTemplate.includes([:data_records]).order(:name)
+    @import_templates = ImportTemplate.order(:name)
   end
 
   def show
