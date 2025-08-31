@@ -1,0 +1,29 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  import_template: one
+  column_number: 1
+  name: "Name"
+  data_type: "string"
+  required: false
+
+two:
+  import_template: one
+  column_number: 2
+  name: "Age"
+  data_type: "number"
+  required: false
+
+three:
+  import_template: two
+  column_number: 1
+  name: "Title"
+  data_type: "string"
+  required: false
+
+four:
+  import_template: two
+  column_number: 2
+  name: "Price"
+  data_type: "number"
+  required: false

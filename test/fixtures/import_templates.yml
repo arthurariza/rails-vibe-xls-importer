@@ -3,11 +3,9 @@
 one:
   name: Template One
   description: First template
-  column_definitions: '{"column_1": {"name": "Name", "data_type": "string"}, "column_2": {"name": "Age", "data_type": "number"}}'
   user: one
 
 two:
   name: Template Two
   description: Second template
-  column_definitions: '{"column_1": {"name": "Title", "data_type": "string"}, "column_2": {"name": "Price", "data_type": "number"}}'
   user: two

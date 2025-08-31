@@ -40,29 +40,29 @@
   - [x] 1.5 Create data migration to move existing column_1-column_5 data to new normalized structure
   - [x] 1.6 Run migrations and verify schema changes
 
-- [ ] 2.0 Create New Model Classes and Associations
-  - [ ] 2.1 Create `TemplateColumn` model with validations for name, data_type, column_number
-  - [ ] 2.2 Create `DataRecordValue` model with belongs_to associations to data_record and template_column
-  - [ ] 2.3 Add validation in TemplateColumn for data_type enum (string, number, date, boolean)
-  - [ ] 2.4 Add scopes in TemplateColumn for ordered columns (by column_number)
-  - [ ] 2.5 Add callbacks for maintaining column_number sequence when columns are added/removed
+- [x] 2.0 Create New Model Classes and Associations
+  - [x] 2.1 Create `TemplateColumn` model with validations for name, data_type, column_number
+  - [x] 2.2 Create `DataRecordValue` model with belongs_to associations to data_record and template_column
+  - [x] 2.3 Add validation in TemplateColumn for data_type enum (string, number, date, boolean)
+  - [x] 2.4 Add scopes in TemplateColumn for ordered columns (by column_number)
+  - [x] 2.5 Add callbacks for maintaining column_number sequence when columns are added/removed
 
-- [ ] 3.0 Update Import Template Model for Dynamic Columns
-  - [ ] 3.1 Add `has_many :template_columns` association with dependent: :destroy, ordered by column_number
-  - [ ] 3.2 Replace hardcoded `column_headers` method to use template_columns association
-  - [ ] 3.3 Replace `column_definition` method to query template_columns instead of JSON
-  - [ ] 3.4 Remove `column_definitions` JSON field and related validations
-  - [ ] 3.5 Add helper methods: `add_column(name, data_type)`, `remove_column(column_number)`, `reorder_columns`
-  - [ ] 3.6 Add validation to ensure at least one column exists per template
+- [x] 3.0 Update Import Template Model for Dynamic Columns
+  - [x] 3.1 Add `has_many :template_columns` association with dependent: :destroy, ordered by column_number
+  - [x] 3.2 Replace hardcoded `column_headers` method to use template_columns association
+  - [x] 3.3 Replace `column_definition` method to query template_columns instead of JSON
+  - [x] 3.4 Remove `column_definitions` JSON field and related validations
+  - [x] 3.5 Add helper methods: `add_column(name, data_type)`, `remove_column(column_number)`, `reorder_columns`
+  - [x] 3.6 Add validation to ensure at least one column exists per template
 
-- [ ] 4.0 Update Data Record Model for Normalized Storage
-  - [ ] 4.1 Add `has_many :data_record_values` association with dependent: :destroy
-  - [ ] 4.2 Remove direct column_1-column_5 methods and replace with dynamic value access
-  - [ ] 4.3 Create `value_for_column(template_column)` method to retrieve values by column
-  - [ ] 4.4 Create `set_value_for_column(template_column, value)` method to set values
-  - [ ] 4.5 Update `column_values` method to work with dynamic columns via template_columns
-  - [ ] 4.6 Update `data_hash` method to use template_columns for key generation
-  - [ ] 4.7 Add validation to ensure values exist for required columns
+- [x] 4.0 Update Data Record Model for Normalized Storage
+  - [x] 4.1 Add `has_many :data_record_values` association with dependent: :destroy
+  - [x] 4.2 Remove direct column_1-column_5 methods and replace with dynamic value access
+  - [x] 4.3 Create `value_for_column(template_column)` method to retrieve values by column
+  - [x] 4.4 Create `set_value_for_column(template_column, value)` method to set values
+  - [x] 4.5 Update `column_values` method to work with dynamic columns via template_columns
+  - [x] 4.6 Update `data_hash` method to use template_columns for key generation
+  - [x] 4.7 Add validation to ensure values exist for required columns
 
 - [ ] 5.0 Create Template Column Management Controller
   - [ ] 5.1 Create `TemplateColumnsController` with create, update, destroy actions

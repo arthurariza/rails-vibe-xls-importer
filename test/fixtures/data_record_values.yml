@@ -1,0 +1,21 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  data_record: one
+  template_column: one
+  value: "MyText"
+
+two:
+  data_record: one
+  template_column: two
+  value: "MyText"
+
+three:
+  data_record: two
+  template_column: three
+  value: "MyText"
+
+four:
+  data_record: two
+  template_column: four
+  value: "MyText"

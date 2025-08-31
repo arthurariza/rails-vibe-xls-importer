@@ -3,57 +3,56 @@
 class ImportTemplate < ApplicationRecord
   belongs_to :user
   has_many :data_records, dependent: :destroy
+  has_many :template_columns, -> { ordered }, dependent: :destroy
 
   validates :name, presence: true, uniqueness: true
-  # Allow empty column_definitions for flexibility
-  validate :validate_column_definitions
+  validate :at_least_one_column
 
-  # Serialize column_definitions as JSON
-  serialize :column_definitions, coder: JSON
-
-  # Get column headers in order
+  # Get column headers in order using new template_columns
   def column_headers
-    return [] if column_definitions.blank?
+    template_columns.pluck(:name)
+  end
 
-    (1..5).filter_map do |i|
-      column_definitions["column_#{i}"]&.dig("name")
+  # Get column definition for a specific column (by number or column object)
+  def column_definition(column_number)
+    if column_number.is_a?(Integer)
+      template_columns.find_by(column_number: column_number)
+    else
+      column_number # Already a template column
     end
   end
 
-  # Get column definition for a specific column
-  def column_definition(column_number)
-    return nil if column_definitions.blank?
+  # Helper methods for managing dynamic columns
+  def add_column(name:, data_type:, required: false)
+    max_number = template_columns.maximum(:column_number) || 0
+    template_columns.create!(
+      name: name,
+      data_type: data_type,
+      required: required,
+      column_number: max_number + 1
+    )
+  end
 
-    column_definitions["column_#{column_number}"]
+  def remove_column(column_number)
+    column = template_columns.find_by(column_number: column_number)
+    return false unless column
+
+    column.destroy
+    reorder_columns
+    true
+  end
+
+  def reorder_columns
+    template_columns.ordered.each_with_index do |column, index|
+      column.update_column(:column_number, index + 1)
+    end
   end
 
   private
 
-  def validate_column_definitions
-    return if column_definitions.blank?
+  def at_least_one_column
+    return unless template_columns.empty? && persisted?
 
-    unless column_definitions.is_a?(Hash)
-      errors.add(:column_definitions, "must be a valid JSON object")
-      return
-    end
-
-    # Check that we have definitions for columns 1-5
-    (1..5).each do |i|
-      column_key = "column_#{i}"
-      column_def = column_definitions[column_key]
-
-      next if column_def.blank? # Allow empty columns
-
-      unless column_def.is_a?(Hash)
-        errors.add(:column_definitions, "column #{i} must be an object")
-        next
-      end
-
-      errors.add(:column_definitions, "column #{i} must have a name") if column_def["name"].blank?
-
-      unless %w[string number date boolean].include?(column_def["data_type"])
-        errors.add(:column_definitions, "column #{i} must have a valid data_type (string, number, date, boolean)")
-      end
-    end
+    errors.add(:base, "Template must have at least one column")
   end
 end
