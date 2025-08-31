@@ -75,4 +75,5 @@ group :development do
   gem "rubocop-rails", require: false
   gem "rubocop-thread_safety", require: false
   gem "web-console"
+  gem "letter_opener"
 end

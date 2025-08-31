@@ -81,11 +81,11 @@
   - [x] 6.4 Add conditional logic to hide/show navigation items based on authentication status
   - [x] 6.5 Style authentication links to match existing navigation styling
 
-- [ ] 7.0 Configure Email Settings  
-  - [ ] 7.1 Configure ActionMailer settings in development.rb for email confirmation
-  - [ ] 7.2 Set up SMTP configuration or use letter_opener gem for development testing
-  - [ ] 7.3 Customize Devise email templates if needed
-  - [ ] 7.4 Test email delivery for registration confirmation and password reset
+- [x] 7.0 Configure Email Settings  
+  - [x] 7.1 Configure ActionMailer settings in development.rb for email confirmation
+  - [x] 7.2 Set up SMTP configuration or use letter_opener gem for development testing
+  - [x] 7.3 Customize Devise email templates if needed
+  - [x] 7.4 Test email delivery for registration confirmation and password reset
 
 - [ ] 8.0 Write Tests for Authentication
   - [ ] 8.1 Create User model tests (validation, associations)
