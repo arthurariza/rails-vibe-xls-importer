@@ -97,9 +97,9 @@
   - [x] 8.7 Create system tests for email confirmation flow
   - [x] 8.8 Test user data isolation (users can't see each other's data)
 
-- [ ] 9.0 Data Migration for Existing Records
-  - [ ] 9.1 Create seeds data for easy testing
-  - [ ] 9.2 Create a rake task or migration to assign existing import_templates to a default user
-  - [ ] 9.3 Create a rake task or migration to assign existing data_records to the same default user
-  - [ ] 9.4 Test the migration with existing data
-  - [ ] 9.5 Document the migration process for future reference
+- [x] 9.0 Data Migration for Existing Records
+  - [x] 9.1 Create seeds data for easy testing
+  - [x] 9.2 Create a rake task or migration to assign existing import_templates to a default user
+  - [x] 9.3 Create a rake task or migration to assign existing data_records to the same default user (Skip - DataRecord gets user through ImportTemplate)
+  - [x] 9.4 Test the migration with existing data
+  - [x] 9.5 Document the migration process for future reference
