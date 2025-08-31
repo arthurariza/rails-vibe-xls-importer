@@ -43,11 +43,11 @@
   - [x] 1.4 Configure Devise settings in `config/initializers/devise.rb` (mailer sender, secret key)
   - [x] 1.5 Set default URL options in development environment config
 
-- [ ] 2.0 Create User Model and Database Migrations
-  - [ ] 2.1 Run `rails generate devise user` to create User model and migration
-  - [ ] 2.2 Review and customize the generated User migration (add confirmable, rememberable modules)
-  - [ ] 2.3 Run `rails db:migrate` to create the users table
-  - [ ] 2.4 Configure User model with desired Devise modules (database_authenticatable, registerable, recoverable, rememberable, validatable, confirmable)
+- [x] 2.0 Create User Model and Database Migrations
+  - [x] 2.1 Run `rails generate devise user` to create User model and migration
+  - [x] 2.2 Review and customize the generated User migration (add confirmable, rememberable modules)
+  - [x] 2.3 Run `rails db:migrate` to create the users table
+  - [x] 2.4 Configure User model with desired Devise modules (database_authenticatable, registerable, recoverable, rememberable, validatable, confirmable)
 
 - [ ] 3.0 Update Existing Models with User Associations
   - [ ] 3.1 Generate migration to add user_id to import_templates table
