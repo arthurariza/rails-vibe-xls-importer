@@ -162,7 +162,9 @@ class ExcelImportService < ApplicationService
 
     # Map Excel columns to our database columns using template columns
     header_mapping.each do |excel_col_index, template_column|
-      value = row_data[excel_col_index]
+      # Adjust index if ID column is present (since headers were extracted without ID column)
+      actual_col_index = @has_id_column ? excel_col_index + 1 : excel_col_index
+      value = row_data[actual_col_index]
 
       # Check for required field validation
       raise "Required field '#{template_column.name}' cannot be empty" if template_column.required? && value.blank?
@@ -305,7 +307,9 @@ class ExcelImportService < ApplicationService
 
     # Map Excel columns to our database columns using template columns
     header_mapping.each do |excel_col_index, template_column|
-      value = row_data[excel_col_index]
+      # Adjust index if ID column is present (since headers were extracted without ID column)
+      actual_col_index = @has_id_column ? excel_col_index + 1 : excel_col_index
+      value = row_data[actual_col_index]
       next if value.blank?
 
       # Convert value according to column data type

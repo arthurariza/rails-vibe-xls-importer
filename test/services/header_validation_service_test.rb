@@ -5,15 +5,7 @@ require "test_helper"
 class HeaderValidationServiceTest < ActiveSupport::TestCase
   def setup
     @user = users(:one)
-    @template = ImportTemplate.create!(
-      name: "Validation Test Template",
-      user: @user,
-      column_definitions: {
-        "column_1" => { "name" => "Name", "data_type" => "string" },
-        "column_2" => { "name" => "Age", "data_type" => "number" },
-        "column_3" => { "name" => "Email", "data_type" => "string" }
-      }
-    )
+    @template = import_templates(:one)
   end
 
   test "should validate matching headers" do
@@ -91,9 +83,12 @@ class HeaderValidationServiceTest < ActiveSupport::TestCase
     service = HeaderValidationService.new(excel_headers, @template)
     result = service.validate_headers
 
-    # Check that mapping correctly maps excel column indexes to database columns
-    assert_equal 1, result.header_mapping[0] # First excel column maps to column_1
-    assert_equal 2, result.header_mapping[1] # Second excel column maps to column_2
-    assert_equal 3, result.header_mapping[2] # Third excel column maps to column_3
+    # Check that mapping correctly maps excel column indexes to template columns
+    assert_equal 1, result.header_mapping[0].column_number # First excel column maps to column_1
+    assert_equal 2, result.header_mapping[1].column_number # Second excel column maps to column_2  
+    assert_equal 3, result.header_mapping[2].column_number # Third excel column maps to column_3
+    assert_equal "Name", result.header_mapping[0].name
+    assert_equal "Age", result.header_mapping[1].name
+    assert_equal "Email", result.header_mapping[2].name
   end
 end

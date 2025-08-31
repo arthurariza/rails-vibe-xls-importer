@@ -20,10 +20,11 @@ class HeaderValidationService < ApplicationService
     end
 
     template_headers = import_template.column_headers.map(&:downcase)
-
+    
     # Handle case where Excel file has no headers
     if excel_headers.empty?
       validation_result.valid = false
+      validation_result.missing_headers = template_headers
       message = "Excel file has no headers. Please ensure the first row contains column headers."
       validation_result.custom_errors << message
       return validation_result
@@ -78,9 +79,8 @@ class HeaderValidationService < ApplicationService
       template_column = template_columns.find { |col| col.name.downcase == excel_header }
       next unless template_column
 
-      # Adjust Excel column index to account for ID column (if present)
-      excel_col_index = @has_id_column ? index + 1 : index
-      mapping[excel_col_index] = template_column
+      # Map excel column index to template column object
+      mapping[index] = template_column
     end
 
     validation_result.header_mapping = mapping

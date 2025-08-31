@@ -228,17 +228,20 @@ class DataRecordTest < ActiveSupport::TestCase
   end
 
   test "should validate at least one column has data when persisted" do
-    record = DataRecord.create!(import_template: @template)
+    record = DataRecord.new(import_template: @template)
 
-    # Empty record should be valid when first created
+    # New record (not persisted) should be valid even without data
     assert_predicate record, :valid?
 
-    # But validation should trigger if we try to update and still have no data
-    # (Note: The validation in the model checks if persisted?)
-    record.save
+    # Once saved (persisted), it should be invalid without data
+    record.save!
+    assert_not record.valid?
+    assert_includes record.errors.full_messages, "At least one column must have data"
 
-    # If the record was saved successfully, the validation allows empty records
-    # This might be a business decision - templates could have "draft" records
+    # Add some data to make it valid
+    template_column = @template.template_columns.first
+    record.set_value_for_column(template_column, "some value")
+    assert_predicate record, :valid?
   end
 
   test "should work with templates having different column counts" do

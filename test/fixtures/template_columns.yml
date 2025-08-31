@@ -14,6 +14,13 @@ two:
   data_type: "number"
   required: false
 
+email:
+  import_template: one
+  column_number: 3
+  name: "Email"
+  data_type: "string"
+  required: false
+
 three:
   import_template: two
   column_number: 1

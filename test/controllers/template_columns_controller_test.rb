@@ -3,10 +3,13 @@
 require "test_helper"
 
 class TemplateColumnsControllerTest < ActionDispatch::IntegrationTest
+  include Devise::Test::IntegrationHelpers
+  
   setup do
     @user = users(:one)
     @template = import_templates(:one)
     @template_column = template_columns(:one)
+    sign_in @user
   end
 
   test "should create template column" do
@@ -114,15 +117,22 @@ class TemplateColumnsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should destroy associated data_record_values when destroying template column" do
+    # Create a new template column to avoid fixture conflicts
+    test_column = @template.template_columns.create!(
+      name: "Test Column",
+      data_type: "string",
+      required: false
+    )
+    
     # Create a data record with values
     data_record = @template.data_records.create!
     data_record.data_record_values.create!(
-      template_column: @template_column,
+      template_column: test_column,
       value: "test value"
     )
 
     assert_difference "DataRecordValue.count", -1 do
-      delete import_template_template_column_path(@template, @template_column),
+      delete import_template_template_column_path(@template, test_column),
              headers: { "Accept" => "application/json" }
     end
 
@@ -173,9 +183,9 @@ class TemplateColumnsControllerTest < ActionDispatch::IntegrationTest
 
   test "should reorder columns after deletion" do
     # Create multiple columns
-    @template.template_columns.create!(name: "Col1", data_type: "string", column_number: 1, required: false)
-    column2 = @template.template_columns.create!(name: "Col2", data_type: "string", column_number: 2, required: false)
-    @template.template_columns.create!(name: "Col3", data_type: "string", column_number: 3, required: false)
+    col1 = @template.template_columns.create!(name: "Col1", data_type: "string", required: false)
+    column2 = @template.template_columns.create!(name: "Col2", data_type: "string", required: false)
+    col3 = @template.template_columns.create!(name: "Col3", data_type: "string", required: false)
 
     # Delete the middle column
     delete import_template_template_column_path(@template, column2),

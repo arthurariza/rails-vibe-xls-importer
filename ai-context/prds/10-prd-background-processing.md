@@ -1,10 +1,10 @@
-# 10 - Background Processing with Solid Queue
+# 10 - Background Processing with Solid Queue and Cache-Based Status Tracking
 
 ## Introduction/Overview
 
-This feature introduces asynchronous background processing for time-intensive operations in the XLS Importer application. Currently, file imports and exports are processed synchronously, causing UI blocking, potential timeouts with large files, and poor user experience. By implementing Solid Queue (already included in Rails 8), we will move these operations to background jobs, allowing users to continue working while their files are processed.
+This feature introduces asynchronous background processing for time-intensive operations in the XLS Importer application. Currently, file imports and exports are processed synchronously, causing UI blocking, potential timeouts with large files, and poor user experience. By implementing Solid Queue (already included in Rails 8) with cache-based status tracking, we will move these operations to background jobs while keeping the core models clean and focused on business logic.
 
-The feature addresses all current pain points: UI blocking during processing, timeout issues with large files, and the requirement for users to remain on pages during lengthy operations.
+The feature uses Rails cache (Solid Cache) to store transient job status information, avoiding database pollution while providing real-time status updates. This approach keeps models focused on business logic while job status remains ephemeral and automatically expires.
 
 ## Goals
 
@@ -12,6 +12,8 @@ The feature addresses all current pain points: UI blocking during processing, ti
 2. **Handle Larger Files**: Support processing of larger XLS files without HTTP timeout constraints
 3. **Provide Real-time Feedback**: Show live job status updates using Turbo Streams without page refreshes
 4. **Ensure Reliability**: Implement proper error handling with user notifications when jobs fail
+5. **Keep Models Clean**: Use cache-based status tracking to avoid polluting business models with transient job state
+6. **Automatic Cleanup**: Job status automatically expires from cache, eliminating need for manual cleanup
 
 ## User Stories
 
@@ -32,148 +34,205 @@ The feature addresses all current pain points: UI blocking during processing, ti
 2. The system must queue XLS export operations in the background using Solid Queue
 3. The system must process jobs using a single default queue priority
 4. The system must send error notifications to users when jobs fail
-5. The system must update job status in real-time using Turbo Streams
+5. The system must update job status in real-time using Turbo Streams and cache-based status
 
-### Backend Job Status Updates
-6. **Job Initialization**: When a background job starts, it must update the model status from `:pending` to `:processing` and set `processing_started_at` timestamp
-7. **Progress Tracking**: The job must update the model status at key processing milestones (e.g., after file parsing, after validation, after data processing)
-8. **Success Completion**: When a job completes successfully, it must update the model status to `:completed` and set `processing_completed_at` timestamp
-9. **Failure Handling**: When a job fails, it must update the model status to `:failed`, set `processing_completed_at` timestamp, and store the error message in the `error_message` field
-10. **Turbo Stream Broadcasting**: After each status update, the job must trigger a Turbo Stream broadcast to notify the frontend of the change
+### Cache-Based Status Tracking
+6. **Job Status Storage**: The system must store job status in Rails cache using structured keys like `job_status:import:#{resource_id}:#{job_id}`
+7. **Status Structure**: Cache entries must contain structured data: `{ status: :processing, started_at: timestamp, progress: optional_progress, error_message: nil }`
+8. **Cache Expiration**: Job status entries must auto-expire after 24 hours to prevent cache bloat
+9. **Status Updates**: Jobs must update cache entries at key milestones without touching the database
+10. **Broadcasting Integration**: Cache updates must trigger Turbo Stream broadcasts for real-time UI updates
+
+### Job Lifecycle with Cache
+11. **Job Creation**: Controller generates unique job_id and stores initial cache entry `{ status: :pending, created_at: timestamp }`
+12. **Job Start**: Job updates cache to `{ status: :processing, started_at: timestamp }` and broadcasts change
+13. **Job Progress**: Job can optionally update progress information in cache entry
+14. **Job Completion**: Job updates cache to `{ status: :completed, completed_at: timestamp, result_data: optional }` or `{ status: :failed, completed_at: timestamp, error_message: error }`
+15. **Status Retrieval**: Controllers and views read job status from cache using job_id for real-time updates
 
 ### User Interface
-11. The system must redirect users to a job status page immediately after file upload
-12. The system must display job status as simple pending/completed/failed states
-13. The system must show real-time updates without requiring page refreshes
-14. The system must provide clear error messages when jobs fail
-15. The system must allow users to navigate away from job status pages and return later
+16. The system must redirect users to a job status page immediately after file upload with job_id in URL
+17. The system must display job status as simple pending/processing/completed/failed states read from cache
+18. The system must show real-time updates without requiring page refreshes via Turbo Streams
+19. The system must provide clear error messages when jobs fail, stored in cache
+20. The system must allow users to navigate away from job status pages and return later using job_id
 
-### Model Integration
-16. The system must add status enum to existing import/export models: `:pending, :processing, :completed, :failed`
-17. The system must add timestamp fields: `processing_started_at`, `processing_completed_at`
-18. The system must add `error_message` text field for storing failure details
-19. The system must add `background_job_id` field to track the actual Solid Queue job
-20. The system must include after_update callbacks to broadcast Turbo Stream updates when status changes
-
-### Integration
-21. The system must integrate with existing import/export services
-22. The system must maintain existing file validation and processing logic
+### Service Integration
+21. The system must integrate with existing import/export services without modifying their interfaces
+22. The system must maintain existing file validation and processing logic unchanged
 23. The system must work seamlessly with the current authentication system
 24. The system must follow Rails job conventions from the project's rails-rules.md
+25. **No Model Changes**: The system must not add any job-related fields to existing business models
 
 ## Backend Status Update Flow
 
-### Job Lifecycle and Model Updates
+### Cache-Based Job Lifecycle 
 
 **1. Job Creation**
-- Controller creates model record with `status: :pending`
-- Controller enqueues background job with model ID
-- Model stores `background_job_id` for tracking
-- Controller redirects user to status page
+- Controller generates unique job_id using `SecureRandom.hex(8)`
+- Controller stores initial status in cache: `Rails.cache.write("job_status:import:#{template_id}:#{job_id}", { status: :pending, created_at: Time.current }, expires_in: 24.hours)`
+- Controller enqueues background job with template_id and job_id parameters
+- Controller redirects user to status page: `/import_templates/#{template_id}/jobs/#{job_id}`
 
 **2. Job Start**
-- Job begins execution: `perform` method called
-- Job updates model: `status: :processing, processing_started_at: Time.current`
-- Model after_update callback broadcasts status change via Turbo Streams
+- Job begins execution: `perform(template_id, job_id)` method called
+- Job updates cache: `JobStatusService.update_status(job_id, :processing, started_at: Time.current)`
+- JobStatusService broadcasts status change via Turbo Streams to channel `"job_status_#{job_id}"`
 
 **3. Job Processing**
-- Job calls existing service objects (import/export services)
-- Services perform actual file processing work
+- Job calls existing service objects (import/export services) unchanged
+- Services perform actual file processing work without knowing about job status
 - Job catches any exceptions from service objects
+- Job can optionally update progress: `JobStatusService.update_progress(job_id, "Processing row 100 of 500")`
 
 **4. Job Completion (Success)**
-- Job updates model: `status: :completed, processing_completed_at: Time.current`
-- Model after_update callback broadcasts completion via Turbo Streams
-- Job clears `background_job_id` field
+- Job updates cache: `JobStatusService.update_status(job_id, :completed, completed_at: Time.current, result_data: service_result)`
+- JobStatusService broadcasts completion via Turbo Streams
+- Cache entry remains available for 24 hours then auto-expires
 
 **5. Job Completion (Failure)**
 - Job catches exception from service objects
-- Job updates model: `status: :failed, processing_completed_at: Time.current, error_message: exception.message`
-- Model after_update callback broadcasts failure via Turbo Streams
-- Job clears `background_job_id` field
+- Job updates cache: `JobStatusService.update_status(job_id, :failed, completed_at: Time.current, error_message: exception.message)`
+- JobStatusService broadcasts failure via Turbo Streams
+- Cache entry remains available for 24 hours for debugging, then auto-expires
 
-### Status Update Implementation Details
+### Cache-Based Implementation Details
 
-**Model Callbacks**
+**JobStatusService**
 ```ruby
-# In ImportTemplate or relevant model
-after_update :broadcast_status_change, if: :saved_change_to_status?
-
-private
-
-def broadcast_status_change
-  broadcast_replace_to "job_#{id}", 
-    partial: "shared/job_status", 
-    locals: { job: self }
+# app/services/job_status_service.rb
+class JobStatusService < ApplicationService
+  def self.cache_key(job_id)
+    "job_status:#{job_id}"
+  end
+  
+  def self.get_status(job_id)
+    Rails.cache.read(cache_key(job_id)) || { status: :not_found }
+  end
+  
+  def self.update_status(job_id, status, **additional_data)
+    current_data = get_status(job_id)
+    updated_data = current_data.merge(
+      status: status,
+      updated_at: Time.current,
+      **additional_data
+    )
+    
+    Rails.cache.write(cache_key(job_id), updated_data, expires_in: 24.hours)
+    broadcast_status_change(job_id, updated_data)
+    updated_data
+  end
+  
+  def self.update_progress(job_id, progress_message)
+    update_status(job_id, :processing, progress: progress_message)
+  end
+  
+  private
+  
+  def self.broadcast_status_change(job_id, status_data)
+    Turbo::StreamsChannel.broadcast_replace_to(
+      "job_status_#{job_id}",
+      target: "job_status_#{job_id}",
+      partial: "shared/job_status",
+      locals: { job_id: job_id, status_data: status_data }
+    )
+  end
 end
 ```
 
-**Job Status Updates**
+**Background Job Implementation**
 ```ruby
-# In ImportProcessingJob
-def perform(import_template_id)
-  @import_template = ImportTemplate.find(import_template_id)
-  
-  # Update to processing
-  @import_template.update!(
-    status: :processing, 
-    processing_started_at: Time.current
-  )
-  
-  # Call existing service
-  service_result = ImportService.new(template: @import_template).call
-  
-  if service_result.success?
-    @import_template.update!(
-      status: :completed,
-      processing_completed_at: Time.current
+# app/jobs/import_processing_job.rb
+class ImportProcessingJob < ApplicationJob
+  def perform(import_template_id, job_id, file_path)
+    template = ImportTemplate.find(import_template_id)
+    
+    # Update to processing
+    JobStatusService.update_status(job_id, :processing, 
+      started_at: Time.current,
+      template_name: template.name
     )
-  else
-    @import_template.update!(
-      status: :failed,
-      processing_completed_at: Time.current,
-      error_message: service_result.error_message
+    
+    # Call existing service unchanged
+    uploaded_file = ActionDispatch::Http::UploadedFile.new(
+      tempfile: File.open(file_path),
+      filename: File.basename(file_path),
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     )
+    
+    service_result = ExcelImportService.new(uploaded_file, template).process_import
+    
+    if service_result.success
+      JobStatusService.update_status(job_id, :completed,
+        completed_at: Time.current,
+        result_summary: service_result.summary,
+        processed_count: service_result.processed_count
+      )
+    else
+      JobStatusService.update_status(job_id, :failed,
+        completed_at: Time.current,
+        error_message: service_result.errors.join('; ')
+      )
+    end
+  rescue => e
+    JobStatusService.update_status(job_id, :failed,
+      completed_at: Time.current,
+      error_message: e.message
+    )
+  ensure
+    # Clean up temporary file
+    File.delete(file_path) if File.exist?(file_path)
   end
-rescue => e
-  @import_template.update!(
-    status: :failed,
-    processing_completed_at: Time.current,
-    error_message: e.message
-  )
 end
 ```
 
 ## Non-Goals (Out of Scope)
 
 - **Job Priorities**: No high/low priority queues - single default queue only
-- **Detailed Progress Bars**: No percentage-based progress tracking - simple status only
+- **Detailed Progress Bars**: No percentage-based progress tracking - simple status and optional progress messages only
 - **Job Scheduling**: No cron-like scheduled jobs - only on-demand processing
 - **Email Notifications**: No email alerts - only in-app notifications
 - **Job History Management**: No advanced filtering or search of job history
 - **Bulk Operations**: No batch processing of multiple files simultaneously
 - **Job Cancellation**: No ability to cancel running jobs
 - **Queue Monitoring Dashboard**: No admin interface for queue management
-- **Separate Jobs Table**: No additional database table - use existing model enums
+- **Persistent Job Storage**: No database tables for job status - cache-only storage that auto-expires
+- **Long-term Job History**: Job status only retained for 24 hours in cache
 
 ## Technical Considerations
+
+### Cache-Based Architecture Benefits
+- **No Database Schema Changes**: Existing models remain unchanged, no migrations required
+- **Automatic Cleanup**: Job status automatically expires from cache after 24 hours
+- **High Performance**: Cache reads/writes are much faster than database operations
+- **Loose Coupling**: Services remain completely independent of job status tracking
+- **Scalability**: Cache-based approach scales better than database status tracking
 
 ### Solid Queue Integration
 - Leverage existing Rails 8 Solid Queue configuration
 - Create job classes following Rails conventions: `ImportProcessingJob`, `ExportGenerationJob`
 - Jobs must be idempotent and handle retries safely
 - Use proper error handling and logging within job classes
+- Jobs receive `job_id` parameter for cache-based status updates
 
 ### Service Object Integration
-- Jobs wrap existing import/export services
-- Services maintain current validation and business logic
-- Jobs handle status updates, services focus on business logic
-- Services return result objects that jobs can inspect for success/failure
+- Jobs wrap existing import/export services without any service modifications
+- Services maintain current validation and business logic completely unchanged
+- Jobs handle all status updates via JobStatusService, services remain status-agnostic
+- Services return result objects that jobs inspect for success/failure status
+- Zero impact on existing service object interfaces or functionality
+
+### File Handling
+- Uploaded files stored temporarily in filesystem during job processing
+- Controller saves uploaded file to temp location before job enqueueing
+- Job receives file path parameter and creates ActionDispatch::Http::UploadedFile for service compatibility
+- Temporary files cleaned up automatically in job's ensure block
 
 ### Dependencies
-- No new gems required - Solid Queue is already configured in Rails 8
+- No new gems required - Solid Queue and Solid Cache are already configured in Rails 8
 - Integration with existing authentication and authorization systems  
 - Compatibility with current Turbo/Stimulus frontend architecture
+- JobStatusService uses Rails.cache (Solid Cache) for all status operations
 
 ## Success Metrics
 
@@ -185,8 +244,9 @@ end
 
 ## Open Questions
 
-1. **Model Selection**: Which existing models should have status enums added (ImportTemplate, Export, etc.)?
+1. **Cache Key Strategy**: Should we include user_id in cache keys for additional security/isolation, or rely on job_id uniqueness?
 2. **Retry Logic**: Should failed jobs automatically retry, or require user intervention?
-3. **File Storage**: Where should uploaded files be temporarily stored while jobs are queued?
-4. **Service Integration**: Should existing services be modified to accept status update callbacks, or should jobs handle all status management?
-5. **Job Cleanup**: Should we clean up the `background_job_id` field immediately after completion or keep it for debugging?
+3. **File Storage Location**: Should temporary files be stored in `/tmp` or a dedicated uploads temp directory?
+4. **Job Status Expiration**: Is 24 hours the right cache expiration time, or should it be configurable?
+5. **Progress Granularity**: How detailed should optional progress messages be (row counts, validation steps, etc.)?
+6. **Multi-job Support**: Should one import template be able to have multiple concurrent jobs, or should new jobs cancel/replace pending ones?

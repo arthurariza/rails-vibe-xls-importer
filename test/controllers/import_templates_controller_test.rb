@@ -9,10 +9,13 @@ class ImportTemplatesControllerTest < ActionDispatch::IntegrationTest
     @user = users(:one)
     @import_template = ImportTemplate.create!(
       name: "Test Template",
-      user: @user,
-      column_definitions: {
-        "column_1" => { "name" => "Name", "data_type" => "string" }
-      }
+      user: @user
+    )
+    # Create template column using the new system
+    @import_template.template_columns.create!(
+      column_number: 1,
+      name: "Name",
+      data_type: "string"
     )
     sign_in @user
   end
@@ -65,7 +68,9 @@ class ImportTemplatesControllerTest < ActionDispatch::IntegrationTest
 
   test "should handle successful sync import with ID column" do
     # Create existing record
-    existing_record = @import_template.data_records.create!(column_1: "Original Name")
+    existing_record = @import_template.data_records.create!
+    template_column = @import_template.template_columns.first
+    existing_record.set_value_for_column(template_column, "Original Name")
 
     # Create Excel file with updated data
     excel_data = [
@@ -76,14 +81,15 @@ class ImportTemplatesControllerTest < ActionDispatch::IntegrationTest
     file = create_test_excel_file(excel_data)
 
     post import_file_import_template_url(@import_template), params: { excel_file: file }
-
+    
     assert_redirected_to @import_template
     assert_match(/Successfully synchronized.*updated/, flash[:notice])
 
     # Verify record was updated
     existing_record.reload
+    template_column = @import_template.template_columns.first
 
-    assert_equal "Updated Name", existing_record.column_1
+    assert_equal "Updated Name", existing_record.value_for_column(template_column)
   end
 
   test "should handle failed import and show errors" do

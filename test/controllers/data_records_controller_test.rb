@@ -9,15 +9,20 @@ class DataRecordsControllerTest < ActionDispatch::IntegrationTest
     @user = users(:one)
     @import_template = ImportTemplate.create!(
       name: "Test Template",
-      user: @user,
-      column_definitions: {
-        "column_1" => { "name" => "Name", "data_type" => "string" }
-      }
+      user: @user
     )
 
-    @data_record = @import_template.data_records.create!(
-      column_1: "Test Data"
+    # Create template column for the new dynamic system
+    @name_column = @import_template.template_columns.create!(
+      name: "Name",
+      data_type: "string",
+      column_number: 1,
+      required: false
     )
+
+    @data_record = @import_template.data_records.create!
+    @data_record.set_value_for_column(@name_column, "Test Data")
+    
     sign_in @user
   end
 
@@ -108,17 +113,24 @@ class DataRecordsControllerTest < ActionDispatch::IntegrationTest
     other_user = users(:two)
     other_template = ImportTemplate.create!(
       name: "Other User Template",
-      user: other_user,
-      column_definitions: {
-        "column_1" => { "name" => "Other", "data_type" => "string" }
-      }
+      user: other_user
     )
-    other_record = other_template.data_records.create!(column_1: "Other Data")
+    
+    # Create template column for the other template
+    other_column = other_template.template_columns.create!(
+      name: "Other",
+      data_type: "string",
+      column_number: 1,
+      required: false
+    )
+    
+    other_record = other_template.data_records.create!
+    other_record.set_value_for_column(other_column, "Other Data")
 
     get data_records_import_template_url(@import_template)
 
     assert_response :success
-    assert_select "td", text: @data_record.column_1
-    assert_select "td", text: other_record.column_1, count: 0
+    assert_select "td", text: @data_record.value_for_column(@name_column)
+    assert_select "td", text: other_record.value_for_column(other_column), count: 0
   end
 end

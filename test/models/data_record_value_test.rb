@@ -46,7 +46,7 @@ class DataRecordValueTest < ActiveSupport::TestCase
   test "should allow empty values" do
     data_record_value = DataRecordValue.new(
       data_record: data_records(:one),
-      template_column: template_columns(:one),
+      template_column: template_columns(:email), # Use the email column we added to avoid conflict
       value: nil
     )
 
@@ -95,29 +95,33 @@ class DataRecordValueTest < ActiveSupport::TestCase
   end
 
   test "should validate uniqueness of template_column per data_record" do
-    data_record = data_records(:one)
-    template_column = template_columns(:one)
+    # Use template 2 and its records to avoid cross-template conflicts
+    data_record = data_records(:two)
+    template_column = template_columns(:three) # Belongs to same template as data_record
 
-    # First value should be valid
+    # First value should be valid (but this combination already exists in fixtures, so create a new record)
+    new_data_record = DataRecord.create!(import_template: import_templates(:two))
+    
     DataRecordValue.create!(
-      data_record: data_record,
+      data_record: new_data_record,
       template_column: template_column,
       value: "first value"
     )
 
     # Second value with same data_record and template_column should not be valid
     value2 = DataRecordValue.new(
-      data_record: data_record,
+      data_record: new_data_record,
       template_column: template_column,
       value: "second value"
     )
 
     assert_not value2.valid?
-    assert_includes value2.errors[:template_column_id], "has already been taken"
+    assert_includes value2.errors[:data_record_id], "has already been taken"
 
     # But same template_column with different data_record should be valid
+    another_data_record = DataRecord.create!(import_template: import_templates(:two))
     value3 = DataRecordValue.new(
-      data_record: data_records(:two),
+      data_record: another_data_record,
       template_column: template_column,
       value: "third value"
     )
@@ -139,8 +143,8 @@ class DataRecordValueTest < ActiveSupport::TestCase
     original_data_record = data_record_value.data_record
     original_template_column = data_record_value.template_column
 
-    # Destroying the data_record should destroy the value
-    assert_difference "DataRecordValue.count", -1 do
+    # Destroying the data_record should destroy its values (data_record :one has 2 values in fixtures)
+    assert_difference "DataRecordValue.count", -2 do
       original_data_record.destroy!
     end
 

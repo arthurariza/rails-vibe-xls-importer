@@ -10,19 +10,18 @@ class TemplateColumnsController < ApplicationController
 
     if @template_column.save
       render json: {
-        status: "success",
-        column: {
-          id: @template_column.id,
-          name: @template_column.name,
-          data_type: @template_column.data_type,
-          required: @template_column.required,
-          column_number: @template_column.column_number
-        }
-      }
+        id: @template_column.id,
+        name: @template_column.name,
+        data_type: @template_column.data_type,
+        required: @template_column.required,
+        column_number: @template_column.column_number,
+        created_at: @template_column.created_at,
+        updated_at: @template_column.updated_at
+      }, status: :created
     else
       render json: {
         status: "error",
-        errors: @template_column.errors.full_messages
+        errors: @template_column.errors
       }, status: :unprocessable_content
     end
   end
@@ -30,19 +29,18 @@ class TemplateColumnsController < ApplicationController
   def update
     if @template_column.update(template_column_params)
       render json: {
-        status: "success",
-        column: {
-          id: @template_column.id,
-          name: @template_column.name,
-          data_type: @template_column.data_type,
-          required: @template_column.required,
-          column_number: @template_column.column_number
-        }
+        id: @template_column.id,
+        name: @template_column.name,
+        data_type: @template_column.data_type,
+        required: @template_column.required,
+        column_number: @template_column.column_number,
+        created_at: @template_column.created_at,
+        updated_at: @template_column.updated_at
       }
     else
       render json: {
         status: "error",
-        errors: @template_column.errors.full_messages
+        errors: @template_column.errors
       }, status: :unprocessable_content
     end
   end
@@ -52,10 +50,7 @@ class TemplateColumnsController < ApplicationController
       # Reorder remaining columns after deletion
       @import_template.reorder_columns
 
-      render json: {
-        status: "success",
-        message: "Column deleted successfully"
-      }
+      head :no_content
     else
       render json: {
         status: "error",
@@ -85,6 +80,6 @@ class TemplateColumnsController < ApplicationController
   end
 
   def template_column_params
-    params.expect(template_column: %i[name data_type required column_number])
+    params.expect(template_column: %i[name data_type required])
   end
 end

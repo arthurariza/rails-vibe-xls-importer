@@ -11,11 +11,14 @@ class TemplateColumn < ApplicationRecord
 
   scope :ordered, -> { order(:column_number) }
 
-  before_save :ensure_column_number_sequence
+  before_validation :ensure_column_number_sequence
 
   private
 
   def ensure_column_number_sequence
+    # Don't auto-assign if column_number has been explicitly set (even to nil)
+    return if column_number_changed?
+    # Only auto-assign if column_number is blank and hasn't been explicitly changed
     return if column_number.present?
 
     max_column_number = import_template.template_columns.maximum(:column_number) || 0

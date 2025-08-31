@@ -114,7 +114,7 @@ class TemplateColumnTest < ActiveSupport::TestCase
   end
 
   test "ordered scope should return columns ordered by column_number" do
-    template = import_templates(:one)
+    template = ImportTemplate.create!(name: "Ordered Test Template", user: users(:one))
 
     # Create columns out of order
     TemplateColumn.create!(
@@ -155,8 +155,8 @@ class TemplateColumnTest < ActiveSupport::TestCase
   end
 
   test "should destroy dependent data_record_values when destroyed" do
-    template_column = template_columns(:one)
-    data_record = data_records(:one)
+    template_column = template_columns(:email) # Use email column which has no existing values
+    data_record = data_records(:two)
 
     # Create a data_record_value
     DataRecordValue.create!(
