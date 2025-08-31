@@ -1,11 +1,10 @@
 # Testing Rules
 
 ## Usefull Folders And Files
-- @spec/ : the main testing folder
-- @spec/fixtures : Fixtures folder
-- @spec/rails_helper.rb : Rails helper file
-- @spec/spec_helper.rb : Spec helper file
-- @spec/swagger_helper.rb: Swagger helper file
+- @test/ : the main testing folder
+- @test/fixtures : Fixtures folder
+- @spec/test_helper.rb : Test helper file
+- @spec/application_system_test_case.rb : System test helper file
 
 ## Arrange-Act-Assert
 1. **Arrange**: Set up test data and prerequisites
@@ -32,30 +31,41 @@
 - Don't test Rails framework itself
 - Focus on business logic coverage
 
-## Rspec Context
-- Use context blocks to group related functionality
-- Use context blocks to group functionality by country
-```ruby
-context 'when employee is from Brazil' do
-  ...
-end
+## Minitest Best Practices
 
-context 'when company is Mexican' do
-  ...
+```ruby
+class UserTest < ActiveSupport::TestCase
+  test "should not save user without email" do
+    user = User.new
+    assert_not user.save, "Saved the user without an email"
+  end
+
+  test "should report full name" do
+    user = User.new(first_name: "John", last_name: "Doe")
+    assert_equal "John Doe", user.full_name
+  end
 end
 ```
 
-## Rspec Anti Patterns
-- Never use **let!**
-- Chaining to many context blocks
-- Never use `allow_any_instance_of` use `allow(Class).to_receive(:method).and_return(instance)` pattern
-- Calling Timecop.freeze **in a before block** (Always ensure to call Timecop.return **in a after block**)
+## Integration Tests
+```ruby
+class UsersControllerTest < ActionDispatch::IntegrationTest
+  setup do
+    @user = users(:one)
+  end
 
-## Rspec Good Pattern
-- **Describe Your Methods**: Be clear about what method you are describing.
-- **Keep your description short**: A spec description should never be longer than 40 characters. If this happens you should split it using a context.
-- **Single expectation test**: This helps you on finding possible errors, going directly to the failing test, and to make your code readable. In isolated unit specs, you want each example to specify one (and only one) behavior. Multiple expectations in the same example are a signal that you may be specifying multiple behaviors.
-- **Test all possible cases**: Testing is a good practice, but if you do not test the edge cases, it will not be useful. Test valid, edge and invalid case.
-- **Expect Syntax**: Always use the expect syntax.
-- **Create only the data you need**
-- **Use factories and not fixtures**: Use the FactoryBot gem
+  test "should get index" do
+    get users_url
+    assert_response :success
+  end
+
+  test "should create user" do
+    assert_difference('User.count') do
+      post users_url, params: { user: { email: 'new@example.com' } }
+    end
+
+    assert_redirected_to user_url(User.last)
+  end
+end
+```
+<% end %>
