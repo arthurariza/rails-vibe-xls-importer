@@ -26,7 +26,7 @@ class ImportTemplatesController < ApplicationController
     if @import_template.save
       redirect_to @import_template, notice: "Template was successfully created."
     else
-      render :new, status: :unprocessable_entity
+      render :new, status: :unprocessable_content
     end
   end
 
@@ -34,7 +34,7 @@ class ImportTemplatesController < ApplicationController
     if @import_template.update(import_template_params)
       redirect_to @import_template, notice: "Template was successfully updated."
     else
-      render :edit, status: :unprocessable_entity
+      render :edit, status: :unprocessable_content
     end
   end
 

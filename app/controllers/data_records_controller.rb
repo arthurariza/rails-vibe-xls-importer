@@ -22,7 +22,7 @@ class DataRecordsController < ApplicationController
     if @data_record.save
       redirect_to [@import_template, @data_record], notice: "Record was successfully created."
     else
-      render :new, status: :unprocessable_entity
+      render :new, status: :unprocessable_content
     end
   end
 
@@ -30,7 +30,7 @@ class DataRecordsController < ApplicationController
     if @data_record.update(data_record_params)
       redirect_to [@import_template, @data_record], notice: "Record was successfully updated."
     else
-      render :edit, status: :unprocessable_entity
+      render :edit, status: :unprocessable_content
     end
   end
 
