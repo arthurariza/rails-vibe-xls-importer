@@ -4,9 +4,11 @@ require "test_helper"
 
 class ExcelExportServiceTest < ActiveSupport::TestCase
   def setup
+    @user = users(:one)
     @template = ImportTemplate.create!(
       name: "Test Export Template",
       description: "Template for testing exports",
+      user: @user,
       column_definitions: {
         "column_1" => { "name" => "Name", "data_type" => "string" },
         "column_2" => { "name" => "Age", "data_type" => "number" },
@@ -66,6 +68,7 @@ class ExcelExportServiceTest < ActiveSupport::TestCase
   test "should handle template with no column definitions" do
     empty_template = ImportTemplate.create!(
       name: "Empty Template",
+      user: @user,
       column_definitions: {}
     )
 
@@ -79,6 +82,7 @@ class ExcelExportServiceTest < ActiveSupport::TestCase
   test "should sanitize template name for worksheet" do
     template_with_special_chars = ImportTemplate.create!(
       name: "Test Template! @#$%",
+      user: @user,
       column_definitions: {
         "column_1" => { "name" => "Test", "data_type" => "string" }
       }

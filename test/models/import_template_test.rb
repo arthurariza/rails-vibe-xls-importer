@@ -7,6 +7,7 @@ class ImportTemplateTest < ActiveSupport::TestCase
     template = ImportTemplate.new(
       name: "Employee Data",
       description: "Employee information template",
+      user: users(:one),
       column_definitions: {
         "column_1" => { "name" => "Name", "data_type" => "string" },
         "column_2" => { "name" => "Age", "data_type" => "number" },
@@ -21,6 +22,7 @@ class ImportTemplateTest < ActiveSupport::TestCase
   test "should require name" do
     template = ImportTemplate.new(
       description: "Test template",
+      user: users(:one),
       column_definitions: {}
     )
 
@@ -32,12 +34,14 @@ class ImportTemplateTest < ActiveSupport::TestCase
     # Create first template
     ImportTemplate.create!(
       name: "Duplicate Name",
+      user: users(:one),
       column_definitions: {}
     )
 
     # Try to create second template with same name
     template = ImportTemplate.new(
       name: "Duplicate Name",
+      user: users(:two),
       column_definitions: {}
     )
 
@@ -104,6 +108,7 @@ class ImportTemplateTest < ActiveSupport::TestCase
   test "should allow empty column definitions" do
     template = ImportTemplate.new(
       name: "Minimal Template",
+      user: users(:one),
       column_definitions: {}
     )
 

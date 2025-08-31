@@ -97,8 +97,9 @@ class ImportTemplatesControllerTest < ActionDispatch::IntegrationTest
 
     post import_file_import_template_url(@import_template), params: { excel_file: file }
 
-    assert_response :success
-    assert_equal "Synchronization failed with errors:", flash.now[:alert]
+    assert_redirected_to import_form_import_template_path(@import_template)
+    follow_redirect!
+    assert_match "Synchronization failed with errors", flash[:alert]
   end
 
   test "should redirect to login when not authenticated" do

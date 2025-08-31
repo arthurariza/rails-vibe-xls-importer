@@ -4,9 +4,11 @@ require "test_helper"
 
 class ExcelImportServiceTest < ActiveSupport::TestCase
   def setup
+    @user = users(:one)
     @template = ImportTemplate.create!(
       name: "Test Import Template",
       description: "Template for testing imports",
+      user: @user,
       column_definitions: {
         "column_1" => { "name" => "Name", "data_type" => "string" },
         "column_2" => { "name" => "Age", "data_type" => "number" },

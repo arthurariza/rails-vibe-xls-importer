@@ -79,25 +79,27 @@ class ImportTemplatesController < ApplicationController
   end
 
   def import_file
-    if params[:excel_file].blank?
-      redirect_to import_form_import_template_path(@import_template),
-                  alert: "Please select a file to import."
-      return
-    end
+    return redirect_with_error("Please select a file to import.") if params[:excel_file].blank?
 
+    process_excel_import
+  end
+
+  private
+
+  def process_excel_import
     service = ExcelImportService.new(params[:excel_file], @import_template)
     @import_result = service.process_import
 
     if @import_result.success
-      redirect_to @import_template,
-                  notice: @import_result.summary
+      redirect_to @import_template, notice: @import_result.summary
     else
-      redirect_to import_form_import_template_path(@import_template),
-                  alert: "Synchronization failed with errors: #{@import_result.errors.join(', ')}"
+      redirect_with_error("Synchronization failed with errors: #{@import_result.errors.join(', ')}")
     end
   end
 
-  private
+  def redirect_with_error(message)
+    redirect_to import_form_import_template_path(@import_template), alert: message
+  end
 
   def set_import_template
     @import_template = current_user.import_templates.find(params[:id])
