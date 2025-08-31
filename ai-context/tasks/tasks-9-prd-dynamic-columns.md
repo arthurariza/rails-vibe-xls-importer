@@ -98,39 +98,39 @@
   - [x] 8.5 Add column width auto-sizing based on content and column names
   - [x] 8.6 Test export functionality with templates having different column counts
 
-- [ ] 9.0 Update Header Validation for Dynamic Templates
-  - [ ] 9.1 Modify `HeaderValidationService` to query template_columns instead of column_definitions
-  - [ ] 9.2 Update validation logic to handle variable numbers of expected headers
-  - [ ] 9.3 Improve error messages to show actual template column names from database
-  - [ ] 9.4 Update `create_header_mapping` to work with template_column IDs instead of hardcoded numbers
-  - [ ] 9.5 Add validation for column order matching between Excel and template configuration
+- [x] 9.0 Update Header Validation for Dynamic Templates
+  - [x] 9.1 Modify `HeaderValidationService` to query template_columns instead of column_definitions
+  - [x] 9.2 Update validation logic to handle variable numbers of expected headers
+  - [x] 9.3 Improve error messages to show actual template column names from database
+  - [x] 9.4 Update `create_header_mapping` to work with template_column IDs instead of hardcoded numbers
+  - [x] 9.5 Add validation for column order matching between Excel and template configuration
 
-- [ ] 10.0 Create Frontend Column Management Interface
-  - [ ] 10.1 Create `column_manager_controller.js` Stimulus controller for dynamic column interactions
-  - [ ] 10.2 Implement `addColumn` action to dynamically add new column configuration fields
-  - [ ] 10.3 Implement `removeColumn` action with confirmation and proper form field removal
-  - [ ] 10.4 Add drag-and-drop functionality for column reordering with visual feedback
-  - [ ] 10.5 Implement real-time Excel structure preview updates as columns change
-  - [ ] 10.6 Add client-side validation for column names (uniqueness, required fields)
-  - [ ] 10.7 Handle AJAX form submissions for seamless column management without page reloads
+- [x] 10.0 Create Frontend Column Management Interface
+  - [x] 10.1 Create `column_manager_controller.js` Stimulus controller for dynamic column interactions
+  - [x] 10.2 Implement `addColumn` action to dynamically add new column configuration fields
+  - [x] 10.3 Implement `removeColumn` action with confirmation and proper form field removal
+  - [x] 10.4 Add drag-and-drop functionality for column reordering with visual feedback
+  - [x] 10.5 Implement real-time Excel structure preview updates as columns change
+  - [x] 10.6 Add client-side validation for column names (uniqueness, required fields)
+  - [x] 10.7 Handle AJAX form submissions for seamless column management without page reloads
 
-- [ ] 11.0 Update Data Viewing Interface for Dynamic Columns
-  - [ ] 11.1 Modify `data_records/index.html.erb` to render dynamic table headers from template_columns
-  - [ ] 11.2 Update table body to display values from data_record_values association
-  - [ ] 11.3 Add responsive design for tables with many columns (horizontal scrolling)
-  - [ ] 11.4 Implement column header tooltips showing data types and requirements
-  - [ ] 11.5 Add pagination handling for large datasets with many columns
-  - [ ] 11.6 Update `show.html.erb` for individual data records to display all dynamic columns
-  - [ ] 11.7 Add export functionality from data viewing pages
+- [x] 11.0 Update Data Viewing Interface for Dynamic Columns
+  - [x] 11.1 Modify `data_records/index.html.erb` to render dynamic table headers from template_columns
+  - [x] 11.2 Update table body to display values from data_record_values association
+  - [x] 11.3 Add responsive design for tables with many columns (horizontal scrolling)
+  - [x] 11.4 Implement column header tooltips showing data types and requirements
+  - [x] 11.5 Add pagination handling for large datasets with many columns
+  - [x] 11.6 Update `show.html.erb` for individual data records to display all dynamic columns
+  - [x] 11.7 Add export functionality from data viewing pages
 
-- [ ] 12.0 Update Tests for New Architecture
-  - [ ] 12.1 Create comprehensive unit tests for `TemplateColumn` model including validations and associations
-  - [ ] 12.2 Create unit tests for `DataRecordValue` model with proper association testing
-  - [ ] 12.3 Update `ImportTemplate` model tests to work with new dynamic column associations
-  - [ ] 12.4 Update `DataRecord` model tests to use new value storage methods
-  - [ ] 12.5 Create controller tests for `TemplateColumnsController` covering CRUD operations
-  - [ ] 12.6 Update `ExcelImportService` tests to cover dynamic column processing scenarios
-  - [ ] 12.7 Update `ExcelExportService` tests for dynamic column generation
-  - [ ] 12.8 Create integration tests for end-to-end dynamic column workflows
-  - [ ] 12.9 Add performance tests for templates with large numbers of columns (50+)
-  - [ ] 12.10 Update system tests for column management UI interactions
+- [x] 12.0 Update Tests for New Architecture
+  - [x] 12.1 Create comprehensive unit tests for `TemplateColumn` model including validations and associations
+  - [x] 12.2 Create unit tests for `DataRecordValue` model with proper association testing
+  - [x] 12.3 Update `ImportTemplate` model tests to work with new dynamic column associations
+  - [x] 12.4 Update `DataRecord` model tests to use new value storage methods
+  - [x] 12.5 Create controller tests for `TemplateColumnsController` covering CRUD operations
+  - [x] 12.6 Update `ExcelImportService` tests to cover dynamic column processing scenarios
+  - [x] 12.7 Update `ExcelExportService` tests for dynamic column generation
+  - [x] 12.8 Create integration tests for end-to-end dynamic column workflows
+  - [x] 12.9 Add performance tests for templates with large numbers of columns (50+)
+  - [x] 12.10 Update system tests for column management UI interactions

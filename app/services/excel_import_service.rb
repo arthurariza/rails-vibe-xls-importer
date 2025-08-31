@@ -163,6 +163,10 @@ class ExcelImportService < ApplicationService
     # Map Excel columns to our database columns using template columns
     header_mapping.each do |excel_col_index, template_column|
       value = row_data[excel_col_index]
+
+      # Check for required field validation
+      raise "Required field '#{template_column.name}' cannot be empty" if template_column.required? && value.blank?
+
       next if value.blank?
 
       # Convert value according to column data type
@@ -170,7 +174,7 @@ class ExcelImportService < ApplicationService
 
       # Build attributes for data_record_values
       data_record_values_attributes << {
-        template_column: template_column,
+        template_column_id: template_column.id,
         value: converted_value
       }
     end
@@ -202,11 +206,28 @@ class ExcelImportService < ApplicationService
             next
           end
 
-          # Test if attributes are valid
-          existing_record.assign_attributes(operation[:attributes])
-          unless existing_record.valid?
+          # Test if attributes are valid by simulating the column value updates
+          # Create a duplicate record for validation without affecting the original
+          test_record = existing_record.dup
+
+          # Simulate updating each column value
+          operation[:attributes][:data_record_values_attributes]&.each do |value_attrs|
+            template_column = TemplateColumn.find(value_attrs[:template_column_id])
+            # For validation, we just check if the value would be valid for the column type
+            begin
+              convert_value(value_attrs[:value], template_column.data_type, operation[:row_number])
+            rescue StandardError => e
+              import_result.add_row_error(operation[:row_number], e.message)
+              break
+            end
+          end
+
+          # Test if the record itself is still valid (without the data_record_values_attributes)
+          basic_attributes = operation[:attributes].except(:data_record_values_attributes)
+          test_record.assign_attributes(basic_attributes)
+          unless test_record.valid?
             import_result.add_row_error(operation[:row_number],
-                                        "Validation failed: #{existing_record.errors.full_messages.join('; ')}")
+                                        "Validation failed: #{test_record.errors.full_messages.join('; ')}")
           end
         else
           # Validate create operation
@@ -236,7 +257,7 @@ class ExcelImportService < ApplicationService
     ActiveRecord::Base.transaction do
       # Delete records not present in import file
       if sync_plan[:to_delete].any?
-        import_template.data_records.where(id: sync_plan[:to_delete]).delete_all
+        import_template.data_records.where(id: sync_plan[:to_delete]).destroy_all
         import_result.deleted_count = sync_plan[:to_delete].length
       end
 
@@ -245,7 +266,15 @@ class ExcelImportService < ApplicationService
         next if operation[:attributes][:_error]
 
         record = import_template.data_records.find(operation[:id])
-        record.update!(operation[:attributes].merge(import_batch_id: batch_id))
+
+        # Update each column value individually using the set_value_for_column method
+        operation[:attributes][:data_record_values_attributes]&.each do |value_attrs|
+          template_column = TemplateColumn.find(value_attrs[:template_column_id])
+          record.set_value_for_column(template_column, value_attrs[:value])
+        end
+
+        # Update the import_batch_id directly
+        record.update!(import_batch_id: batch_id)
         import_result.updated_records << record
       end
 
@@ -284,7 +313,7 @@ class ExcelImportService < ApplicationService
 
       # Build attributes for data_record_values
       data_record_values_attributes << {
-        template_column: template_column,
+        template_column_id: template_column.id,
         value: converted_value
       }
     end
