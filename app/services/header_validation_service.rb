@@ -12,19 +12,38 @@ class HeaderValidationService < ApplicationService
   end
 
   def validate_headers
+    # Handle case where template has no columns configured
+    if import_template.template_columns.empty?
+      validation_result.valid = false
+      validation_result.custom_errors << "Template has no columns configured. Please add columns to the template first."
+      return validation_result
+    end
+
     template_headers = import_template.column_headers.map(&:downcase)
+
+    # Handle case where Excel file has no headers
+    if excel_headers.empty?
+      validation_result.valid = false
+      message = "Excel file has no headers. Please ensure the first row contains column headers."
+      validation_result.custom_errors << message
+      return validation_result
+    end
 
     # Check for missing required headers
     missing_normalized_headers = template_headers - excel_headers
     validation_result.missing_headers = missing_normalized_headers
 
-    # Check for extra headers
+    # Check for extra headers (only show warning, don't fail validation)
     extra_headers = excel_headers - template_headers
     validation_result.extra_headers = extra_headers
 
     # Create mapping of excel headers to template columns
     create_header_mapping
 
+    # Check column order matching (optional validation - warns but doesn't fail)
+    validate_column_order
+
+    # Validation succeeds if all required headers are present
     validation_result.valid = missing_normalized_headers.empty?
     validation_result
   end
@@ -52,25 +71,44 @@ class HeaderValidationService < ApplicationService
 
   def create_header_mapping
     mapping = {}
-    template_headers = import_template.column_headers
+    template_columns = import_template.template_columns.includes(:import_template)
 
     excel_headers.each_with_index do |excel_header, index|
-      template_header = template_headers.find { |h| h.downcase == excel_header }
-      next unless template_header
+      # Find the template column with matching name
+      template_column = template_columns.find { |col| col.name.downcase == excel_header }
+      next unless template_column
 
-      # Find which column number this header belongs to
-      (1..5).each do |col_num|
-        column_def = import_template.column_definition(col_num)
-        next unless column_def&.dig("name")&.downcase == excel_header
-
-        # Adjust Excel column index to account for ID column (if present)
-        excel_col_index = @has_id_column ? index + 1 : index
-        mapping[excel_col_index] = col_num
-        break
-      end
+      # Adjust Excel column index to account for ID column (if present)
+      excel_col_index = @has_id_column ? index + 1 : index
+      mapping[excel_col_index] = template_column
     end
 
     validation_result.header_mapping = mapping
+  end
+
+  def validate_column_order
+    # Only validate order if all required headers are present
+    return if validation_result.missing_headers.any?
+
+    template_headers = import_template.column_headers.map(&:downcase)
+
+    # Find the order of matching headers in Excel
+    excel_order = []
+    template_headers.each do |template_header|
+      excel_index = excel_headers.index(template_header)
+      excel_order << excel_index if excel_index
+    end
+
+    # Check if the Excel headers are in the same order as template
+    expected_order = excel_order.sort
+    return unless excel_order != expected_order
+
+    template_order = import_template.column_headers.join(", ")
+    excel_found_order = excel_order.map { |idx| excel_headers[idx].titleize }.join(", ")
+
+    message = "Column order mismatch: Expected order '#{template_order}' " \
+              "but found '#{excel_found_order}'. Data will still import correctly."
+    validation_result.custom_errors << message
   end
 
   def find_best_match(excel_header, template_headers)
@@ -126,6 +164,7 @@ class HeaderValidationService < ApplicationService
 
   class ValidationResult
     attr_accessor :valid, :missing_headers, :extra_headers, :header_mapping, :suggested_mappings, :import_template
+    attr_reader :custom_errors
 
     def initialize
       @valid = false
@@ -134,17 +173,23 @@ class HeaderValidationService < ApplicationService
       @header_mapping = {}
       @suggested_mappings = {}
       @import_template = nil
+      @custom_errors = []
     end
 
     def errors
-      errors = []
+      # Combine custom errors with missing/extra header errors
+      all_errors = custom_errors.dup
+
       if missing_headers.any?
         # Show the actual template headers, not the normalized ones
         actual_missing_headers = find_actual_template_headers(missing_headers)
-        errors << "Missing required headers: #{actual_missing_headers.join(', ')}"
+        template_name = import_template&.name ? " in template '#{import_template.name}'" : ""
+        all_errors << "Missing required headers#{template_name}: #{actual_missing_headers.join(', ')}"
       end
-      errors << "Extra headers found: #{extra_headers.join(', ')}" if extra_headers.any?
-      errors
+
+      all_errors << "Extra headers found (will be ignored): #{extra_headers.join(', ')}" if extra_headers.any?
+
+      all_errors
     end
 
     def has_suggestions?

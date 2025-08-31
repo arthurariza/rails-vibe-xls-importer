@@ -3,7 +3,7 @@
 class MigrateExistingColumnData < ActiveRecord::Migration[8.0]
   def up
     # First, migrate column definitions from import_templates to template_columns
-    puts "Migrating column definitions to template_columns..."
+    Rails.logger.debug "Migrating column definitions to template_columns..."
 
     connection.select_all("SELECT * FROM import_templates WHERE column_definitions IS NOT NULL AND column_definitions != ''").each do |template|
       next if template["column_definitions"].blank?
@@ -24,7 +24,7 @@ class MigrateExistingColumnData < ActiveRecord::Migration[8.0]
     end
 
     # Second, migrate data from column_1-5 fields to data_record_values
-    puts "Migrating data record values to normalized structure..."
+    Rails.logger.debug "Migrating data record values to normalized structure..."
 
     connection.select_all("SELECT * FROM data_records").each do |record|
       (1..5).each do |column_number|
@@ -46,16 +46,16 @@ class MigrateExistingColumnData < ActiveRecord::Migration[8.0]
       end
     end
 
-    puts "Migration completed successfully!"
+    Rails.logger.debug "Migration completed successfully!"
   end
 
   def down
     # Remove all template columns and data record values
-    puts "Reverting migration - removing template columns and data record values..."
+    Rails.logger.debug "Reverting migration - removing template columns and data record values..."
 
     connection.execute("DELETE FROM data_record_values")
     connection.execute("DELETE FROM template_columns")
 
-    puts "Migration reverted successfully!"
+    Rails.logger.debug "Migration reverted successfully!"
   end
 end

@@ -99,6 +99,7 @@ class ImportTemplatesControllerTest < ActionDispatch::IntegrationTest
 
     assert_redirected_to import_form_import_template_path(@import_template)
     follow_redirect!
+
     assert_match "Synchronization failed with errors", flash[:alert]
   end
 

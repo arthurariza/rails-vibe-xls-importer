@@ -7,6 +7,7 @@ export default class extends Controller {
   static values = { templateId: Number }
   
   connect() {
+    this.draggedElement = null
     this.updatePreview()
   }
   
@@ -128,6 +129,72 @@ export default class extends Controller {
     const div = document.createElement('div')
     div.textContent = text
     return div.innerHTML
+  }
+  
+  // Drag and Drop Methods
+  handleMouseDown(event) {
+    // This just provides visual feedback that the handle is interactive
+    event.target.closest('.column-field').style.cursor = 'grabbing'
+  }
+  
+  dragStart(event) {
+    this.draggedElement = event.target
+    this.draggedElement.style.opacity = '0.5'
+    event.dataTransfer.effectAllowed = 'move'
+    event.dataTransfer.setData('text/html', this.draggedElement.outerHTML)
+  }
+  
+  dragEnd(event) {
+    event.target.style.opacity = '1'
+    event.target.style.cursor = 'grab'
+    this.draggedElement = null
+  }
+  
+  dragOver(event) {
+    event.preventDefault()
+    event.dataTransfer.dropEffect = 'move'
+    
+    const afterElement = this.getDragAfterElement(event.clientY)
+    const dragging = this.draggedElement
+    
+    if (afterElement == null) {
+      this.columnsContainerTarget.appendChild(dragging)
+    } else {
+      this.columnsContainerTarget.insertBefore(dragging, afterElement)
+    }
+  }
+  
+  drop(event) {
+    event.preventDefault()
+    this.updateColumnNumbers()
+    this.updatePreview()
+    this.showMessage('Column order updated', 'success')
+  }
+  
+  getDragAfterElement(y) {
+    const draggableElements = [...this.columnsContainerTarget.querySelectorAll('.column-field:not(.dragging)')]
+    
+    return draggableElements.reduce((closest, child) => {
+      const box = child.getBoundingClientRect()
+      const offset = y - box.top - box.height / 2
+      
+      if (offset < 0 && offset > closest.offset) {
+        return { offset: offset, element: child }
+      } else {
+        return closest
+      }
+    }, { offset: Number.NEGATIVE_INFINITY }).element
+  }
+  
+  updateColumnNumbers() {
+    const columnFields = this.columnsContainerTarget.querySelectorAll('.column-field')
+    columnFields.forEach((field, index) => {
+      const header = field.querySelector('h4')
+      const columnId = field.dataset.columnId
+      if (columnId && !columnId.startsWith('new_')) {
+        header.textContent = `Column ${index + 1}`
+      }
+    })
   }
   
   // Add event listeners for preview updates when columns are modified

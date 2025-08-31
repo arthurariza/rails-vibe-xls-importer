@@ -12,6 +12,8 @@
       <div class="flex space-x-3">
         <%= link_to "Edit Record", edit_import_template_data_record_path(@import_template, @data_record), 
             class: "bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" %>
+        <%= link_to "Export All Data", export_data_import_template_path(@import_template), 
+            class: "bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" %>
         <%= link_to "Back to Records", import_template_data_records_path(@import_template), 
             class: "bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded" %>
       </div>
@@ -23,41 +25,43 @@
         <h2 class="text-xl font-semibold text-gray-900">Record Data</h2>
       </div>
       <div class="p-6">
-        <% if @import_template.column_headers.any? %>
+        <% if @import_template.template_columns.any? %>
           <div class="space-y-6">
-            <% (1..5).each do |i| %>
-              <% column_def = @import_template.column_definition(i) %>
-              <% if column_def.present? %>
-                <div class="border-l-4 border-blue-500 pl-4">
-                  <dt class="text-sm font-medium text-gray-500 uppercase tracking-wide">
-                    <%= column_def["name"] %>
-                    <span class="text-xs text-gray-400">(<%= column_def["data_type"]&.capitalize %>)</span>
-                  </dt>
-                  <dd class="mt-1 text-lg text-gray-900">
-                    <% value = @data_record.column_value(i) %>
-                    <% if value.present? %>
-                      <% case column_def["data_type"] %>
-                      <% when "boolean" %>
-                        <span class="<%= value == 'true' ? 'text-green-600' : value == 'false' ? 'text-red-600' : 'text-gray-500' %>">
-                          <%= value == 'true' ? 'Yes' : value == 'false' ? 'No' : 'Not set' %>
-                        </span>
-                      <% when "date" %>
-                        <%= Date.parse(value).strftime("%B %d, %Y") rescue value %>
-                      <% when "number" %>
-                        <%= number_with_delimiter(value) rescue value %>
-                      <% else %>
-                        <%= simple_format(value) %>
-                      <% end %>
+            <% @import_template.template_columns.ordered.each do |template_column| %>
+              <div class="border-l-4 border-blue-500 pl-4">
+                <dt class="text-sm font-medium text-gray-500 uppercase tracking-wide">
+                  <%= template_column.name %>
+                  <% if template_column.required? %>
+                    <span class="text-red-500 ml-1">*</span>
+                  <% end %>
+                  <span class="text-xs text-gray-400">(<%= template_column.data_type.capitalize %>)</span>
+                </dt>
+                <dd class="mt-1 text-lg text-gray-900">
+                  <% value = @data_record.value_for_column(template_column) %>
+                  <% if value.present? %>
+                    <% case template_column.data_type %>
+                    <% when "boolean" %>
+                      <span class="<%= value == 'true' ? 'text-green-600' : value == 'false' ? 'text-red-600' : 'text-gray-500' %>">
+                        <%= value == 'true' ? 'Yes' : value == 'false' ? 'No' : 'Not set' %>
+                      </span>
+                    <% when "date" %>
+                      <%= Date.parse(value).strftime("%B %d, %Y") rescue value %>
+                    <% when "number" %>
+                      <%= number_with_delimiter(value) rescue value %>
                     <% else %>
-                      <span class="text-gray-400 italic">No data provided</span>
+                      <%= simple_format(value) %>
                     <% end %>
-                  </dd>
-                </div>
-              <% end %>
+                  <% else %>
+                    <span class="text-gray-400 italic">
+                      <%= template_column.required? ? "Required field - no data provided" : "No data provided" %>
+                    </span>
+                  <% end %>
+                </dd>
+              </div>
             <% end %>
           </div>
         <% else %>
-          <p class="text-gray-500">No column definitions available for this template.</p>
+          <p class="text-gray-500">No columns configured for this template.</p>
         <% end %>
       </div>
     </div>

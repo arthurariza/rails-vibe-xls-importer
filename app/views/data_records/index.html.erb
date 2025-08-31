@@ -11,6 +11,10 @@
       <div class="flex space-x-3">
         <%= link_to "Add Record", new_import_template_data_record_path(@import_template), 
             class: "bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" %>
+        <% if @data_records.any? %>
+          <%= link_to "Export Data", export_data_import_template_path(@import_template), 
+              class: "bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" %>
+        <% end %>
         <%= link_to "Back to Template", @import_template, 
             class: "bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded" %>
       </div>
@@ -19,7 +23,8 @@
     <!-- Records Count -->
     <div class="mb-6">
       <p class="text-sm text-gray-600">
-        <strong><%= @data_records.count %></strong> records found
+        <strong><%= @pagy.count %></strong> records found
+        <%= "(showing #{@pagy.from}-#{@pagy.to})" if @pagy.pages > 1 %>
       </p>
     </div>
 
@@ -30,9 +35,13 @@
           <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
               <tr>
-                <% @import_template.column_headers.each do |header| %>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    <%= header %>
+                <% @import_template.template_columns.ordered.each do |template_column| %>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      title="Type: <%= template_column.data_type.capitalize %><%= template_column.required? ? ' (Required)' : '' %>">
+                    <%= template_column.name %>
+                    <% if template_column.required? %>
+                      <span class="text-red-500 ml-1">*</span>
+                    <% end %>
                   </th>
                 <% end %>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -46,14 +55,17 @@
             <tbody class="bg-white divide-y divide-gray-200">
               <% @data_records.each do |record| %>
                 <tr class="hover:bg-gray-50">
-                  <% (1..5).each do |i| %>
-                    <% if @import_template.column_definition(i).present? %>
-                      <td class="px-6 py-4 text-sm text-gray-900">
-                        <div class="max-w-xs truncate">
-                          <%= record.column_value(i) || "-" %>
-                        </div>
-                      </td>
-                    <% end %>
+                  <% @import_template.template_columns.ordered.each do |template_column| %>
+                    <td class="px-6 py-4 text-sm text-gray-900">
+                      <div class="max-w-xs truncate">
+                        <% value = record.value_for_column(template_column) %>
+                        <% if value.present? %>
+                          <%= format_column_value(value, template_column.data_type) %>
+                        <% else %>
+                          <span class="text-gray-400">-</span>
+                        <% end %>
+                      </div>
+                    </td>
                   <% end %>
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     <%= record.created_at.strftime("%m/%d/%Y") %>
@@ -76,14 +88,36 @@
           </table>
         </div>
 
-        <!-- Pagination placeholder -->
-        <div class="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">
-          <div class="flex-1 flex justify-between sm:justify-end">
-            <p class="text-sm text-gray-700">
-              Showing <strong><%= @data_records.count %></strong> records
-            </p>
+        <!-- Pagination -->
+        <% if @pagy.pages > 1 %>
+          <div class="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">
+            <div class="flex items-center justify-between">
+              <div class="flex-1 flex justify-between sm:hidden">
+                <% if @pagy.prev %>
+                  <%= link_to "Previous", pagy_url_for(@pagy, @pagy.prev), 
+                      class: "relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50" %>
+                <% end %>
+                <% if @pagy.next %>
+                  <%= link_to "Next", pagy_url_for(@pagy, @pagy.next), 
+                      class: "ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50" %>
+                <% end %>
+              </div>
+              <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                <div>
+                  <p class="text-sm text-gray-700">
+                    Showing <strong><%= @pagy.from %></strong> to <strong><%= @pagy.to %></strong> 
+                    of <strong><%= @pagy.count %></strong> records
+                  </p>
+                </div>
+                <div>
+                  <%== pagy_nav(@pagy, id: "pagy-nav", 
+                                class: "relative z-0 inline-flex rounded-md shadow-sm -space-x-px",
+                                link_extra: "class='bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium'") %>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
+        <% end %>
       <% else %>
         <!-- Empty State -->
         <div class="text-center py-12">
@@ -103,18 +137,23 @@
     </div>
 
     <!-- Column Information -->
-    <% if @import_template.column_headers.any? %>
+    <% if @import_template.template_columns.any? %>
       <div class="mt-8 bg-gray-50 rounded-lg p-6">
         <h3 class="text-lg font-medium text-gray-900 mb-4">Template Column Information</h3>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <% (1..5).each do |i| %>
-            <% column_def = @import_template.column_definition(i) %>
-            <% if column_def.present? %>
-              <div class="bg-white border border-gray-200 rounded p-3">
-                <p class="font-medium text-gray-900"><%= column_def["name"] %></p>
-                <p class="text-sm text-gray-600">Type: <%= column_def["data_type"]&.capitalize %></p>
-              </div>
-            <% end %>
+          <% @import_template.template_columns.ordered.each do |template_column| %>
+            <div class="bg-white border border-gray-200 rounded p-3">
+              <p class="font-medium text-gray-900">
+                <%= template_column.name %>
+                <% if template_column.required? %>
+                  <span class="text-red-500 ml-1">*</span>
+                <% end %>
+              </p>
+              <p class="text-sm text-gray-600">Type: <%= template_column.data_type.capitalize %></p>
+              <% if template_column.required? %>
+                <p class="text-xs text-red-600">Required</p>
+              <% end %>
+            </div>
           <% end %>
         </div>
       </div>

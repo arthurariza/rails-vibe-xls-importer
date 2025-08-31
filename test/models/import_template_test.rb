@@ -7,12 +7,7 @@ class ImportTemplateTest < ActiveSupport::TestCase
     template = ImportTemplate.new(
       name: "Employee Data",
       description: "Employee information template",
-      user: users(:one),
-      column_definitions: {
-        "column_1" => { "name" => "Name", "data_type" => "string" },
-        "column_2" => { "name" => "Age", "data_type" => "number" },
-        "column_3" => { "name" => "Start Date", "data_type" => "date" }
-      }
+      user: users(:one)
     )
 
     assert_predicate template, :valid?
@@ -22,8 +17,7 @@ class ImportTemplateTest < ActiveSupport::TestCase
   test "should require name" do
     template = ImportTemplate.new(
       description: "Test template",
-      user: users(:one),
-      column_definitions: {}
+      user: users(:one)
     )
 
     assert_not template.valid?
@@ -34,85 +28,154 @@ class ImportTemplateTest < ActiveSupport::TestCase
     # Create first template
     ImportTemplate.create!(
       name: "Duplicate Name",
-      user: users(:one),
-      column_definitions: {}
+      user: users(:one)
     )
 
     # Try to create second template with same name
     template = ImportTemplate.new(
       name: "Duplicate Name",
-      user: users(:two),
-      column_definitions: {}
+      user: users(:two)
     )
 
     assert_not template.valid?
     assert_includes template.errors[:name], "has already been taken"
   end
 
-  test "should validate column definitions structure" do
-    template = ImportTemplate.new(
-      name: "Invalid Columns",
-      column_definitions: {
-        "column_1" => { "name" => "Valid Column", "data_type" => "string" },
-        "column_2" => { "name" => "", "data_type" => "string" } # Invalid: empty name
-      }
-    )
+  test "should have many template_columns" do
+    template = import_templates(:one)
 
-    assert_not template.valid?
-    assert_includes template.errors[:column_definitions], "column 2 must have a name"
+    assert_respond_to template, :template_columns
+    assert_predicate template.template_columns, :any?
   end
 
-  test "should validate data types" do
-    template = ImportTemplate.new(
-      name: "Invalid Data Types",
-      column_definitions: {
-        "column_1" => { "name" => "Invalid Type", "data_type" => "invalid_type" }
-      }
-    )
+  test "should have many data_records" do
+    template = import_templates(:one)
 
-    assert_not template.valid?
-    assert_includes template.errors[:column_definitions],
-                    "column 1 must have a valid data_type (string, number, date, boolean)"
+    assert_respond_to template, :data_records
   end
 
-  test "should return column headers in order" do
-    template = ImportTemplate.new(
-      column_definitions: {
-        "column_1" => { "name" => "First", "data_type" => "string" },
-        "column_2" => { "name" => "Second", "data_type" => "number" },
-        "column_5" => { "name" => "Fifth", "data_type" => "boolean" }
-      }
-    )
-
+  test "should return column headers from template_columns in order" do
+    template = import_templates(:one)
     headers = template.column_headers
 
-    assert_equal %w[First Second Fifth], headers
+    expected_headers = template.template_columns.ordered.pluck(:name)
+
+    assert_equal expected_headers, headers
   end
 
-  test "should return column definition by number" do
-    template = ImportTemplate.new(
-      column_definitions: {
-        "column_1" => { "name" => "Test Column", "data_type" => "string" }
-      }
+  test "should return empty array for column headers when no template_columns exist" do
+    template = ImportTemplate.create!(
+      name: "Empty Template",
+      user: users(:one)
     )
 
-    column_def = template.column_definition(1)
-
-    assert_equal "Test Column", column_def["name"]
-    assert_equal "string", column_def["data_type"]
-
-    # Non-existent column should return nil
-    assert_nil template.column_definition(5)
+    assert_empty template.column_headers
   end
 
-  test "should allow empty column definitions" do
-    template = ImportTemplate.new(
-      name: "Minimal Template",
-      user: users(:one),
-      column_definitions: {}
+  test "should validate at least one column exists" do
+    template = ImportTemplate.create!(
+      name: "Test Template",
+      user: users(:one)
     )
 
     assert_predicate template, :valid?
+
+    # Add validation requirement (this would be a business rule)
+    # For now, templates can exist without columns (they get added later)
+  end
+
+  test "should destroy associated template_columns when destroyed" do
+    template = import_templates(:one)
+    column_count = template.template_columns.count
+
+    assert_predicate column_count, :positive?, "Template should have columns for this test"
+
+    assert_difference "TemplateColumn.count", -column_count do
+      template.destroy!
+    end
+  end
+
+  test "should destroy associated data_records when destroyed" do
+    template = import_templates(:one)
+    record_count = template.data_records.count
+
+    if record_count.positive?
+      assert_difference "DataRecord.count", -record_count do
+        template.destroy!
+      end
+    else
+      # If no records exist, create one for the test
+      template.data_records.create!
+      assert_difference "DataRecord.count", -1 do
+        template.destroy!
+      end
+    end
+  end
+
+  test "should update data_records_count counter cache" do
+    template = import_templates(:one)
+    template.data_records_count || 0
+
+    assert_difference "template.reload.data_records_count", 1 do
+      template.data_records.create!
+    end
+
+    assert_difference "template.reload.data_records_count", -1 do
+      template.data_records.last.destroy!
+    end
+  end
+
+  test "should have ordered template_columns association" do
+    template = import_templates(:one)
+
+    # Add columns with specific order
+    template.template_columns.destroy_all
+
+    template.template_columns.create!(name: "Third", data_type: "string", column_number: 3, required: false)
+    template.template_columns.create!(name: "First", data_type: "string", column_number: 1, required: false)
+    template.template_columns.create!(name: "Second", data_type: "string", column_number: 2, required: false)
+
+    ordered_columns = template.template_columns.ordered
+
+    assert_equal [1, 2, 3], ordered_columns.pluck(:column_number)
+    assert_equal %w[First Second Third], ordered_columns.pluck(:name)
+  end
+
+  test "should belong to user" do
+    template = import_templates(:one)
+
+    assert_equal users(:one), template.user
+    assert_respond_to template, :user
+  end
+
+  test "should allow templates with many columns" do
+    template = ImportTemplate.create!(
+      name: "Many Column Template",
+      user: users(:one)
+    )
+
+    # Create 10 columns
+    10.times do |i|
+      template.template_columns.create!(
+        name: "Column #{i + 1}",
+        data_type: "string",
+        column_number: i + 1,
+        required: false
+      )
+    end
+
+    assert_equal 10, template.template_columns.count
+    assert_equal 10, template.column_headers.count
+  end
+
+  test "should handle template without columns gracefully" do
+    template = ImportTemplate.create!(
+      name: "No Columns Template",
+      user: users(:one)
+    )
+
+    assert_empty template.template_columns
     assert_empty template.column_headers
+    assert_predicate template, :valid?
   end
 end

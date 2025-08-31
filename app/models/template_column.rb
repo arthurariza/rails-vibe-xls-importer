@@ -2,6 +2,7 @@
 
 class TemplateColumn < ApplicationRecord
   belongs_to :import_template
+  has_many :data_record_values, dependent: :destroy
 
   validates :name, presence: true
   validates :data_type, presence: true, inclusion: { in: %w[string number date boolean] }

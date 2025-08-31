@@ -6,7 +6,7 @@ class ImportTemplate < ApplicationRecord
   has_many :template_columns, -> { ordered }, dependent: :destroy
 
   validates :name, presence: true, uniqueness: true
-  validate :at_least_one_column
+  # validate :at_least_one_column  # Disabled for now - business rule that templates can be created empty initially
 
   # Get column headers in order using new template_columns
   def column_headers

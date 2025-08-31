@@ -3,6 +3,7 @@
 class DataRecord < ApplicationRecord
   belongs_to :import_template, counter_cache: :data_records_count
   has_many :data_record_values, dependent: :destroy
+  accepts_nested_attributes_for :data_record_values
 
   validate :at_least_one_column_has_data
 
@@ -30,7 +31,7 @@ class DataRecord < ApplicationRecord
     return {} if import_template.blank?
 
     result = {}
-    import_template.template_columns.includes(:data_record_values).each do |template_column|
+    import_template.template_columns.includes(:data_record_values).find_each do |template_column|
       value = value_for_column(template_column)
       result[template_column.name] = value if value.present?
     end

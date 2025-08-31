@@ -5,7 +5,8 @@ class DataRecordsController < ApplicationController
   before_action :set_data_record, only: %i[show edit update destroy]
 
   def index
-    @data_records = @import_template.data_records.order(created_at: :desc)
+    @pagy, @data_records = pagy(@import_template.data_records.includes(:data_record_values).order(created_at: :desc),
+                                items: 25)
   end
 
   def show; end
@@ -50,6 +51,9 @@ class DataRecordsController < ApplicationController
   end
 
   def data_record_params
-    params.expect(data_record: %i[column_1 column_2 column_3 column_4 column_5 import_batch_id])
+    params.expect(data_record: [
+                    :import_batch_id,
+                    { data_record_values_attributes: %i[id template_column_id value _destroy] }
+                  ])
   end
 end

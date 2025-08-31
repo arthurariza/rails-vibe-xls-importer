@@ -116,7 +116,7 @@ class ImportTemplatesController < ApplicationController
   end
 
   def handle_template_columns
-    return unless params[:template_columns].present?
+    return if params[:template_columns].blank?
 
     template_columns_params.each do |key, column_attrs|
       if key.to_s.start_with?("new_")

@@ -64,7 +64,7 @@
   - [x] 4.6 Update `data_hash` method to use template_columns for key generation
   - [x] 4.7 Add validation to ensure values exist for required columns
 
-- [ ] 5.0 Create Template Column Management Controller
+- [x] 5.0 Create Template Column Management Controller
   - [x] 5.1 Create `TemplateColumnsController` with create, update, destroy actions
   - [x] 5.2 Add nested routes under import_templates for template column management
   - [x] 5.3 Implement `create` action to add new columns to templates with proper column_number sequencing
@@ -73,30 +73,30 @@
   - [x] 5.6 Add authorization to ensure users can only modify their own template columns
   - [x] 5.7 Add JSON responses for AJAX column management operations
 
-- [ ] 6.0 Build Dynamic Column Configuration UI (Make user o playwright MCP here to test changes)
+- [x] 6.0 Build Dynamic Column Configuration UI
   - [x] 6.1 Create `_column_fields.html.erb` partial for rendering individual column configuration forms
   - [x] 6.2 Update `import_templates/_form.html.erb` to include dynamic column management section
   - [x] 6.3 Add "Add Column" button that dynamically adds new column configuration fields
   - [x] 6.4 Add "Remove" buttons for each column with confirmation prompts
-  - [ ] 6.5 Include drag-and-drop handles for column reordering (using Sortable.js or similar)
+  - [x] 6.5 Include drag-and-drop handles for column reordering (using Sortable.js or similar)
   - [x] 6.6 Add inline validation feedback for column names and data types
   - [x] 6.7 Show preview of resulting Excel structure based on configured columns
 
-- [ ] 7.0 Update Excel Import Service for Dynamic Processing
-  - [ ] 7.1 Modify `extract_headers` method to work with any number of columns
-  - [ ] 7.2 Update header validation to check against template_columns instead of hardcoded column_definitions
-  - [ ] 7.3 Modify `build_record_attributes_raw` to create DataRecordValue objects instead of column_1-5 attributes
-  - [ ] 7.4 Update `process_single_row` to iterate through template_columns and create corresponding values
-  - [ ] 7.5 Modify error reporting to reference dynamic column names in error messages
-  - [ ] 7.6 Update batch processing to handle variable column counts efficiently
+- [x] 7.0 Update Excel Import Service for Dynamic Processing
+  - [x] 7.1 Modify `extract_headers` method to work with any number of columns
+  - [x] 7.2 Update header validation to check against template_columns instead of hardcoded column_definitions
+  - [x] 7.3 Modify `build_record_attributes_raw` to create DataRecordValue objects instead of column_1-5 attributes
+  - [x] 7.4 Update `process_single_row` to iterate through template_columns and create corresponding values
+  - [x] 7.5 Modify error reporting to reference dynamic column names in error messages
+  - [x] 7.6 Update batch processing to handle variable column counts efficiently
 
-- [ ] 8.0 Update Excel Export Service for Dynamic Generation
-  - [ ] 8.1 Replace hardcoded column headers with dynamic template_columns query
-  - [ ] 8.2 Update header row generation to output all configured column names
-  - [ ] 8.3 Modify data row generation to iterate through template_columns and extract values
-  - [ ] 8.4 Ensure proper Excel formatting for dynamic column types (string, number, date, boolean)
-  - [ ] 8.5 Add column width auto-sizing based on content and column names
-  - [ ] 8.6 Test export functionality with templates having different column counts
+- [x] 8.0 Update Excel Export Service for Dynamic Generation
+  - [x] 8.1 Replace hardcoded column headers with dynamic template_columns query
+  - [x] 8.2 Update header row generation to output all configured column names
+  - [x] 8.3 Modify data row generation to iterate through template_columns and extract values
+  - [x] 8.4 Ensure proper Excel formatting for dynamic column types (string, number, date, boolean)
+  - [x] 8.5 Add column width auto-sizing based on content and column names
+  - [x] 8.6 Test export functionality with templates having different column counts
 
 - [ ] 9.0 Update Header Validation for Dynamic Templates
   - [ ] 9.1 Modify `HeaderValidationService` to query template_columns instead of column_definitions

@@ -73,12 +73,10 @@ class ExcelExportService < ApplicationService
     # Start with record ID as first column
     row_data = [record.id]
 
-    # Add user-defined column data
-    (1..5).each do |col_num|
-      column_def = import_template.column_definition(col_num)
-      next if column_def.blank?
-
-      row_data << format_cell_value(record.column_value(col_num), column_def["data_type"])
+    # Add user-defined column data using dynamic template columns
+    import_template.template_columns.ordered.each do |template_column|
+      value = record.value_for_column(template_column)
+      row_data << format_cell_value(value, template_column.data_type)
     end
 
     row_data
@@ -88,12 +86,9 @@ class ExcelExportService < ApplicationService
     # Start with placeholder ID (empty for sample data since these aren't real records)
     row_data = [""]
 
-    # Add sample data for user-defined columns
-    (1..5).each do |col_num|
-      column_def = import_template.column_definition(col_num)
-      next if column_def.blank?
-
-      row_data << generate_sample_value(column_def, row_number)
+    # Add sample data for user-defined columns using dynamic template columns
+    import_template.template_columns.ordered.each do |template_column|
+      row_data << generate_sample_value(template_column, row_number)
     end
 
     row_data
@@ -118,10 +113,10 @@ class ExcelExportService < ApplicationService
     end
   end
 
-  def generate_sample_value(column_def, row_number)
-    case column_def["data_type"]
+  def generate_sample_value(template_column, row_number)
+    case template_column.data_type
     when "string"
-      "Sample #{column_def['name']} #{row_number}"
+      "Sample #{template_column.name} #{row_number}"
     when "number"
       (row_number * 100).to_f
     when "date"

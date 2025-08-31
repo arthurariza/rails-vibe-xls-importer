@@ -85,6 +85,6 @@ class TemplateColumnsController < ApplicationController
   end
 
   def template_column_params
-    params.require(:template_column).permit(:name, :data_type, :required, :column_number)
+    params.expect(template_column: %i[name data_type required column_number])
   end
 end

@@ -158,19 +158,24 @@ class ExcelImportService < ApplicationService
 
   def build_record_attributes_raw(row_data, header_mapping, row_number)
     attributes = { import_template: import_template }
+    data_record_values_attributes = []
 
-    # Map Excel columns to our database columns
-    header_mapping.each do |excel_col_index, db_col_number|
+    # Map Excel columns to our database columns using template columns
+    header_mapping.each do |excel_col_index, template_column|
       value = row_data[excel_col_index]
       next if value.blank?
 
-      # Get column definition for data type conversion
-      column_def = import_template.column_definition(db_col_number)
-      converted_value = convert_value(value, column_def["data_type"], row_number)
+      # Convert value according to column data type
+      converted_value = convert_value(value, template_column.data_type, row_number)
 
-      attributes[:"column_#{db_col_number}"] = converted_value
+      # Build attributes for data_record_values
+      data_record_values_attributes << {
+        template_column: template_column,
+        value: converted_value
+      }
     end
 
+    attributes[:data_record_values_attributes] = data_record_values_attributes
     attributes
   end
 
@@ -267,18 +272,24 @@ class ExcelImportService < ApplicationService
       import_template: import_template,
       import_batch_id: batch_id
     }
+    data_record_values_attributes = []
 
-    # Map Excel columns to our database columns
-    header_mapping.each do |excel_col_index, db_col_number|
+    # Map Excel columns to our database columns using template columns
+    header_mapping.each do |excel_col_index, template_column|
       value = row_data[excel_col_index]
       next if value.blank?
 
-      # Get column definition for data type conversion
-      column_def = import_template.column_definition(db_col_number)
-      converted_value = convert_value(value, column_def["data_type"], row_number)
+      # Convert value according to column data type
+      converted_value = convert_value(value, template_column.data_type, row_number)
 
-      attributes[:"column_#{db_col_number}"] = converted_value
+      # Build attributes for data_record_values
+      data_record_values_attributes << {
+        template_column: template_column,
+        value: converted_value
+      }
     end
+
+    attributes[:data_record_values_attributes] = data_record_values_attributes
 
     # Create the data record
     record = DataRecord.new(attributes)

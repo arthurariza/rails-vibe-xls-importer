@@ -23,50 +23,64 @@
     <div class="space-y-4">
       <h3 class="text-lg font-medium text-gray-900">Record Data</h3>
       
-      <% (1..5).each do |i| %>
-        <% column_def = @import_template.column_definition(i) %>
-        <% if column_def.present? %>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">
-              <%= column_def["name"] %>
-              <span class="text-gray-500 text-xs">(<%= column_def["data_type"]&.capitalize %>)</span>
-            </label>
+      <%= form.fields_for :data_record_values do |values_form| %>
+        <% @import_template.template_columns.ordered.each do |template_column| %>
+          <% existing_value = data_record.data_record_values.find_by(template_column: template_column) %>
+          <% current_value = existing_value&.value %>
+          
+          <%= values_form.fields_for :data_record_values, existing_value || data_record.data_record_values.build(template_column: template_column), 
+                                     child_index: template_column.id do |value_form| %>
+            <%= value_form.hidden_field :template_column_id, value: template_column.id %>
             
-            <% case column_def["data_type"] %>
-            <% when "string" %>
-              <%= form.text_field "column_#{i}".to_sym, 
-                  class: "block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500",
-                  placeholder: "Enter #{column_def['name'].downcase}" %>
-            <% when "number" %>
-              <%= form.number_field "column_#{i}".to_sym, 
-                  class: "block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500",
-                  step: :any,
-                  placeholder: "Enter #{column_def['name'].downcase}" %>
-            <% when "date" %>
-              <%= form.date_field "column_#{i}".to_sym, 
-                  class: "block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" %>
-            <% when "boolean" %>
-              <div class="flex items-center space-x-3 mt-1">
-                <label class="flex items-center">
-                  <%= form.radio_button "column_#{i}".to_sym, "true", class: "focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300" %>
-                  <span class="ml-2 text-sm text-gray-700">Yes</span>
-                </label>
-                <label class="flex items-center">
-                  <%= form.radio_button "column_#{i}".to_sym, "false", class: "focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300" %>
-                  <span class="ml-2 text-sm text-gray-700">No</span>
-                </label>
-                <label class="flex items-center">
-                  <%= form.radio_button "column_#{i}".to_sym, "", checked: data_record.send("column_#{i}").blank?, class: "focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300" %>
-                  <span class="ml-2 text-sm text-gray-700">Not set</span>
-                </label>
-              </div>
-            <% else %>
-              <%= form.text_area "column_#{i}".to_sym, 
-                  rows: 3,
-                  class: "block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500",
-                  placeholder: "Enter #{column_def['name'].downcase}" %>
-            <% end %>
-          </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">
+                <%= template_column.name %>
+                <% if template_column.required? %>
+                  <span class="text-red-500 ml-1">*</span>
+                <% end %>
+                <span class="text-gray-500 text-xs">(<%= template_column.data_type.capitalize %>)</span>
+              </label>
+              
+              <% case template_column.data_type %>
+              <% when "string" %>
+                <%= value_form.text_field :value, 
+                    value: current_value,
+                    class: "block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500",
+                    placeholder: "Enter #{template_column.name.downcase}" %>
+              <% when "number" %>
+                <%= value_form.number_field :value, 
+                    value: current_value,
+                    class: "block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500",
+                    step: :any,
+                    placeholder: "Enter #{template_column.name.downcase}" %>
+              <% when "date" %>
+                <%= value_form.date_field :value, 
+                    value: current_value,
+                    class: "block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" %>
+              <% when "boolean" %>
+                <div class="flex items-center space-x-3 mt-1">
+                  <label class="flex items-center">
+                    <%= value_form.radio_button :value, "true", checked: current_value == "true", class: "focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300" %>
+                    <span class="ml-2 text-sm text-gray-700">Yes</span>
+                  </label>
+                  <label class="flex items-center">
+                    <%= value_form.radio_button :value, "false", checked: current_value == "false", class: "focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300" %>
+                    <span class="ml-2 text-sm text-gray-700">No</span>
+                  </label>
+                  <label class="flex items-center">
+                    <%= value_form.radio_button :value, "", checked: current_value.blank?, class: "focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300" %>
+                    <span class="ml-2 text-sm text-gray-700">Not set</span>
+                  </label>
+                </div>
+              <% else %>
+                <%= value_form.text_area :value, 
+                    value: current_value,
+                    rows: 3,
+                    class: "block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500",
+                    placeholder: "Enter #{template_column.name.downcase}" %>
+              <% end %>
+            </div>
+          <% end %>
         <% end %>
       <% end %>
     </div>
