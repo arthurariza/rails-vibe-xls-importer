@@ -75,20 +75,6 @@ Remember: Controllers should be thin coordinators. Business logic belongs in mod
 - **Single Responsibility**: Each Service Object should perform exactly one business operation or transaction.
 - **Immutability**: Service Objects should be immutable after initialization.
 - **Error Handling**: Use custom exceptions for domain errors, Handle errors gracefully, Provide meaningful error messages
-- **Notify Error Tracker**: The main rescue block from the call method needs to call `TP::ErrorTracker.notify(e, params = {})`
-```ruby
-def call
-  ...
-rescue StandardError => e
-  TP::ErrorTracker.notify(e, employee_id: @employee_id)
-end
-# when using dependency injection
-def call
-  ...
-rescue StandardError => e
-  @error_tracker.notify(e, employee_id: @employee_id)
-end
-```
 
 ### Dependency Injection
 ```ruby
