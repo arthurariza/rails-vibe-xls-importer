@@ -8,14 +8,15 @@ class HeaderValidationService < ApplicationService
     @import_template = import_template
     @has_id_column = has_id_column
     @validation_result = ValidationResult.new
+    @validation_result.import_template = import_template
   end
 
   def validate_headers
     template_headers = import_template.column_headers.map(&:downcase)
 
     # Check for missing required headers
-    missing_headers = template_headers - excel_headers
-    validation_result.missing_headers = missing_headers
+    missing_normalized_headers = template_headers - excel_headers
+    validation_result.missing_headers = missing_normalized_headers
 
     # Check for extra headers
     extra_headers = excel_headers - template_headers
@@ -24,7 +25,7 @@ class HeaderValidationService < ApplicationService
     # Create mapping of excel headers to template columns
     create_header_mapping
 
-    validation_result.valid = missing_headers.empty?
+    validation_result.valid = missing_normalized_headers.empty?
     validation_result
   end
 
@@ -124,7 +125,7 @@ class HeaderValidationService < ApplicationService
   end
 
   class ValidationResult
-    attr_accessor :valid, :missing_headers, :extra_headers, :header_mapping, :suggested_mappings
+    attr_accessor :valid, :missing_headers, :extra_headers, :header_mapping, :suggested_mappings, :import_template
 
     def initialize
       @valid = false
@@ -132,17 +133,36 @@ class HeaderValidationService < ApplicationService
       @extra_headers = []
       @header_mapping = {}
       @suggested_mappings = {}
+      @import_template = nil
     end
 
     def errors
       errors = []
-      errors << "Missing required headers: #{missing_headers.join(', ')}" if missing_headers.any?
+      if missing_headers.any?
+        # Show the actual template headers, not the normalized ones
+        actual_missing_headers = find_actual_template_headers(missing_headers)
+        errors << "Missing required headers: #{actual_missing_headers.join(', ')}"
+      end
       errors << "Extra headers found: #{extra_headers.join(', ')}" if extra_headers.any?
       errors
     end
 
     def has_suggestions?
       suggested_mappings.any?
+    end
+
+    private
+
+    def find_actual_template_headers(normalized_missing_headers)
+      return normalized_missing_headers unless import_template
+
+      actual_headers = []
+      normalized_missing_headers.each do |normalized_header|
+        # Find the actual header that matches this normalized one
+        actual_header = import_template.column_headers.find { |h| h.downcase == normalized_header }
+        actual_headers << (actual_header || normalized_header)
+      end
+      actual_headers
     end
   end
 end

@@ -92,8 +92,8 @@ class ImportTemplatesController < ApplicationController
       redirect_to @import_template,
                   notice: @import_result.summary
     else
-      flash.now[:alert] = "Synchronization failed with errors:"
-      render :import_result
+      redirect_to import_form_import_template_path(@import_template),
+                  alert: "Synchronization failed with errors: #{@import_result.errors.join(', ')}"
     end
   end
 
