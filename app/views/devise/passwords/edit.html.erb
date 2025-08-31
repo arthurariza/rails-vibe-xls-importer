@@ -1,0 +1,33 @@
+<div class="max-w-md mx-auto mt-8 bg-white p-8 border border-gray-200 rounded-lg shadow-sm">
+  <h2 class="text-2xl font-bold text-gray-900 mb-6 text-center">Change your password</h2>
+
+  <%= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :put }, local: true) do |f| %>
+    <%= render "devise/shared/error_messages", resource: resource %>
+    <%= f.hidden_field :reset_password_token %>
+
+    <div class="space-y-6">
+      <div>
+        <%= f.label :password, "New password", class: "block text-sm font-medium text-gray-700" %>
+        <% if @minimum_password_length %>
+          <span class="text-xs text-gray-500">(<%= @minimum_password_length %> characters minimum)</span>
+        <% end %>
+        <%= f.password_field :password, autofocus: true, autocomplete: "new-password",
+            class: "mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" %>
+      </div>
+
+      <div>
+        <%= f.label :password_confirmation, "Confirm new password", class: "block text-sm font-medium text-gray-700" %>
+        <%= f.password_field :password_confirmation, autocomplete: "new-password",
+            class: "mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" %>
+      </div>
+
+      <div>
+        <%= f.submit "Change my password", class: "w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" %>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="mt-6 text-center">
+    <%= render "devise/shared/links" %>
+  </div>
+</div>

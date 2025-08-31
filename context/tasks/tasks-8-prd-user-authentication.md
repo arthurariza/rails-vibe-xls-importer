@@ -65,21 +65,21 @@
   - [x] 4.5 Add authorization checks to prevent access to other users' data
   - [x] 4.6 Update root route to redirect to import_templates_path after authentication
 
-- [ ] 5.0 Create and Style Devise Views (Make use of the playwright mcp in all sub tasks)
-  - [ ] 5.1 Run `rails generate devise:views` to generate customizable view templates
-  - [ ] 5.2 Style login form (sessions/new.html.erb) with TailwindCSS to match existing forms
-  - [ ] 5.3 Style registration form (registrations/new.html.erb) with TailwindCSS
-  - [ ] 5.4 Style account edit form (registrations/edit.html.erb) with TailwindCSS  
-  - [ ] 5.5 Style password reset forms (passwords/new.html.erb and edit.html.erb) with TailwindCSS
-  - [ ] 5.6 Style email confirmation form (confirmations/new.html.erb) with TailwindCSS
-  - [ ] 5.7 Customize Devise flash message styling to match existing notice/alert classes
+- [x] 5.0 Create and Style Devise Views (Make use of the playwright mcp in all sub tasks)
+  - [x] 5.1 Run `rails generate devise:views` to generate customizable view templates
+  - [x] 5.2 Style login form (sessions/new.html.erb) with TailwindCSS to match existing forms
+  - [x] 5.3 Style registration form (registrations/new.html.erb) with TailwindCSS
+  - [x] 5.4 Style account edit form (registrations/edit.html.erb) with TailwindCSS  
+  - [x] 5.5 Style password reset forms (passwords/new.html.erb and edit.html.erb) with TailwindCSS
+  - [x] 5.6 Style email confirmation form (confirmations/new.html.erb) with TailwindCSS
+  - [x] 5.7 Customize Devise flash message styling to match existing notice/alert classes
 
-- [ ] 6.0 Update Application Layout and Navigation
-  - [ ] 6.1 Add authentication links to navigation bar in application.html.erb
-  - [ ] 6.2 Show "Sign Up" and "Log In" links for unauthenticated users
-  - [ ] 6.3 Show user email and "Log Out" link for authenticated users
-  - [ ] 6.4 Add conditional logic to hide/show navigation items based on authentication status
-  - [ ] 6.5 Style authentication links to match existing navigation styling
+- [x] 6.0 Update Application Layout and Navigation
+  - [x] 6.1 Add authentication links to navigation bar in application.html.erb
+  - [x] 6.2 Show "Sign Up" and "Log In" links for unauthenticated users
+  - [x] 6.3 Show user email and "Log Out" link for authenticated users
+  - [x] 6.4 Add conditional logic to hide/show navigation items based on authentication status
+  - [x] 6.5 Style authentication links to match existing navigation styling
 
 - [ ] 7.0 Configure Email Settings  
   - [ ] 7.1 Configure ActionMailer settings in development.rb for email confirmation
