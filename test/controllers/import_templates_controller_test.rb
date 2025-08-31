@@ -3,13 +3,18 @@
 require "test_helper"
 
 class ImportTemplatesControllerTest < ActionDispatch::IntegrationTest
+  include Devise::Test::IntegrationHelpers
+
   def setup
+    @user = users(:one)
     @import_template = ImportTemplate.create!(
       name: "Test Template",
+      user: @user,
       column_definitions: {
         "column_1" => { "name" => "Name", "data_type" => "string" }
       }
     )
+    sign_in @user
   end
 
   test "should get index" do
@@ -93,6 +98,61 @@ class ImportTemplatesControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_equal "Synchronization failed with errors:", flash.now[:alert]
+  end
+
+  test "should redirect to login when not authenticated" do
+    sign_out @user
+    
+    get import_templates_url
+    
+    assert_redirected_to new_user_session_url
+  end
+
+  test "should only show user's own templates in index" do
+    other_user = users(:two)
+    other_template = ImportTemplate.create!(
+      name: "Other User Template",
+      user: other_user,
+      column_definitions: {
+        "column_1" => { "name" => "Other", "data_type" => "string" }
+      }
+    )
+
+    get import_templates_url
+
+    assert_response :success
+    assert_select "a", text: @import_template.name
+    assert_select "a", text: other_template.name, count: 0
+  end
+
+  test "should redirect when accessing other user's template" do
+    other_user = users(:two)
+    other_template = ImportTemplate.create!(
+      name: "Other User Template", 
+      user: other_user,
+      column_definitions: {
+        "column_1" => { "name" => "Other", "data_type" => "string" }
+      }
+    )
+
+    get import_template_url(other_template)
+    assert_redirected_to root_path
+    assert_equal "You don't have permission to access that resource.", flash[:alert]
+  end
+
+  test "should redirect when editing other user's template" do
+    other_user = users(:two)  
+    other_template = ImportTemplate.create!(
+      name: "Other User Template",
+      user: other_user,
+      column_definitions: {
+        "column_1" => { "name" => "Other", "data_type" => "string" }
+      }
+    )
+
+    get edit_import_template_url(other_template)
+    assert_redirected_to root_path
+    assert_equal "You don't have permission to access that resource.", flash[:alert]
   end
 
   private

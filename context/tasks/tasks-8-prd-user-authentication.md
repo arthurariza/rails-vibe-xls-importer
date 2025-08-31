@@ -87,15 +87,15 @@
   - [x] 7.3 Customize Devise email templates if needed
   - [x] 7.4 Test email delivery for registration confirmation and password reset
 
-- [ ] 8.0 Write Tests for Authentication
-  - [ ] 8.1 Create User model tests (validation, associations)
-  - [ ] 8.2 Update ImportTemplatesController tests to include authentication and user scoping
-  - [ ] 8.3 Update DataRecordsController tests to include authentication and user scoping  
-  - [ ] 8.4 Create system tests for user registration flow
-  - [ ] 8.5 Create system tests for login/logout flow
-  - [ ] 8.6 Create system tests for password reset flow
-  - [ ] 8.7 Create system tests for email confirmation flow
-  - [ ] 8.8 Test user data isolation (users can't see each other's data)
+- [x] 8.0 Write Tests for Authentication
+  - [x] 8.1 Create User model tests (validation, associations)
+  - [x] 8.2 Update ImportTemplatesController tests to include authentication and user scoping
+  - [x] 8.3 Update DataRecordsController tests to include authentication and user scoping  
+  - [x] 8.4 Create system tests for user registration flow
+  - [x] 8.5 Create system tests for login/logout flow
+  - [x] 8.6 Create system tests for password reset flow
+  - [x] 8.7 Create system tests for email confirmation flow
+  - [x] 8.8 Test user data isolation (users can't see each other's data)
 
 - [ ] 9.0 Data Migration for Existing Records
   - [ ] 9.1 Create seeds data for easy testing
