@@ -10,7 +10,18 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_31_015909) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_31_154458) do
+  create_table "data_record_values", force: :cascade do |t|
+    t.integer "data_record_id", null: false
+    t.integer "template_column_id", null: false
+    t.text "value"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["data_record_id", "template_column_id"], name: "idx_on_data_record_id_template_column_id_45806ce0b0", unique: true
+    t.index ["data_record_id"], name: "index_data_record_values_on_data_record_id"
+    t.index ["template_column_id"], name: "index_data_record_values_on_template_column_id"
+  end
+
   create_table "data_records", force: :cascade do |t|
     t.integer "import_template_id", null: false
     t.text "column_1"
@@ -35,6 +46,18 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_31_015909) do
     t.index ["user_id"], name: "index_import_templates_on_user_id"
   end
 
+  create_table "template_columns", force: :cascade do |t|
+    t.integer "import_template_id", null: false
+    t.integer "column_number", null: false
+    t.string "name", null: false
+    t.string "data_type", null: false
+    t.boolean "required", default: false, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["import_template_id", "column_number"], name: "index_template_columns_on_import_template_id_and_column_number", unique: true
+    t.index ["import_template_id"], name: "index_template_columns_on_import_template_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
@@ -52,6 +75,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_31_015909) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  add_foreign_key "data_record_values", "data_records"
+  add_foreign_key "data_record_values", "template_columns"
   add_foreign_key "data_records", "import_templates"
   add_foreign_key "import_templates", "users"
+  add_foreign_key "template_columns", "import_templates"
 end

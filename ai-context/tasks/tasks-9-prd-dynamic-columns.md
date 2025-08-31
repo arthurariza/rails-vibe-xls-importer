@@ -32,13 +32,13 @@
 
 ## Tasks
 
-- [ ] 1.0 Create Database Schema for Dynamic Columns
-  - [ ] 1.1 Create migration for `template_columns` table with fields: id, import_template_id, column_number, name, data_type, required, created_at, updated_at
-  - [ ] 1.2 Create migration for `data_record_values` table with fields: id, data_record_id, template_column_id, value, created_at, updated_at
-  - [ ] 1.3 Add database indexes for performance: template_column_id, data_record_id, import_template_id on template_columns
-  - [ ] 1.4 Add foreign key constraints for referential integrity
-  - [ ] 1.5 Create data migration to move existing column_1-column_5 data to new normalized structure
-  - [ ] 1.6 Run migrations and verify schema changes
+- [x] 1.0 Create Database Schema for Dynamic Columns
+  - [x] 1.1 Create migration for `template_columns` table with fields: id, import_template_id, column_number, name, data_type, required, created_at, updated_at
+  - [x] 1.2 Create migration for `data_record_values` table with fields: id, data_record_id, template_column_id, value, created_at, updated_at
+  - [x] 1.3 Add database indexes for performance: template_column_id, data_record_id, import_template_id on template_columns
+  - [x] 1.4 Add foreign key constraints for referential integrity
+  - [x] 1.5 Create data migration to move existing column_1-column_5 data to new normalized structure
+  - [x] 1.6 Run migrations and verify schema changes
 
 - [ ] 2.0 Create New Model Classes and Associations
   - [ ] 2.1 Create `TemplateColumn` model with validations for name, data_type, column_number
