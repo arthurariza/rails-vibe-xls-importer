@@ -24,6 +24,7 @@ class ImportTemplatesController < ApplicationController
     @import_template = current_user.import_templates.build(import_template_params)
 
     if @import_template.save
+      handle_template_columns
       redirect_to @import_template, notice: "Template was successfully created."
     else
       render :new, status: :unprocessable_content
@@ -32,6 +33,7 @@ class ImportTemplatesController < ApplicationController
 
   def update
     if @import_template.update(import_template_params)
+      handle_template_columns
       redirect_to @import_template, notice: "Template was successfully updated."
     else
       render :edit, status: :unprocessable_content
@@ -106,7 +108,29 @@ class ImportTemplatesController < ApplicationController
   end
 
   def import_template_params
-    params.expect(import_template: [:name, :description, { column_definitions: {} }])
+    params.expect(import_template: %i[name description])
+  end
+
+  def template_columns_params
+    params.fetch(:template_columns, {})
+  end
+
+  def handle_template_columns
+    return unless params[:template_columns].present?
+
+    template_columns_params.each do |key, column_attrs|
+      if key.to_s.start_with?("new_")
+        # Create new column
+        @import_template.template_columns.create!(column_attrs.except(:id))
+      elsif column_attrs[:id].present?
+        # Update existing column
+        column = @import_template.template_columns.find(column_attrs[:id])
+        column.update!(column_attrs.except(:id))
+      end
+    end
+
+    # Reorder columns to ensure sequential numbering
+    @import_template.reorder_columns
   end
 
   def sanitize_filename(filename)

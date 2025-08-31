@@ -65,22 +65,22 @@
   - [x] 4.7 Add validation to ensure values exist for required columns
 
 - [ ] 5.0 Create Template Column Management Controller
-  - [ ] 5.1 Create `TemplateColumnsController` with create, update, destroy actions
-  - [ ] 5.2 Add nested routes under import_templates for template column management
-  - [ ] 5.3 Implement `create` action to add new columns to templates with proper column_number sequencing
-  - [ ] 5.4 Implement `update` action to modify column properties (name, data_type, required)
-  - [ ] 5.5 Implement `destroy` action to remove columns and handle data cleanup
-  - [ ] 5.6 Add authorization to ensure users can only modify their own template columns
-  - [ ] 5.7 Add JSON responses for AJAX column management operations
+  - [x] 5.1 Create `TemplateColumnsController` with create, update, destroy actions
+  - [x] 5.2 Add nested routes under import_templates for template column management
+  - [x] 5.3 Implement `create` action to add new columns to templates with proper column_number sequencing
+  - [x] 5.4 Implement `update` action to modify column properties (name, data_type, required)
+  - [x] 5.5 Implement `destroy` action to remove columns and handle data cleanup
+  - [x] 5.6 Add authorization to ensure users can only modify their own template columns
+  - [x] 5.7 Add JSON responses for AJAX column management operations
 
 - [ ] 6.0 Build Dynamic Column Configuration UI (Make user o playwright MCP here to test changes)
-  - [ ] 6.1 Create `_column_fields.html.erb` partial for rendering individual column configuration forms
-  - [ ] 6.2 Update `import_templates/_form.html.erb` to include dynamic column management section
-  - [ ] 6.3 Add "Add Column" button that dynamically adds new column configuration fields
-  - [ ] 6.4 Add "Remove" buttons for each column with confirmation prompts
+  - [x] 6.1 Create `_column_fields.html.erb` partial for rendering individual column configuration forms
+  - [x] 6.2 Update `import_templates/_form.html.erb` to include dynamic column management section
+  - [x] 6.3 Add "Add Column" button that dynamically adds new column configuration fields
+  - [x] 6.4 Add "Remove" buttons for each column with confirmation prompts
   - [ ] 6.5 Include drag-and-drop handles for column reordering (using Sortable.js or similar)
-  - [ ] 6.6 Add inline validation feedback for column names and data types
-  - [ ] 6.7 Show preview of resulting Excel structure based on configured columns
+  - [x] 6.6 Add inline validation feedback for column names and data types
+  - [x] 6.7 Show preview of resulting Excel structure based on configured columns
 
 - [ ] 7.0 Update Excel Import Service for Dynamic Processing
   - [ ] 7.1 Modify `extract_headers` method to work with any number of columns

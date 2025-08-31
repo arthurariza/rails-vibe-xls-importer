@@ -6,6 +6,7 @@ Rails.application.routes.draw do
 
   resources :import_templates do
     resources :data_records, except: [:index]
+    resources :template_columns, only: [:create, :update, :destroy]
     member do
       get :data_records, to: "data_records#index"
       get :export_template
