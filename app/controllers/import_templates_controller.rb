@@ -6,7 +6,7 @@ class ImportTemplatesController < ApplicationController
                          import_file]
 
   def index
-    @import_templates = ImportTemplate.order(:name)
+    @import_templates = current_user.import_templates.order(:name)
   end
 
   def show
@@ -15,13 +15,13 @@ class ImportTemplatesController < ApplicationController
   end
 
   def new
-    @import_template = ImportTemplate.new
+    @import_template = current_user.import_templates.build
   end
 
   def edit; end
 
   def create
-    @import_template = ImportTemplate.new(import_template_params)
+    @import_template = current_user.import_templates.build(import_template_params)
 
     if @import_template.save
       redirect_to @import_template, notice: "Template was successfully created."
@@ -100,7 +100,7 @@ class ImportTemplatesController < ApplicationController
   private
 
   def set_import_template
-    @import_template = ImportTemplate.find(params[:id])
+    @import_template = current_user.import_templates.find(params[:id])
   end
 
   def import_template_params

@@ -57,13 +57,13 @@
   - [x] 3.5 Add `has_many :import_templates` and `has_many :data_records` to User model
   - [x] 3.6 Run migrations to update database schema
 
-- [ ] 4.0 Add Authentication to Controllers
-  - [ ] 4.1 Add `before_action :authenticate_user!` to ApplicationController
-  - [ ] 4.2 Update ImportTemplatesController to scope queries by `current_user.import_templates`
-  - [ ] 4.3 Update DataRecordsController to scope queries through user's import_templates
-  - [ ] 4.4 Ensure new records are automatically associated with current_user
-  - [ ] 4.5 Add authorization checks to prevent access to other users' data
-  - [ ] 4.6 Update root route to redirect to import_templates_path after authentication
+- [x] 4.0 Add Authentication to Controllers
+  - [x] 4.1 Add `before_action :authenticate_user!` to ApplicationController
+  - [x] 4.2 Update ImportTemplatesController to scope queries by `current_user.import_templates`
+  - [x] 4.3 Update DataRecordsController to scope queries through user's import_templates
+  - [x] 4.4 Ensure new records are automatically associated with current_user
+  - [x] 4.5 Add authorization checks to prevent access to other users' data
+  - [x] 4.6 Update root route to redirect to import_templates_path after authentication
 
 - [ ] 5.0 Create and Style Devise Views (Make use of the playwright mcp in all sub tasks)
   - [ ] 5.1 Run `rails generate devise:views` to generate customizable view templates
@@ -98,7 +98,8 @@
   - [ ] 8.8 Test user data isolation (users can't see each other's data)
 
 - [ ] 9.0 Data Migration for Existing Records
-  - [ ] 9.1 Create a rake task or migration to assign existing import_templates to a default user
-  - [ ] 9.2 Create a rake task or migration to assign existing data_records to the same default user
-  - [ ] 9.3 Test the migration with existing data
-  - [ ] 9.4 Document the migration process for future reference
+  - [ ] 9.1 Create seeds data for easy testing
+  - [ ] 9.2 Create a rake task or migration to assign existing import_templates to a default user
+  - [ ] 9.3 Create a rake task or migration to assign existing data_records to the same default user
+  - [ ] 9.4 Test the migration with existing data
+  - [ ] 9.5 Document the migration process for future reference

@@ -42,7 +42,7 @@ class DataRecordsController < ApplicationController
   private
 
   def set_import_template
-    @import_template = ImportTemplate.find(params[:import_template_id] || params[:id])
+    @import_template = current_user.import_templates.find(params[:import_template_id] || params[:id])
   end
 
   def set_data_record
