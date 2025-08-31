@@ -7,8 +7,8 @@ To guide an AI assistant in creating a detailed, step-by-step task list in Markd
 ## Output
 
 - **Format:** Markdown (`.md`)
-- **Location:** `/context/tasks/`
-- **Filename:** `tasks-[prd-file-name].md` (e.g., `tasks-prd-user-profile-editing.md`)
+- **Location:** `@ai-context/tasks/`
+- **Filename:** `tasks-[prd-file-name].md` (e.g., `tasks-4-prd-user-profile-editing.md`)
 
 ## Process
 
@@ -21,7 +21,7 @@ To guide an AI assistant in creating a detailed, step-by-step task list in Markd
 7.  **Phase 2: Generate Sub-Tasks:** Once the user confirms, break down each parent task into smaller, actionable sub-tasks necessary to complete the parent task. Ensure sub-tasks logically follow from the parent task, cover the implementation details implied by the PRD, and consider existing codebase patterns where relevant without being constrained by them.
 8.  **Identify Relevant Files:** Based on the tasks and PRD, identify potential files that will need to be created or modified. List these under the `Relevant Files` section, including corresponding test files if applicable.
 9.  **Generate Final Output:** Combine the parent tasks, sub-tasks, relevant files, and notes into the final Markdown structure.
-10.  **Save Task List:** Save the generated document in the `/tasks/` directory with the filename `tasks-[prd-file-name].md`, where `[prd-file-name]` matches the base name of the input PRD file (e.g., if the input was `prd-user-profile-editing.md`, the output is `tasks-prd-user-profile-editing.md`).
+10.  **Save Task List:** Save the generated document in the `@ai-context/tasks/` directory with the filename `tasks-[prd-file-name].md`, where `[prd-file-name]` matches the base name of the input PRD file (e.g., if the input was `1-prd-user-profile-editing.md`, the output is `tasks-1-prd-user-profile-editing.md`).
 
 ## Output Format
 
@@ -36,11 +36,6 @@ The generated task list _must_ follow this structure:
 - `path/to/another/file.test.tsx` - Unit tests for `another/file.tsx`.
 - `lib/utils/helpers.ts` - Brief description (e.g., Utility functions needed for calculations).
 - `lib/utils/helpers.test.ts` - Unit tests for `helpers.ts`.
-
-### Notes
-
-- Unit tests should typically be placed alongside the code files they are testing (e.g., `MyComponent.tsx` and `MyComponent.test.tsx` in the same directory).
-- Use `npx jest [optional/path/to/test/file]` to run tests. Running without a path executes all tests found by the Jest configuration.
 
 ## Tasks
 
