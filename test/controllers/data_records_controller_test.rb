@@ -47,9 +47,9 @@ class DataRecordsControllerTest < ActionDispatch::IntegrationTest
 
   test "should redirect to login when not authenticated" do
     sign_out @user
-    
+
     get data_records_import_template_url(@import_template)
-    
+
     assert_redirected_to new_user_session_url
   end
 
@@ -62,9 +62,10 @@ class DataRecordsControllerTest < ActionDispatch::IntegrationTest
         "column_1" => { "name" => "Other", "data_type" => "string" }
       }
     )
-    other_record = other_template.data_records.create!(column_1: "Other Data")
+    other_template.data_records.create!(column_1: "Other Data")
 
     get data_records_import_template_url(other_template)
+
     assert_redirected_to root_path
     assert_equal "You don't have permission to access that resource.", flash[:alert]
   end
@@ -81,6 +82,7 @@ class DataRecordsControllerTest < ActionDispatch::IntegrationTest
     other_record = other_template.data_records.create!(column_1: "Other Data")
 
     get import_template_data_record_url(other_template, other_record)
+
     assert_redirected_to root_path
     assert_equal "You don't have permission to access that resource.", flash[:alert]
   end
@@ -97,6 +99,7 @@ class DataRecordsControllerTest < ActionDispatch::IntegrationTest
     other_record = other_template.data_records.create!(column_1: "Other Data")
 
     get edit_import_template_data_record_url(other_template, other_record)
+
     assert_redirected_to root_path
     assert_equal "You don't have permission to access that resource.", flash[:alert]
   end

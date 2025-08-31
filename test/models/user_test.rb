@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "test_helper"
 
 class UserTest < ActiveSupport::TestCase
@@ -11,17 +13,20 @@ class UserTest < ActiveSupport::TestCase
       password: "password123",
       password_confirmation: "password123"
     )
-    assert user.valid?
+
+    assert_predicate user, :valid?
   end
 
   test "should require email" do
     user = User.new(password: "password123", password_confirmation: "password123")
+
     assert_not user.valid?
     assert_includes user.errors[:email], "can't be blank"
   end
 
   test "should require password" do
     user = User.new(email: "test@example.com")
+
     assert_not user.valid?
     assert_includes user.errors[:password], "can't be blank"
   end
@@ -32,6 +37,7 @@ class UserTest < ActiveSupport::TestCase
       password: "password123",
       password_confirmation: "password123"
     )
+
     assert_not duplicate_user.valid?
     assert_includes duplicate_user.errors[:email], "has already been taken"
   end
@@ -42,6 +48,7 @@ class UserTest < ActiveSupport::TestCase
       password: "password123",
       password_confirmation: "password123"
     )
+
     assert_not user.valid?
     assert_includes user.errors[:email], "is invalid"
   end
@@ -52,6 +59,7 @@ class UserTest < ActiveSupport::TestCase
       password: "short",
       password_confirmation: "short"
     )
+
     assert_not user.valid?
     assert_includes user.errors[:password], "is too short (minimum is 6 characters)"
   end
@@ -68,13 +76,13 @@ class UserTest < ActiveSupport::TestCase
 
   test "should destroy associated import_templates when user is destroyed" do
     initial_count = @user.import_templates.count
-    template = ImportTemplate.create!(
+    ImportTemplate.create!(
       name: "Test Template",
       user: @user,
       column_definitions: { "column_1" => { "name" => "Name", "data_type" => "string" } }
     )
-    
-    expected_decrease = initial_count + 1  # All existing templates plus the new one
+
+    expected_decrease = initial_count + 1 # All existing templates plus the new one
     assert_difference "ImportTemplate.count", -expected_decrease do
       @user.destroy
     end

@@ -85,13 +85,13 @@ class ExcelImportService < ApplicationService
     # Get the first row as headers
     first_row = workbook.row(workbook.first_row)
     all_headers = first_row.compact.map(&:to_s)
-    
+
     # Check if first column is our hidden ID column
     if all_headers.first == "__record_id"
       # Store ID column presence for later use
       @has_id_column = true
       # Return headers without the ID column for validation
-      all_headers[1..-1]
+      all_headers[1..]
     else
       @has_id_column = false
       all_headers
@@ -101,7 +101,7 @@ class ExcelImportService < ApplicationService
   def process_data_rows(workbook, header_mapping)
     # Build sync plan by parsing all rows first
     sync_plan = build_sync_plan(workbook, header_mapping)
-    
+
     # Validate all data before making any database changes
     return import_result unless validate_all_data(sync_plan)
 
@@ -137,7 +137,7 @@ class ExcelImportService < ApplicationService
         attributes = { _error: e.message, _row_number: row_number }
       end
 
-      if record_id && record_id > 0
+      if record_id&.positive?
         # Existing record to update
         sync_plan[:to_update] << { id: record_id, attributes: attributes, row_number: row_number }
         sync_plan[:existing_ids] << record_id
@@ -177,7 +177,7 @@ class ExcelImportService < ApplicationService
   def validate_all_data(sync_plan)
     # Check for any parsing errors from sync plan building
     all_operations = sync_plan[:to_update] + sync_plan[:to_create]
-    
+
     all_operations.each do |operation|
       # Check if there was a parsing error during sync plan building
       if operation[:attributes][:_error]
@@ -196,17 +196,19 @@ class ExcelImportService < ApplicationService
             import_result.add_row_error(operation[:row_number], "Record with ID #{operation[:id]} not found")
             next
           end
-          
+
           # Test if attributes are valid
           existing_record.assign_attributes(operation[:attributes])
           unless existing_record.valid?
-            import_result.add_row_error(operation[:row_number], "Validation failed: #{existing_record.errors.full_messages.join('; ')}")
+            import_result.add_row_error(operation[:row_number],
+                                        "Validation failed: #{existing_record.errors.full_messages.join('; ')}")
           end
         else
           # Validate create operation
           new_record = DataRecord.new(operation[:attributes])
           unless new_record.valid?
-            import_result.add_row_error(operation[:row_number], "Validation failed: #{new_record.errors.full_messages.join('; ')}")
+            import_result.add_row_error(operation[:row_number],
+                                        "Validation failed: #{new_record.errors.full_messages.join('; ')}")
           end
         end
       rescue StandardError => e
@@ -236,7 +238,7 @@ class ExcelImportService < ApplicationService
       # Update existing records (skip any with errors)
       sync_plan[:to_update].each do |operation|
         next if operation[:attributes][:_error]
-        
+
         record = import_template.data_records.find(operation[:id])
         record.update!(operation[:attributes].merge(import_batch_id: batch_id))
         import_result.updated_records << record
@@ -245,7 +247,7 @@ class ExcelImportService < ApplicationService
       # Create new records (skip any with errors)
       sync_plan[:to_create].each do |operation|
         next if operation[:attributes][:_error]
-        
+
         record = DataRecord.create!(operation[:attributes].merge(import_batch_id: batch_id))
         import_result.created_records << record
       end
@@ -353,7 +355,8 @@ class ExcelImportService < ApplicationService
   end
 
   class ImportResult
-    attr_accessor :success, :errors, :processed_count, :error_count, :created_records, :updated_records, :deleted_count, :import_batch_id
+    attr_accessor :success, :errors, :processed_count, :error_count, :created_records, :updated_records,
+                  :deleted_count, :import_batch_id
 
     def initialize
       @success = false
@@ -395,8 +398,8 @@ class ExcelImportService < ApplicationService
         parts = []
         parts << "#{created_records.count} created" if created_records.any?
         parts << "#{updated_records.count} updated" if updated_records.any?
-        parts << "#{deleted_count} deleted" if deleted_count > 0
-        
+        parts << "#{deleted_count} deleted" if deleted_count.positive?
+
         if parts.any?
           "Successfully synchronized: #{parts.join(', ')}"
         else

@@ -72,7 +72,7 @@ class ImportTemplatesControllerTest < ActionDispatch::IntegrationTest
       ["__record_id", "Name"],
       [existing_record.id, "Updated Name"]
     ]
-    
+
     file = create_test_excel_file(excel_data)
 
     post import_file_import_template_url(@import_template), params: { excel_file: file }
@@ -82,6 +82,7 @@ class ImportTemplatesControllerTest < ActionDispatch::IntegrationTest
 
     # Verify record was updated
     existing_record.reload
+
     assert_equal "Updated Name", existing_record.column_1
   end
 
@@ -91,7 +92,7 @@ class ImportTemplatesControllerTest < ActionDispatch::IntegrationTest
       ["InvalidHeader"],
       ["Some Data"]
     ]
-    
+
     file = create_test_excel_file(excel_data)
 
     post import_file_import_template_url(@import_template), params: { excel_file: file }
@@ -102,9 +103,9 @@ class ImportTemplatesControllerTest < ActionDispatch::IntegrationTest
 
   test "should redirect to login when not authenticated" do
     sign_out @user
-    
+
     get import_templates_url
-    
+
     assert_redirected_to new_user_session_url
   end
 
@@ -128,7 +129,7 @@ class ImportTemplatesControllerTest < ActionDispatch::IntegrationTest
   test "should redirect when accessing other user's template" do
     other_user = users(:two)
     other_template = ImportTemplate.create!(
-      name: "Other User Template", 
+      name: "Other User Template",
       user: other_user,
       column_definitions: {
         "column_1" => { "name" => "Other", "data_type" => "string" }
@@ -136,12 +137,13 @@ class ImportTemplatesControllerTest < ActionDispatch::IntegrationTest
     )
 
     get import_template_url(other_template)
+
     assert_redirected_to root_path
     assert_equal "You don't have permission to access that resource.", flash[:alert]
   end
 
   test "should redirect when editing other user's template" do
-    other_user = users(:two)  
+    other_user = users(:two)
     other_template = ImportTemplate.create!(
       name: "Other User Template",
       user: other_user,
@@ -151,6 +153,7 @@ class ImportTemplatesControllerTest < ActionDispatch::IntegrationTest
     )
 
     get edit_import_template_url(other_template)
+
     assert_redirected_to root_path
     assert_equal "You don't have permission to access that resource.", flash[:alert]
   end
@@ -159,10 +162,10 @@ class ImportTemplatesControllerTest < ActionDispatch::IntegrationTest
 
   def create_test_excel_file(data)
     require "caxlsx"
-    
+
     package = Axlsx::Package.new
     workbook = package.workbook
-    
+
     worksheet = workbook.add_worksheet(name: "Test Data")
     data.each { |row| worksheet.add_row(row) }
 

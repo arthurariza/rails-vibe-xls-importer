@@ -141,7 +141,7 @@ class ExcelExportService < ApplicationService
       sz: 8,
       b: false
     )
-    
+
     visible_style = sheet.styles.add_style(
       bg_color: "4472C4",
       fg_color: "FFFFFF",

@@ -4,7 +4,7 @@
 # development, test). The code here should be idempotent so that it can be executed at any point in every environment.
 # The data can then be loaded with the bin/rails db:seed command (or created alongside the database with db:setup).
 
-puts "Creating seed data..."
+Rails.logger.debug "Creating seed data..."
 
 # Create default admin user
 admin_user = User.find_or_create_by!(email: "admin@xls-importer.com") do |user|
@@ -12,7 +12,7 @@ admin_user = User.find_or_create_by!(email: "admin@xls-importer.com") do |user|
   user.password_confirmation = "password123"
   user.confirmed_at = Time.current
 end
-puts "Created admin user: #{admin_user.email}"
+Rails.logger.debug { "Created admin user: #{admin_user.email}" }
 
 # Create demo user
 demo_user = User.find_or_create_by!(email: "demo@xls-importer.com") do |user|
@@ -20,7 +20,7 @@ demo_user = User.find_or_create_by!(email: "demo@xls-importer.com") do |user|
   user.password_confirmation = "password123"
   user.confirmed_at = Time.current
 end
-puts "Created demo user: #{demo_user.email}"
+Rails.logger.debug { "Created demo user: #{demo_user.email}" }
 
 # Create sample import templates for admin user
 employee_template = ImportTemplate.find_or_create_by!(
@@ -48,10 +48,10 @@ if employee_template.data_records.empty?
   ].each do |record_data|
     employee_template.data_records.create!(record_data)
   end
-  puts "Created #{employee_template.data_records.count} employee records"
+  Rails.logger.debug { "Created #{employee_template.data_records.count} employee records" }
 end
 
-# Create product template for demo user  
+# Create product template for demo user
 product_template = ImportTemplate.find_or_create_by!(
   name: "Product Catalog Template",
   user: demo_user
@@ -69,16 +69,17 @@ end
 # Create sample product data
 if product_template.data_records.empty?
   [
-    { column_1: "Wireless Headphones", column_2: "Electronics", column_3: "149.99", column_4: "true", column_5: "2024-01-01" },
+    { column_1: "Wireless Headphones", column_2: "Electronics", column_3: "149.99", column_4: "true",
+      column_5: "2024-01-01" },
     { column_1: "Coffee Mug", column_2: "Kitchen", column_3: "12.99", column_4: "true", column_5: "2023-12-15" },
     { column_1: "Desk Lamp", column_2: "Office", column_3: "45.50", column_4: "false", column_5: "2024-02-10" },
     { column_1: "Running Shoes", column_2: "Sports", column_3: "89.99", column_4: "true", column_5: "2023-11-20" }
   ].each do |record_data|
     product_template.data_records.create!(record_data)
   end
-  puts "Created #{product_template.data_records.count} product records"
+  Rails.logger.debug { "Created #{product_template.data_records.count} product records" }
 end
 
-puts "Seed data creation completed!"
-puts "Admin user: admin@xls-importer.com / password123"
-puts "Demo user: demo@xls-importer.com / password123"
+Rails.logger.debug "Seed data creation completed!"
+Rails.logger.debug "Admin user: admin@xls-importer.com / password123"
+Rails.logger.debug "Demo user: demo@xls-importer.com / password123"

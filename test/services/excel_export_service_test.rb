@@ -104,9 +104,10 @@ class ExcelExportServiceTest < ActiveSupport::TestCase
     # Read back the Excel file to verify structure
     require "roo"
     workbook = Roo::Excelx.new(temp_file.path)
-    
+
     # Check headers - first should be __record_id
     headers = workbook.row(1)
+
     assert_equal "__record_id", headers[0]
     assert_equal "Name", headers[1]
     assert_equal "Age", headers[2]
@@ -115,6 +116,7 @@ class ExcelExportServiceTest < ActiveSupport::TestCase
     # Check first data row has actual record ID
     first_data_row = workbook.row(2)
     first_record_id = @template.data_records.first.id
+
     assert_equal first_record_id, first_data_row[0].to_i
     assert_equal "John Doe", first_data_row[1]
 
@@ -134,9 +136,10 @@ class ExcelExportServiceTest < ActiveSupport::TestCase
     # Read back the Excel file to verify structure
     require "roo"
     workbook = Roo::Excelx.new(temp_file.path)
-    
+
     # Check headers - first should be __record_id
     headers = workbook.row(1)
+
     assert_equal "__record_id", headers[0]
     assert_equal "Name", headers[1]
 
@@ -159,16 +162,17 @@ class ExcelExportServiceTest < ActiveSupport::TestCase
     # Read back the Excel file to verify structure
     require "roo"
     workbook = Roo::Excelx.new(temp_file.path)
-    
+
     # Check headers - first should be __record_id
     headers = workbook.row(1)
+
     assert_equal "__record_id", headers[0]
-    
+
     # Check sample data rows have empty ID values
     (2..4).each do |row_num|
       sample_row = workbook.row(row_num)
       # ID column should be empty for samples (nil or empty string)
-      assert sample_row[0].blank?, "ID column should be empty for sample data"
+      assert_predicate sample_row[0], :blank?, "ID column should be empty for sample data"
     end
 
     temp_file.unlink

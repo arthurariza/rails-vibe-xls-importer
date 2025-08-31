@@ -68,6 +68,7 @@ gem "csv"
 gem "roo", "~> 2.10.0"
 
 group :development do
+  gem "letter_opener"
   gem "rubocop", require: false
   gem "rubocop-capybara", require: false
   gem "rubocop-minitest", require: false
@@ -75,5 +76,4 @@ group :development do
   gem "rubocop-rails", require: false
   gem "rubocop-thread_safety", require: false
   gem "web-console"
-  gem "letter_opener"
 end

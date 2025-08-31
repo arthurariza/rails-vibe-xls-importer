@@ -60,12 +60,12 @@ class HeaderValidationService < ApplicationService
       # Find which column number this header belongs to
       (1..5).each do |col_num|
         column_def = import_template.column_definition(col_num)
-        if column_def&.dig("name")&.downcase == excel_header
-          # Adjust Excel column index to account for ID column (if present)
-          excel_col_index = @has_id_column ? index + 1 : index
-          mapping[excel_col_index] = col_num
-          break
-        end
+        next unless column_def&.dig("name")&.downcase == excel_header
+
+        # Adjust Excel column index to account for ID column (if present)
+        excel_col_index = @has_id_column ? index + 1 : index
+        mapping[excel_col_index] = col_num
+        break
       end
     end
 

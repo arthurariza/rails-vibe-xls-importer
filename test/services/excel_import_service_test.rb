@@ -22,7 +22,7 @@ class ExcelImportServiceTest < ActiveSupport::TestCase
     )
 
     @existing_record_2 = @template.data_records.create!(
-      column_1: "Jane Smith", 
+      column_1: "Jane Smith",
       column_2: "25",
       column_3: "false"
     )
@@ -47,11 +47,13 @@ class ExcelImportServiceTest < ActiveSupport::TestCase
 
     # Verify records were updated
     @existing_record_1.reload
+
     assert_equal "John Updated", @existing_record_1.column_1
     assert_equal "31", @existing_record_1.column_2
     assert_equal "false", @existing_record_1.column_3
 
     @existing_record_2.reload
+
     assert_equal "Jane Updated", @existing_record_2.column_1
     assert_equal "26", @existing_record_2.column_2
     assert_equal "true", @existing_record_2.column_3
@@ -71,11 +73,12 @@ class ExcelImportServiceTest < ActiveSupport::TestCase
 
     assert result.success, "Import should succeed"
     assert_equal 1, result.updated_count # existing_record_1 updated
-    assert_equal 1, result.success_count # new record created  
+    assert_equal 1, result.success_count # new record created
     assert_equal 1, result.deleted_count # existing_record_2 deleted
 
     # Verify existing_record_1 was updated
     @existing_record_1.reload
+
     assert_equal "John Updated", @existing_record_1.column_1
 
     # Verify existing_record_2 was deleted
@@ -83,6 +86,7 @@ class ExcelImportServiceTest < ActiveSupport::TestCase
 
     # Verify new record was created
     new_record = @template.data_records.where.not(id: [@existing_record_1.id]).first
+
     assert_not_nil new_record
     assert_equal "Bob New", new_record.column_1
     assert_equal "35", new_record.column_2
@@ -125,10 +129,11 @@ class ExcelImportServiceTest < ActiveSupport::TestCase
     result = service.process_import
 
     assert_not result.success, "Import should fail due to validation error"
-    assert result.has_errors?
+    assert_predicate result, :has_errors?
 
     # Verify no changes were made to existing records
     @existing_record_1.reload
+
     assert_equal "John Doe", @existing_record_1.column_1 # unchanged
     assert_equal "30", @existing_record_1.column_2 # unchanged
   end
@@ -137,7 +142,7 @@ class ExcelImportServiceTest < ActiveSupport::TestCase
     # Create Excel file with non-existent record ID
     excel_data = [
       ["__record_id", "Name", "Age", "Active"],
-      [99999, "Fake Record", "25", "true"] # Non-existent ID
+      [99_999, "Fake Record", "25", "true"] # Non-existent ID
     ]
 
     file = create_test_excel_file(excel_data)
@@ -145,7 +150,7 @@ class ExcelImportServiceTest < ActiveSupport::TestCase
     result = service.process_import
 
     assert_not result.success, "Import should fail due to non-existent ID"
-    assert result.has_errors?
+    assert_predicate result, :has_errors?
     assert_includes result.errors.join, "Record with ID 99999 not found"
   end
 
@@ -165,14 +170,14 @@ class ExcelImportServiceTest < ActiveSupport::TestCase
     result = service.process_import
 
     assert_not result.success, "Import should fail due to validation error"
-    assert result.has_errors?
+    assert_predicate result, :has_errors?
 
     # Verify transaction rolled back - no changes should be made
     assert_equal original_count, @template.data_records.count
     @existing_record_1.reload
+
     assert_equal original_name, @existing_record_1.column_1 # Should be unchanged
   end
-
 
   test "should handle duplicate IDs in import file" do
     # Create Excel file with duplicate record IDs
@@ -188,9 +193,10 @@ class ExcelImportServiceTest < ActiveSupport::TestCase
 
     # Should process but the second occurrence will overwrite the first
     assert result.success, "Import should succeed with duplicate IDs"
-    
+
     # The last occurrence should win
     @existing_record_1.reload
+
     assert_equal "John Duplicate", @existing_record_1.column_1
     assert_equal "31", @existing_record_1.column_2
   end
@@ -212,6 +218,7 @@ class ExcelImportServiceTest < ActiveSupport::TestCase
 
     # Should create new record since invalid ID is treated as no ID
     new_record = @template.data_records.where(column_1: "Invalid ID Record").first
+
     assert_not_nil new_record
   end
 
@@ -238,6 +245,7 @@ class ExcelImportServiceTest < ActiveSupport::TestCase
 
     # Original records should be unchanged
     @existing_record_1.reload
+
     assert_equal "John Doe", @existing_record_1.column_1
   end
 
@@ -261,10 +269,12 @@ class ExcelImportServiceTest < ActiveSupport::TestCase
 
     # Verify update occurred
     @existing_record_1.reload
+
     assert_equal "John Updated", @existing_record_1.column_1
 
     # Verify new records were created
     new_records = @template.data_records.where(column_1: ["New Record 1", "New Record 2"])
+
     assert_equal 2, new_records.count
   end
 
@@ -272,10 +282,10 @@ class ExcelImportServiceTest < ActiveSupport::TestCase
 
   def create_test_excel_file(data)
     require "caxlsx"
-    
+
     package = Axlsx::Package.new
     workbook = package.workbook
-    
+
     worksheet = workbook.add_worksheet(name: "Test Data")
     data.each { |row| worksheet.add_row(row) }
 
@@ -286,12 +296,10 @@ class ExcelImportServiceTest < ActiveSupport::TestCase
     temp_file.rewind
 
     # Create ActionDispatch::Http::UploadedFile-like object
-    uploaded_file = ActionDispatch::Http::UploadedFile.new(
+    ActionDispatch::Http::UploadedFile.new(
       tempfile: temp_file,
       filename: "test_import.xlsx",
       type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
-
-    uploaded_file
   end
 end
