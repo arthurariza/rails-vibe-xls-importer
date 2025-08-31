@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_31_015303) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_31_015909) do
   create_table "data_records", force: :cascade do |t|
     t.integer "import_template_id", null: false
     t.text "column_1"
@@ -31,6 +31,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_31_015303) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "data_records_count", default: 0, null: false
+    t.integer "user_id", null: false
+    t.index ["user_id"], name: "index_import_templates_on_user_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -51,4 +53,5 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_31_015303) do
   end
 
   add_foreign_key "data_records", "import_templates"
+  add_foreign_key "import_templates", "users"
 end

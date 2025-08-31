@@ -49,13 +49,13 @@
   - [x] 2.3 Run `rails db:migrate` to create the users table
   - [x] 2.4 Configure User model with desired Devise modules (database_authenticatable, registerable, recoverable, rememberable, validatable, confirmable)
 
-- [ ] 3.0 Update Existing Models with User Associations
-  - [ ] 3.1 Generate migration to add user_id to import_templates table
-  - [ ] 3.2 Generate migration to add user_id to data_records table  
-  - [ ] 3.3 Add `belongs_to :user` to ImportTemplate model
-  - [ ] 3.4 Add `belongs_to :user` to DataRecord model
-  - [ ] 3.5 Add `has_many :import_templates` and `has_many :data_records` to User model
-  - [ ] 3.6 Run migrations to update database schema
+- [x] 3.0 Update Existing Models with User Associations
+  - [x] 3.1 Generate migration to add user_id to import_templates table
+  - [x] 3.2 ~~Generate migration to add user_id to data_records table~~ (Removed - not needed)  
+  - [x] 3.3 Add `belongs_to :user` to ImportTemplate model
+  - [x] 3.4 ~~Add `belongs_to :user` to DataRecord model~~ (Skip - DataRecord gets user through ImportTemplate)
+  - [x] 3.5 Add `has_many :import_templates` and `has_many :data_records` to User model
+  - [x] 3.6 Run migrations to update database schema
 
 - [ ] 4.0 Add Authentication to Controllers
   - [ ] 4.1 Add `before_action :authenticate_user!` to ApplicationController

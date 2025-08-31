@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class ImportTemplate < ApplicationRecord
+  belongs_to :user
   has_many :data_records, dependent: :destroy
 
   validates :name, presence: true, uniqueness: true
