@@ -18,7 +18,7 @@
 
 ## Tasks
 
-- [ ] 1.0 Create JobStatusService for Cache-Based Status Tracking (including tests)
+- [x] 1.0 Create JobStatusService for Cache-Based Status Tracking (including tests)
   - [x] 1.1 Generate JobStatusService class inheriting from ApplicationService
   - [x] 1.2 Implement cache_key method for consistent key generation: "job_status:#{job_id}"
   - [x] 1.3 Implement get_status method to read job status from Rails.cache
@@ -31,16 +31,16 @@
   - [x] 1.10 Test cache expiration behavior and auto-cleanup functionality
 
 - [ ] 2.0 Create Background Jobs with Cache-Based Status Integration (including tests)
-  - [ ] 2.1 Generate ImportProcessingJob class inheriting from ApplicationJob
-  - [ ] 2.2 Implement perform method accepting (import_template_id, job_id, file_path) parameters
-  - [ ] 2.3 Update job status to :processing using JobStatusService.update_status at job start
-  - [ ] 2.4 Create ActionDispatch::Http::UploadedFile from file_path for service compatibility
-  - [ ] 2.5 Call existing ExcelImportService.new(file, import_template).process_import unchanged
-  - [ ] 2.6 Update job status to :completed/:failed based on service result using JobStatusService
-  - [ ] 2.7 Add proper error handling and ensure block for temporary file cleanup
-  - [ ] 2.8 Generate ExportGenerationJob class with similar cache-based status structure
-  - [ ] 2.9 Write unit tests for ImportProcessingJob cache status integration and service delegation
-  - [ ] 2.10 Write unit tests for ExportGenerationJob with mocked service calls and cache verification
+  - [x] 2.1 Generate ImportProcessingJob class inheriting from ApplicationJob
+  - [x] 2.2 Implement perform method accepting (import_template_id, job_id, file_path) parameters
+  - [x] 2.3 Update job status to :processing using JobStatusService.update_status at job start
+  - [x] 2.4 Create ActionDispatch::Http::UploadedFile from file_path for service compatibility
+  - [x] 2.5 Call existing ExcelImportService.new(file, import_template).process_import unchanged
+  - [x] 2.6 Update job status to :completed/:failed based on service result using JobStatusService
+  - [x] 2.7 Add proper error handling and ensure block for temporary file cleanup
+  - [x] 2.8 Generate ExportGenerationJob class with similar cache-based status structure
+  - [x] 2.9 Write unit tests for ImportProcessingJob cache status integration and service delegation
+  - [x] 2.10 Write unit tests for ExportGenerationJob with mocked service calls and cache verification
 
 - [ ] 3.0 Modify Controllers for Background Processing with File Handling (including tests)
   - [ ] 3.1 Update ImportTemplatesController#import_file to save uploaded file to temporary location
