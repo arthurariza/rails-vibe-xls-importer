@@ -8,9 +8,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Rules
 
+- Make your best judgment for when to include rules in the context
+
 ### Rails Rules
 - Find the rules at @ai-context/rules/rails-rules.md
-- Always include this rule in the context
 
 ### Testing Rules
 - Find the rules at @ai-context/rules/testing-rules.md

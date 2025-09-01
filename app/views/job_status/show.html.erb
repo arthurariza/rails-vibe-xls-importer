@@ -1,2 +1,155 @@
-<h1>JobStatus#show</h1>
-<p>Find me in app/views/job_status/show.html.erb</p>
+<%= turbo_stream_from "job_status_#{@job_id}" %>
+
+<div class="min-h-screen bg-gray-50" data-controller="job-status" data-job-status-job-id-value="<%= @job_id %>">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Header -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-8 mb-8">
+      <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+        <div class="flex items-center gap-4">
+          <div class="h-12 w-12 bg-blue-100 rounded-xl flex items-center justify-center">
+            <svg class="h-7 w-7 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+            </svg>
+          </div>
+          <div>
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">Job Processing Status</h1>
+            <p class="text-lg text-gray-600">Template: <%= @import_template.name %></p>
+            <p class="text-sm text-gray-500 mt-1">Job ID: <%= @job_id %></p>
+          </div>
+        </div>
+        <div class="flex flex-wrap gap-3">
+          <%= link_to @import_template, 
+              class: "inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 transition-colors" do %>
+            <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            Back to Template
+          <% end %>
+          
+          <% if @import_template.present? %>
+            <%= link_to import_templates_path, 
+                class: "inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 transition-colors" do %>
+              <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+              </svg>
+              All Templates
+            <% end %>
+          <% end %>
+          
+          <button data-job-status-target="refreshButton" 
+                  data-action="click->job-status#refresh"
+                  class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+            <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+            </svg>
+            Refresh
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Job Status Content -->
+    <div class="space-y-6" data-job-status-target="status">
+      <!-- Main Status Display -->
+      <%= render "shared/job_status", job_id: @job_id, status_data: @status_data %>
+
+      <!-- Additional Information -->
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">About This Job</h3>
+        <div class="space-y-3 text-sm">
+          <div class="flex justify-between">
+            <span class="text-gray-600">Template:</span>
+            <span class="font-medium text-gray-900"><%= @import_template.name %></span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-600">Job ID:</span>
+            <span class="font-mono text-gray-900"><%= @job_id %></span>
+          </div>
+          <% if @import_template.description.present? %>
+            <div class="flex justify-between">
+              <span class="text-gray-600">Description:</span>
+              <span class="text-gray-900 text-right max-w-xs"><%= truncate(@import_template.description, length: 100) %></span>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Status-specific Actions -->
+      <% case @status_data[:status].to_sym %>
+      <% when :completed %>
+        <div class="bg-green-50 border border-green-200 rounded-xl p-6">
+          <div class="flex items-center gap-3 mb-4">
+            <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <h3 class="text-lg font-semibold text-green-900">Import Completed Successfully</h3>
+          </div>
+          <p class="text-green-800 mb-4">Your file has been processed successfully. You can now view the imported data in your template.</p>
+          <div class="flex gap-3">
+            <%= link_to @import_template, 
+                class: "inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-colors" do %>
+              <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+              </svg>
+              View Imported Data
+            <% end %>
+          </div>
+        </div>
+
+      <% when :failed %>
+        <div class="bg-red-50 border border-red-200 rounded-xl p-6">
+          <div class="flex items-center gap-3 mb-4">
+            <svg class="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <h3 class="text-lg font-semibold text-red-900">Import Failed</h3>
+          </div>
+          <p class="text-red-800 mb-4">There was an issue processing your file. Please check the error details above and try again with a corrected file.</p>
+          <div class="flex gap-3">
+            <%= link_to @import_template, 
+                class: "inline-flex items-center px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition-colors" do %>
+              <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+              </svg>
+              Try Again
+            <% end %>
+          </div>
+        </div>
+
+      <% when :processing %>
+        <div class="bg-blue-50 border border-blue-200 rounded-xl p-6">
+          <div class="flex items-center gap-3 mb-4">
+            <svg class="animate-spin h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <h3 class="text-lg font-semibold text-blue-900">Processing Your File</h3>
+          </div>
+          <p class="text-blue-800 mb-4">Please wait while your file is being processed. This page will automatically update when the processing is complete.</p>
+          <div class="text-sm text-blue-700">
+            <p><strong>Note:</strong> You can safely navigate away from this page and return later using the same URL.</p>
+          </div>
+        </div>
+
+      <% when :pending %>
+        <div class="bg-gray-50 border border-gray-200 rounded-xl p-6">
+          <div class="flex items-center gap-3 mb-4">
+            <svg class="h-6 w-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <h3 class="text-lg font-semibold text-gray-900">Job Queued</h3>
+          </div>
+          <p class="text-gray-700 mb-4">Your job is queued and will start processing shortly. This page will automatically update when processing begins.</p>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Real-time Update Notice -->
+    <div class="mt-8 text-center">
+      <p class="text-xs text-gray-500">
+        This page updates automatically. No need to refresh.
+      </p>
+    </div>
+  </div>
+</div>

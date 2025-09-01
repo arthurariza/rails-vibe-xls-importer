@@ -9,3 +9,6 @@ application.register("file-upload", FileUploadController)
 
 import HelloController from "./hello_controller"
 application.register("hello", HelloController)
+
+import JobStatusController from "./job_status_controller"
+application.register("job-status", JobStatusController)

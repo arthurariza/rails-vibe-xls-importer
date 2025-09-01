@@ -55,19 +55,19 @@
   - [x] 3.10 Test error handling for invalid files, job failures, and missing job status
 
 - [ ] 4.0 Implement Real-time Status Updates with Cache-Based Turbo Streams (use Playwright Mcp If needed)
-  - [ ] 4.1 Create app/views/shared/_job_status.html.erb partial accepting job_id and status_data locals
-  - [ ] 4.2 Add status indicators with appropriate styling (pending/processing/completed/failed states)
-  - [ ] 4.3 Include Turbo Stream target elements with job-specific IDs: id="job_status_#{job_id}"
-  - [ ] 4.4 Create app/views/job_status/show.html.erb for dedicated job status pages
-  - [ ] 4.5 Add turbo_stream_from "job_status_#{@job_id}" helper to subscribe to updates
-  - [ ] 4.6 Add routes for job status pages: resources :import_templates do resources :jobs, only: [:show]
-  - [ ] 4.7 Create Stimulus controller (job_status_controller.js) for client-side interactions
-  - [ ] 4.8 Implement fallback polling mechanism for browsers without Turbo Stream support
-  - [ ] 4.9 Add error state display with clear error messages from cache-stored job failures
-  - [ ] 4.10 Test Turbo Stream broadcasting integration with JobStatusService
+  - [x] 4.1 Create app/views/shared/_job_status.html.erb partial accepting job_id and status_data locals
+  - [x] 4.2 Add status indicators with appropriate styling (pending/processing/completed/failed states)
+  - [x] 4.3 Include Turbo Stream target elements with job-specific IDs: id="job_status_#{job_id}"
+  - [x] 4.4 Create app/views/job_status/show.html.erb for dedicated job status pages
+  - [x] 4.5 Add turbo_stream_from "job_status_#{@job_id}" helper to subscribe to updates
+  - [x] 4.6 Add routes for job status pages: resources :import_templates do resources :jobs, only: [:show]
+  - [x] 4.7 Create Stimulus controller (job_status_controller.js) for client-side interactions
+  - [x] 4.8 Implement fallback polling mechanism for browsers without Turbo Stream support
+  - [x] 4.9 Add error state display with clear error messages from cache-stored job failures
+  - [x] 4.10 Test Turbo Stream broadcasting integration with JobStatusService
 
 - [ ] 5.0 Verify Service Integration Compatibility (no changes required)
-  - [ ] 5.1 Confirm ExcelImportService.process_import already returns proper ImportResult objects
+  - [x] 5.1 Confirm ExcelImportService.process_import already returns proper ImportResult objects
   - [ ] 5.2 Verify ImportResult class has success boolean and errors array structure for job consumption
   - [ ] 5.3 Test existing service error handling provides meaningful error messages for cache storage
   - [ ] 5.4 Confirm ExcelExportService follows similar result object pattern for background jobs
