@@ -19,16 +19,16 @@
 ## Tasks
 
 - [ ] 1.0 Create JobStatusService for Cache-Based Status Tracking (including tests)
-  - [ ] 1.1 Generate JobStatusService class inheriting from ApplicationService
-  - [ ] 1.2 Implement cache_key method for consistent key generation: "job_status:#{job_id}"
-  - [ ] 1.3 Implement get_status method to read job status from Rails.cache
-  - [ ] 1.4 Implement update_status method to write status updates to cache with 24-hour expiration
-  - [ ] 1.5 Implement update_progress method for optional progress message updates
-  - [ ] 1.6 Implement broadcast_status_change private method for Turbo Stream broadcasting
-  - [ ] 1.7 Add proper error handling for cache read/write operations
-  - [ ] 1.8 Write unit tests for cache operations and status transitions
-  - [ ] 1.9 Write unit tests for Turbo Stream broadcasting integration
-  - [ ] 1.10 Test cache expiration behavior and auto-cleanup functionality
+  - [x] 1.1 Generate JobStatusService class inheriting from ApplicationService
+  - [x] 1.2 Implement cache_key method for consistent key generation: "job_status:#{job_id}"
+  - [x] 1.3 Implement get_status method to read job status from Rails.cache
+  - [x] 1.4 Implement update_status method to write status updates to cache with 24-hour expiration
+  - [x] 1.5 Implement update_progress method for optional progress message updates
+  - [x] 1.6 Implement broadcast_status_change private method for Turbo Stream broadcasting
+  - [x] 1.7 Add proper error handling for cache read/write operations
+  - [x] 1.8 Write unit tests for cache operations and status transitions
+  - [x] 1.9 Write unit tests for Turbo Stream broadcasting integration
+  - [x] 1.10 Test cache expiration behavior and auto-cleanup functionality
 
 - [ ] 2.0 Create Background Jobs with Cache-Based Status Integration (including tests)
   - [ ] 2.1 Generate ImportProcessingJob class inheriting from ApplicationJob
@@ -54,7 +54,7 @@
   - [ ] 3.9 Write controller tests verifying file handling, job enqueueing, and status page redirection
   - [ ] 3.10 Test error handling for invalid files, job failures, and missing job status
 
-- [ ] 4.0 Implement Real-time Status Updates with Cache-Based Turbo Streams (including Playwright system tests)
+- [ ] 4.0 Implement Real-time Status Updates with Cache-Based Turbo Streams (use Playwright Mcp If needed)
   - [ ] 4.1 Create app/views/shared/_job_status.html.erb partial accepting job_id and status_data locals
   - [ ] 4.2 Add status indicators with appropriate styling (pending/processing/completed/failed states)
   - [ ] 4.3 Include Turbo Stream target elements with job-specific IDs: id="job_status_#{job_id}"
@@ -65,8 +65,6 @@
   - [ ] 4.8 Implement fallback polling mechanism for browsers without Turbo Stream support
   - [ ] 4.9 Add error state display with clear error messages from cache-stored job failures
   - [ ] 4.10 Test Turbo Stream broadcasting integration with JobStatusService
-  - [ ] 4.11 Write Playwright system tests for file upload → job status page → real-time updates flow
-  - [ ] 4.12 Test error scenarios and cache expiration behavior using Playwright automation
 
 - [ ] 5.0 Verify Service Integration Compatibility (no changes required)
   - [ ] 5.1 Confirm ExcelImportService.process_import already returns proper ImportResult objects
@@ -77,5 +75,4 @@
   - [ ] 5.6 Verify service compatibility with ActionDispatch::Http::UploadedFile created from temp files
   - [ ] 5.7 Test edge cases like file validation failures and processing exceptions in background context
   - [ ] 5.8 Ensure services remain fully synchronous-compatible for non-background use cases
-  - [ ] 5.9 Performance test services with larger files to validate background processing benefits
-  - [ ] 5.10 Document service result object expectations for background job integration
+  - [ ] 5.9 Document service result object expectations for background job integration
