@@ -1,12 +1,15 @@
 # frozen_string_literal: true
 
 Rails.application.routes.draw do
+  # API endpoint for polling/debugging: GET /jobs/:job_id/status.json
+  get "jobs/:id/status", to: "job_status#status", as: :job_status_api
   devise_for :users
   root "import_templates#index"
 
   resources :import_templates do
     resources :data_records, except: [:index]
     resources :template_columns, only: %i[create update destroy]
+    resources :jobs, only: [:show], controller: "job_status"
     member do
       get :data_records, to: "data_records#index"
       get :export_template

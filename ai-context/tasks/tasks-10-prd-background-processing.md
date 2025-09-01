@@ -30,7 +30,7 @@
   - [x] 1.9 Write unit tests for Turbo Stream broadcasting integration
   - [x] 1.10 Test cache expiration behavior and auto-cleanup functionality
 
-- [ ] 2.0 Create Background Jobs with Cache-Based Status Integration (including tests)
+- [x] 2.0 Create Background Jobs with Cache-Based Status Integration (including tests)
   - [x] 2.1 Generate ImportProcessingJob class inheriting from ApplicationJob
   - [x] 2.2 Implement perform method accepting (import_template_id, job_id, file_path) parameters
   - [x] 2.3 Update job status to :processing using JobStatusService.update_status at job start
@@ -43,15 +43,15 @@
   - [x] 2.10 Write unit tests for ExportGenerationJob with mocked service calls and cache verification
 
 - [ ] 3.0 Modify Controllers for Background Processing with File Handling (including tests)
-  - [ ] 3.1 Update ImportTemplatesController#import_file to save uploaded file to temporary location
-  - [ ] 3.2 Generate unique job_id using SecureRandom.hex(8) for cache key generation
-  - [ ] 3.3 Initialize job status in cache using JobStatusService.update_status with :pending status
-  - [ ] 3.4 Enqueue ImportProcessingJob with (template_id, job_id, file_path) parameters
-  - [ ] 3.5 Redirect to job status page: /import_templates/:template_id/jobs/:job_id
-  - [ ] 3.6 Add error handling for file saving and job enqueueing failures
-  - [ ] 3.7 Create JobStatusController with show action for job status pages
-  - [ ] 3.8 Add job status API endpoint for polling/debugging: GET /jobs/:job_id/status.json
-  - [ ] 3.9 Write controller tests verifying file handling, job enqueueing, and status page redirection
+  - [x] 3.1 Update ImportTemplatesController#import_file to save uploaded file to temporary location
+  - [x] 3.2 Generate unique job_id using SecureRandom.hex(8) for cache key generation
+  - [x] 3.3 Initialize job status in cache using JobStatusService.update_status with :pending status
+  - [x] 3.4 Enqueue ImportProcessingJob with (template_id, job_id, file_path) parameters
+  - [x] 3.5 Redirect to job status page: /import_templates/:template_id/jobs/:job_id
+  - [x] 3.6 Add error handling for file saving and job enqueueing failures
+  - [x] 3.7 Create JobStatusController with show action for job status pages
+  - [x] 3.8 Add job status API endpoint for polling/debugging: GET /jobs/:job_id/status.json
+  - [x] 3.9 Write controller tests verifying file handling, job enqueueing, and status page redirection
   - [ ] 3.10 Test error handling for invalid files, job failures, and missing job status
 
 - [ ] 4.0 Implement Real-time Status Updates with Cache-Based Turbo Streams (use Playwright Mcp If needed)
