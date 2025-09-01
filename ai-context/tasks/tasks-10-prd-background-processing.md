@@ -42,7 +42,7 @@
   - [x] 2.9 Write unit tests for ImportProcessingJob cache status integration and service delegation
   - [x] 2.10 Write unit tests for ExportGenerationJob with mocked service calls and cache verification
 
-- [ ] 3.0 Modify Controllers for Background Processing with File Handling (including tests)
+- [x] 3.0 Modify Controllers for Background Processing with File Handling (including tests)
   - [x] 3.1 Update ImportTemplatesController#import_file to save uploaded file to temporary location
   - [x] 3.2 Generate unique job_id using SecureRandom.hex(8) for cache key generation
   - [x] 3.3 Initialize job status in cache using JobStatusService.update_status with :pending status
@@ -52,7 +52,7 @@
   - [x] 3.7 Create JobStatusController with show action for job status pages
   - [x] 3.8 Add job status API endpoint for polling/debugging: GET /jobs/:job_id/status.json
   - [x] 3.9 Write controller tests verifying file handling, job enqueueing, and status page redirection
-  - [ ] 3.10 Test error handling for invalid files, job failures, and missing job status
+  - [x] 3.10 Test error handling for invalid files, job failures, and missing job status
 
 - [ ] 4.0 Implement Real-time Status Updates with Cache-Based Turbo Streams (use Playwright Mcp If needed)
   - [ ] 4.1 Create app/views/shared/_job_status.html.erb partial accepting job_id and status_data locals
