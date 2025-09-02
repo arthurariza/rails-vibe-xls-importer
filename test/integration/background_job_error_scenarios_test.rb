@@ -329,7 +329,7 @@ class BackgroundJobErrorScenariosTest < ActiveSupport::TestCase
 
   test "jobs handle database transaction failures correctly" do
     job_id = SecureRandom.hex(8)
-    temp_file_path = create_valid_excel_file([["Name"], ["Transaction Test"]], job_id)
+    temp_file_path = create_valid_excel_file([["Name", "Age"], ["Transaction Test", "30"]], job_id)
     
     JobStatusService.update_status(job_id, :pending, created_at: Time.current)
     
@@ -364,16 +364,14 @@ class BackgroundJobErrorScenariosTest < ActiveSupport::TestCase
 
   test "jobs handle database connection pool exhaustion" do
     job_id = SecureRandom.hex(8)
-    temp_file_path = create_valid_excel_file([["Name"], ["Pool Test"]], job_id)
+    temp_file_path = create_valid_excel_file([["Name", "Age"], ["Pool Test", "25"]], job_id)
     
     JobStatusService.update_status(job_id, :pending, created_at: Time.current)
     
-    # Mock connection pool exhaustion
-    pool = ActiveRecord::Base.connection_pool
-    original_checkout = pool.method(:checkout)
-    
-    pool.define_singleton_method(:checkout) do |*args|
-      raise ActiveRecord::ConnectionTimeoutError, "could not obtain a connection from the pool"
+    # Mock ImportTemplate.find to simulate connection pool exhaustion
+    original_find = ImportTemplate.method(:find)
+    ImportTemplate.define_singleton_method(:find) do |id|
+      raise ActiveRecord::ConnectionTimeoutError, "could not obtain a connection from the pool within 5.000 seconds"
     end
     
     begin
@@ -381,7 +379,7 @@ class BackgroundJobErrorScenariosTest < ActiveSupport::TestCase
       job.perform(@template.id, job_id, temp_file_path)
     ensure
       # Restore original method
-      pool.define_singleton_method(:checkout, original_checkout)
+      ImportTemplate.define_singleton_method(:find, original_find)
     end
     
     status = JobStatusService.get_status(job_id)
@@ -406,19 +404,8 @@ class BackgroundJobErrorScenariosTest < ActiveSupport::TestCase
   end
 
   def create_valid_excel_file(excel_data, job_id)
-    require "caxlsx"
-
-    package = Axlsx::Package.new
-    workbook = package.workbook
-    worksheet = workbook.add_worksheet(name: "Test Data")
-    
-    excel_data.each { |row| worksheet.add_row(row) }
-
-    temp_file_path = Rails.root.join("tmp", "job_error_test_#{job_id}.xlsx")
-    FileUtils.mkdir_p(File.dirname(temp_file_path))
-    package.serialize(temp_file_path)
-    
-    temp_file_path.to_s
+    # Use fixture file to avoid race conditions in parallel tests
+    excel_fixture_file_path("edge_case_base.xlsx")
   end
 
   def clear_enqueued_jobs

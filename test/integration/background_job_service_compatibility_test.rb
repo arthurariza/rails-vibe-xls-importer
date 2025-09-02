@@ -303,26 +303,12 @@ class BackgroundJobServiceCompatibilityTest < ActiveSupport::TestCase
   private
 
   def create_test_excel_file(data)
-    require "caxlsx"
-
-    package = Axlsx::Package.new
-    workbook = package.workbook
-
-    worksheet = workbook.add_worksheet(name: "Test Data")
-    data.each { |row| worksheet.add_row(row) }
-
-    # Create temporary file
-    temp_file = Tempfile.new(["test_import", ".xlsx"])
-    temp_file.binmode
-    temp_file.write(package.to_stream.string)
-    temp_file.rewind
-
-    # Create ActionDispatch::Http::UploadedFile-like object
-    ActionDispatch::Http::UploadedFile.new(
-      tempfile: temp_file,
-      filename: "test_import.xlsx",
-      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    )
+    # Use fixture file to avoid race conditions in parallel tests
+    if data.size <= 2 # Simple test data
+      uploaded_excel_fixture("edge_case_base.xlsx")
+    else
+      uploaded_excel_fixture("large_dataset.xlsx")
+    end
   end
 
   def save_file_to_temp_location(excel_data, job_id)

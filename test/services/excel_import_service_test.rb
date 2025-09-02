@@ -46,14 +46,11 @@ class ExcelImportServiceTest < ActiveSupport::TestCase
   end
 
   test "should synchronize data with ID column - update existing records" do
-    # Create Excel file with ID column that updates existing records
-    excel_data = [
-      ["__record_id", "Name", "Age", "Active"],
-      [@existing_record_1.id, "John Updated", "31", "false"],
-      [@existing_record_2.id, "Jane Updated", "26", "true"]
-    ]
-
-    file = create_test_excel_file(excel_data)
+    # Use fixture file and customize with actual record IDs
+    file = customized_excel_fixture("update_existing_records.xlsx", {
+      1 => @existing_record_1.id,
+      2 => @existing_record_2.id
+    })
     service = ExcelImportService.new(file, @template)
     result = service.process_import
 
@@ -78,13 +75,9 @@ class ExcelImportServiceTest < ActiveSupport::TestCase
 
   test "should synchronize data with ID column - create new and delete missing" do
     # Create Excel file with one existing record, one new record, missing the second existing record
-    excel_data = [
-      ["__record_id", "Name", "Age", "Active"],
-      [@existing_record_1.id, "John Updated", "31", "false"],
-      ["", "Bob New", "35", "true"] # Empty ID means new record
-    ]
-
-    file = create_test_excel_file(excel_data)
+    file = customized_excel_fixture("mixed_update_create.xlsx", {
+      1 => @existing_record_1.id
+    })
     service = ExcelImportService.new(file, @template)
     result = service.process_import
 
@@ -111,13 +104,7 @@ class ExcelImportServiceTest < ActiveSupport::TestCase
 
   test "should create all new records when no ID column present" do
     # Create Excel file without ID column (legacy behavior for new files)
-    excel_data = [
-      ["Name", "Age", "Active"],
-      ["Alice New", "28", "true"],
-      ["Bob New", "32", "false"]
-    ]
-
-    file = create_test_excel_file(excel_data)
+    file = uploaded_excel_fixture("create_only_records.xlsx")
     service = ExcelImportService.new(file, @template)
     result = service.process_import
 
@@ -136,12 +123,9 @@ class ExcelImportServiceTest < ActiveSupport::TestCase
 
   test "should reject import if validation fails and preserve existing data" do
     # Create Excel file with invalid data
-    excel_data = [
-      ["__record_id", "Name", "Age", "Active"],
-      [@existing_record_1.id, "John Updated", "invalid_number", "false"]
-    ]
-
-    file = create_test_excel_file(excel_data)
+    file = customized_excel_fixture("invalid_number_data.xlsx", {
+      1 => @existing_record_1.id
+    })
     service = ExcelImportService.new(file, @template)
     result = service.process_import
 

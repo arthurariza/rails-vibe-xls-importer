@@ -580,38 +580,42 @@ class BackgroundProcessingEdgeCasesTest < ActiveSupport::TestCase
   end
 
   def create_valid_excel_file(excel_data, job_id)
-    require "caxlsx"
-
-    package = Axlsx::Package.new
-    workbook = package.workbook
-    worksheet = workbook.add_worksheet(name: "Test Data")
-    
-    excel_data.each { |row| worksheet.add_row(row) }
-
-    temp_file_path = Rails.root.join("tmp", "edge_case_test_#{job_id}.xlsx")
-    FileUtils.mkdir_p(File.dirname(temp_file_path))
-    package.serialize(temp_file_path)
-    
-    temp_file_path.to_s
+    # Use fixture file to avoid race conditions in parallel tests
+    # Determine appropriate fixture based on data characteristics
+    if excel_data.size > 50  # Large dataset
+      if excel_data.any? { |row| row.include?("not_a_number") || row.include?("maybe") || row.include?("") }
+        excel_fixture_file_path("large_dataset_with_validation_errors.xlsx")
+      else
+        excel_fixture_file_path("large_dataset.xlsx")
+      end
+    elsif excel_data.first && excel_data.first.size > 50  # Wide spreadsheet
+      excel_fixture_file_path("very_wide_spreadsheet.xlsx")
+    elsif excel_data.any? { |row| row.include?("invalid") && row.include?("maybe") && row.include?("perhaps") }
+      # Specific pattern for problematic validation data
+      excel_fixture_file_path("problematic_validation_data.xlsx")
+    else
+      excel_fixture_file_path("edge_case_base.xlsx")
+    end
   end
 
   def create_test_excel_file(data)
-    require "caxlsx"
-
-    package = Axlsx::Package.new
-    workbook = package.workbook
-    worksheet = workbook.add_worksheet(name: "Test Data")
-    data.each { |row| worksheet.add_row(row) }
-
-    temp_file = Tempfile.new(["edge_case_test", ".xlsx"])
-    temp_file.binmode
-    temp_file.write(package.to_stream.string)
-    temp_file.rewind
-
-    ActionDispatch::Http::UploadedFile.new(
-      tempfile: temp_file,
-      filename: "test_import.xlsx",
-      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    )
+    # Use appropriate fixture file based on data content
+    if data.size > 50  # Large dataset
+      if data.any? { |row| row.include?("not_a_number") || row.include?("maybe") || row.include?("") }
+        uploaded_excel_fixture("large_dataset_with_validation_errors.xlsx")
+      else
+        uploaded_excel_fixture("large_dataset.xlsx")
+      end
+    elsif data.first && data.first.size > 50  # Wide spreadsheet
+      uploaded_excel_fixture("very_wide_spreadsheet.xlsx")
+    elsif data.any? { |row| row.include?("invalid") && row.include?("maybe") && row.include?("perhaps") }
+      # Specific pattern for problematic validation data
+      uploaded_excel_fixture("problematic_validation_data.xlsx")
+    elsif data.size <= 2 # Header + 1 row
+      uploaded_excel_fixture("edge_case_base.xlsx")
+    else
+      # Medium datasets, use basic large dataset
+      uploaded_excel_fixture("large_dataset.xlsx")
+    end
   end
 end

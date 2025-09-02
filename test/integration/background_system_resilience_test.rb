@@ -224,15 +224,15 @@ class BackgroundSystemResilienceTest < ActiveSupport::TestCase
     
     service = ExcelImportService.new(uploaded_file, @template)
     
-    # Simulate interruption during processing by overriding the transaction method
-    original_execute_sync = service.method(:execute_sync_transaction)
-    service.define_singleton_method(:execute_sync_transaction) do |sync_plan|
-      # Process half the records, then simulate interruption
-      original_execute_sync.call(sync_plan.merge(
-        to_create: sync_plan[:to_create].take(5)  # Only process first 5 records
-      ))
-      
-      raise StandardError, "Simulated processing interruption"
+    # Simulate interruption during processing by mocking DataRecord.create! to fail midway
+    original_create = DataRecord.method(:create!)
+    record_count = 0
+    DataRecord.define_singleton_method(:create!) do |attributes|
+      record_count += 1
+      if record_count > 5
+        raise StandardError, "Simulated processing interruption during record creation"
+      end
+      original_create.call(attributes)
     end
     
     # Execute and expect failure
@@ -242,6 +242,9 @@ class BackgroundSystemResilienceTest < ActiveSupport::TestCase
     rescue StandardError => e
       # Service might raise the exception instead of catching it
       result = OpenStruct.new(success: false, errors: ["Transaction failed: #{e.message}"], created_records: [])
+    ensure
+      # Restore original method
+      DataRecord.define_singleton_method(:create!, original_create)
     end
     
     assert_not result.success, "Processing should fail due to interruption"
