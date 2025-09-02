@@ -130,6 +130,7 @@ end
 ### When a test fails
 - Don't always assume that the tests are correct
 - Identify if the test is outdated or the new implementation is correct
+- Rerun only the failing test(s) for a fix
 
 ### Edge Cases
 - **Handling Empty Datasets:** Ensure code handles empty datasets gracefully.

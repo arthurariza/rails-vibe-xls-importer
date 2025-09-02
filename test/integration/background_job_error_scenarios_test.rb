@@ -58,14 +58,11 @@ class BackgroundJobErrorScenariosTest < ActiveSupport::TestCase
     
     # Execute job with invalid template ID
     job = ImportProcessingJob.new
-    
-    assert_raises(ActiveRecord::RecordNotFound) do
-      job.perform(invalid_template_id, job_id, temp_file_path)
-    end
+    job.perform(invalid_template_id, job_id, temp_file_path)
     
     # Job should have updated status to failed
     status = JobStatusService.get_status(job_id)
-    assert_equal "failed", status[:status]
+    assert_equal :failed, status[:status]
     assert_includes status[:error_message], "Couldn't find ImportTemplate"
     
     # Temp file should still be cleaned up
@@ -83,7 +80,7 @@ class BackgroundJobErrorScenariosTest < ActiveSupport::TestCase
     
     # Job should have failed gracefully
     status = JobStatusService.get_status(job_id)
-    assert_equal "failed", status[:status]
+    assert_equal :failed, status[:status]
     assert_includes status[:error_message].downcase, "no such file"
   end
 
@@ -113,7 +110,7 @@ class BackgroundJobErrorScenariosTest < ActiveSupport::TestCase
     
     # Job should have captured the service exception
     status = JobStatusService.get_status(job_id)
-    assert_equal "failed", status[:status]
+    assert_equal :failed, status[:status]
     assert_includes status[:error_message], "Simulated service failure"
     assert_not_nil status[:completed_at]
     
@@ -132,7 +129,7 @@ class BackgroundJobErrorScenariosTest < ActiveSupport::TestCase
     
     # Job should complete with service-level failure
     status = JobStatusService.get_status(job_id)
-    assert_equal "failed", status[:status]
+    assert_equal :failed, status[:status]
     assert_includes status[:error_message], "Could not read Excel file"
     
     # File should be cleaned up
@@ -160,8 +157,8 @@ class BackgroundJobErrorScenariosTest < ActiveSupport::TestCase
     status1 = JobStatusService.get_status(job_id1)
     status2 = JobStatusService.get_status(job_id2)
     
-    assert_includes ["completed", "failed"], status1[:status]
-    assert_includes ["completed", "failed"], status2[:status]
+    assert_includes [:completed, :failed], status1[:status]
+    assert_includes [:completed, :failed], status2[:status]
     
     # Both should have completed_at timestamps
     assert_not_nil status1[:completed_at]
@@ -181,13 +178,10 @@ class BackgroundJobErrorScenariosTest < ActiveSupport::TestCase
     JobStatusService.update_status(job_id, :pending, created_at: Time.current)
     
     job = ExportGenerationJob.new
-    
-    assert_raises(ActiveRecord::RecordNotFound) do
-      job.perform(invalid_template_id, job_id, :data)
-    end
+    job.perform(invalid_template_id, job_id, :data)
     
     status = JobStatusService.get_status(job_id)
-    assert_equal "failed", status[:status]
+    assert_equal :failed, status[:status]
     assert_includes status[:error_message], "Couldn't find ImportTemplate"
   end
 
@@ -215,7 +209,7 @@ class BackgroundJobErrorScenariosTest < ActiveSupport::TestCase
     end
     
     status = JobStatusService.get_status(job_id)
-    assert_equal "failed", status[:status]
+    assert_equal :failed, status[:status]
     assert_includes status[:error_message], "Export generation failed"
     assert_not_nil status[:completed_at]
   end
@@ -225,13 +219,13 @@ class BackgroundJobErrorScenariosTest < ActiveSupport::TestCase
     
     JobStatusService.update_status(job_id, :pending, created_at: Time.current)
     
-    # Mock FileUtils to simulate file system error
-    original_mkdir_p = FileUtils.method(:mkdir_p)
-    FileUtils.define_singleton_method(:mkdir_p) do |path|
+    # Mock File.open to simulate file system error during package serialization
+    original_serialize = Axlsx::Package.instance_method(:serialize)
+    Axlsx::Package.define_method(:serialize) do |path|
       if path.to_s.include?(job_id)
         raise Errno::EACCES, "Permission denied - simulated file system error"
       else
-        original_mkdir_p.call(path)
+        original_serialize.bind(self).call(path)
       end
     end
     
@@ -240,11 +234,11 @@ class BackgroundJobErrorScenariosTest < ActiveSupport::TestCase
       job.perform(@template.id, job_id, :data)
     ensure
       # Restore original method
-      FileUtils.define_singleton_method(:mkdir_p, original_mkdir_p)
+      Axlsx::Package.define_method(:serialize, original_serialize)
     end
     
     status = JobStatusService.get_status(job_id)
-    assert_equal "failed", status[:status]
+    assert_equal :failed, status[:status]
     assert_includes status[:error_message].downcase, "permission denied"
   end
 
@@ -273,7 +267,7 @@ class BackgroundJobErrorScenariosTest < ActiveSupport::TestCase
     
     # All export types should complete successfully
     results.each do |export_type, status|
-      assert_equal "completed", status[:status], "#{export_type} export should complete successfully"
+      assert_equal :completed, status[:status], "#{export_type} export should complete successfully"
       assert_not_nil status[:completed_at], "#{export_type} export should have completed_at timestamp"
       assert_includes status[:result_summary], "Export generated successfully", "#{export_type} export should have success message"
       assert_not_nil status[:file_path], "#{export_type} export should have file path"
@@ -304,7 +298,7 @@ class BackgroundJobErrorScenariosTest < ActiveSupport::TestCase
     
     # Final status should be consistent
     status = JobStatusService.get_status(job_id)
-    assert_equal "processing", status[:status]
+    assert_equal :processing, status[:status]
     assert_not_nil status[:started_at]
     # worker_id should be from one of the threads
     assert_match /worker_[0-2]/, status[:worker_id] if status[:worker_id]
@@ -325,7 +319,7 @@ class BackgroundJobErrorScenariosTest < ActiveSupport::TestCase
     # Job should still complete and update status
     status = JobStatusService.get_status(job_id)
     assert_not_nil status
-    assert_includes ["completed", "failed"], status[:status]
+    assert_includes [:completed, :failed], status[:status]
     
     # File should be cleaned up
     assert_not File.exist?(temp_file_path)
@@ -358,7 +352,7 @@ class BackgroundJobErrorScenariosTest < ActiveSupport::TestCase
     end
     
     status = JobStatusService.get_status(job_id)
-    assert_equal "failed", status[:status]
+    assert_equal :failed, status[:status]
     assert_includes status[:error_message], "Transaction failed"
     
     # No partial records should be created
@@ -391,7 +385,7 @@ class BackgroundJobErrorScenariosTest < ActiveSupport::TestCase
     end
     
     status = JobStatusService.get_status(job_id)
-    assert_equal "failed", status[:status]
+    assert_equal :failed, status[:status]
     assert_includes status[:error_message].downcase, "connection"
     
     # File should be cleaned up
