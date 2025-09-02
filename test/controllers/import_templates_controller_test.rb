@@ -24,14 +24,33 @@ class ImportTemplatesControllerTest < ActionDispatch::IntegrationTest
     # Setup cache for JobStatusService
     @original_cache_store = Rails.cache
     Rails.cache = ActiveSupport::Cache::MemoryStore.new
+    
+    # Create unique temporary directory for this test to avoid race conditions
+    @test_temp_dir = Rails.root.join("tmp", "test_imports_#{Process.pid}_#{Thread.current.object_id}")
+    FileUtils.mkdir_p(@test_temp_dir)
   end
   
   def teardown
     # Restore cache
     Rails.cache = @original_cache_store
     
-    # Clean up any temporary files created during tests
-    FileUtils.rm_rf(Rails.root.join("tmp", "imports")) if Dir.exist?(Rails.root.join("tmp", "imports"))
+    # Clean up test-specific temporary directory
+    FileUtils.rm_rf(@test_temp_dir) if @test_temp_dir && Dir.exist?(@test_temp_dir)
+  end
+
+  # Helper method to stub the Rails root path for imports to use test-specific directory
+  def with_test_temp_dir(&block)
+    original_method = Rails.root.method(:join)
+    
+    Rails.root.stub(:join, proc do |*args|
+      if args.first == "tmp" && args[1] == "imports"
+        # Redirect tmp/imports to our test-specific directory
+        @test_temp_dir.join(*args[2..-1])
+      else
+        # Use original method for all other paths
+        original_method.call(*args)
+      end
+    end, &block)
   end
 
   test "should get index" do
@@ -94,17 +113,19 @@ class ImportTemplatesControllerTest < ActionDispatch::IntegrationTest
 
     file = create_test_excel_file(excel_data)
 
-    # Mock job enqueueing to verify it's called
-    job_enqueued = false
-    ImportProcessingJob.stub(:perform_later, ->(*_args) { job_enqueued = true }) do
-      post import_file_import_template_url(@import_template), params: { excel_file: file }
+    with_test_temp_dir do
+      # Mock job enqueueing to verify it's called
+      job_enqueued = false
+      ImportProcessingJob.stub(:perform_later, ->(*_args) { job_enqueued = true }) do
+        post import_file_import_template_url(@import_template), params: { excel_file: file }
+      end
+      
+      # Should now redirect to job status page instead of template page
+      assert_response :redirect
+      assert job_enqueued, "ImportProcessingJob should be enqueued"
+      
+      # Note: Record won't be updated immediately since it's now background processing
     end
-    
-    # Should now redirect to job status page instead of template page
-    assert_response :redirect
-    assert job_enqueued, "ImportProcessingJob should be enqueued"
-    
-    # Note: Record won't be updated immediately since it's now background processing
   end
 
   test "should handle failed import and show errors (now using background processing)" do
@@ -116,17 +137,19 @@ class ImportTemplatesControllerTest < ActionDispatch::IntegrationTest
 
     file = create_test_excel_file(excel_data)
 
-    # Mock job enqueueing to verify it's called
-    job_enqueued = false
-    ImportProcessingJob.stub(:perform_later, ->(*_args) { job_enqueued = true }) do
-      post import_file_import_template_url(@import_template), params: { excel_file: file }
-    end
+    with_test_temp_dir do
+      # Mock job enqueueing to verify it's called
+      job_enqueued = false
+      ImportProcessingJob.stub(:perform_later, ->(*_args) { job_enqueued = true }) do
+        post import_file_import_template_url(@import_template), params: { excel_file: file }
+      end
 
-    # Should now redirect to job status page instead of showing errors immediately
-    assert_response :redirect
-    assert job_enqueued, "ImportProcessingJob should be enqueued"
-    
-    # Note: Errors will be shown on the job status page after background processing
+      # Should now redirect to job status page instead of showing errors immediately
+      assert_response :redirect
+      assert job_enqueued, "ImportProcessingJob should be enqueued"
+      
+      # Note: Errors will be shown on the job status page after background processing
+    end
   end
 
   test "should redirect to login when not authenticated" do
@@ -192,105 +215,117 @@ class ImportTemplatesControllerTest < ActionDispatch::IntegrationTest
     excel_data = [["Name"], ["John Doe"]]
     file = create_test_excel_file(excel_data)
 
-    # Mock job enqueueing to verify it's called
-    job_enqueued = false
-    ImportProcessingJob.stub(:perform_later, ->(*_args) { job_enqueued = true }) do
-      post import_file_import_template_url(@import_template), params: { excel_file: file }
+    with_test_temp_dir do
+      # Mock job enqueueing to verify it's called
+      job_enqueued = false
+      ImportProcessingJob.stub(:perform_later, ->(*_args) { job_enqueued = true }) do
+        post import_file_import_template_url(@import_template), params: { excel_file: file }
+      end
+
+      # Verify job was enqueued
+      assert job_enqueued, "ImportProcessingJob should be enqueued"
+
+      # Verify temporary file was created in test-specific directory
+      temp_files = Dir.glob(@test_temp_dir.join("*"))
+      assert temp_files.any?, "Temporary file should be created"
     end
-
-    # Verify job was enqueued
-    assert job_enqueued, "ImportProcessingJob should be enqueued"
-
-    # Verify temporary file was created (it will be cleaned up by teardown)
-    temp_files = Dir.glob(Rails.root.join("tmp", "imports", "*"))
-    assert temp_files.any?, "Temporary file should be created"
   end
 
   test "should generate unique job_id and initialize cache status" do
     excel_data = [["Name"], ["John Doe"]]
     file = create_test_excel_file(excel_data)
 
-    # Capture the job_id and arguments passed to the job
-    job_args = nil
-    ImportProcessingJob.stub(:perform_later, ->(template_id, job_id, file_path) {
-      job_args = { template_id: template_id, job_id: job_id, file_path: file_path }
-    }) do
-      post import_file_import_template_url(@import_template), params: { excel_file: file }
+    with_test_temp_dir do
+      # Capture the job_id and arguments passed to the job
+      job_args = nil
+      ImportProcessingJob.stub(:perform_later, ->(template_id, job_id, file_path) {
+        job_args = { template_id: template_id, job_id: job_id, file_path: file_path }
+      }) do
+        post import_file_import_template_url(@import_template), params: { excel_file: file }
+      end
+
+      # Verify job was called with correct arguments
+      assert_not_nil job_args
+      assert_equal @import_template.id, job_args[:template_id]
+      assert_not_nil job_args[:job_id]
+      assert_equal 16, job_args[:job_id].length # SecureRandom.hex(8) generates 16 chars
+      assert_not_nil job_args[:file_path]
+
+      # Verify cache status was initialized
+      cached_status = Rails.cache.read("job_status:#{job_args[:job_id]}")
+      assert_not_nil cached_status
+      assert_equal :pending, cached_status[:status]
+      assert_not_nil cached_status[:created_at]
     end
-
-    # Verify job was called with correct arguments
-    assert_not_nil job_args
-    assert_equal @import_template.id, job_args[:template_id]
-    assert_not_nil job_args[:job_id]
-    assert_equal 16, job_args[:job_id].length # SecureRandom.hex(8) generates 16 chars
-    assert_not_nil job_args[:file_path]
-
-    # Verify cache status was initialized
-    cached_status = Rails.cache.read("job_status:#{job_args[:job_id]}")
-    assert_not_nil cached_status
-    assert_equal :pending, cached_status[:status]
-    assert_not_nil cached_status[:created_at]
   end
 
   test "should redirect to job status page after enqueueing" do
     excel_data = [["Name"], ["John Doe"]]
     file = create_test_excel_file(excel_data)
 
-    # Capture job_id to verify redirect URL
-    job_id = nil
-    ImportProcessingJob.stub(:perform_later, ->(_template_id, captured_job_id, _file_path) {
-      job_id = captured_job_id
-    }) do
-      post import_file_import_template_url(@import_template), params: { excel_file: file }
-    end
+    with_test_temp_dir do
+      # Capture job_id to verify redirect URL
+      job_id = nil
+      ImportProcessingJob.stub(:perform_later, ->(_template_id, captured_job_id, _file_path) {
+        job_id = captured_job_id
+      }) do
+        post import_file_import_template_url(@import_template), params: { excel_file: file }
+      end
 
-    # Note: The redirect will fail because the route doesn't exist yet (task 4.6)
-    # But we can verify the controller attempted the correct redirect
-    assert_response :redirect
-    assert_not_nil job_id
+      # Note: The redirect will fail because the route doesn't exist yet (task 4.6)
+      # But we can verify the controller attempted the correct redirect
+      assert_response :redirect
+      assert_not_nil job_id
+    end
   end
 
   test "should handle file saving errors gracefully" do
     excel_data = [["Name"], ["John Doe"]]
     file = create_test_excel_file(excel_data)
 
-    # Mock FileUtils.mkdir_p to raise an error
-    FileUtils.stub(:mkdir_p, ->(*_args) { raise StandardError.new("Permission denied") }) do
-      post import_file_import_template_url(@import_template), params: { excel_file: file }
-    end
+    with_test_temp_dir do
+      # Mock FileUtils.mkdir_p to raise an error
+      FileUtils.stub(:mkdir_p, ->(*_args) { raise StandardError.new("Permission denied") }) do
+        post import_file_import_template_url(@import_template), params: { excel_file: file }
+      end
 
-    assert_redirected_to import_form_import_template_url(@import_template)
-    assert_match(/Failed to start background import.*Permission denied/, flash[:alert])
+      assert_redirected_to import_form_import_template_url(@import_template)
+      assert_match(/Failed to start background import.*Permission denied/, flash[:alert])
+    end
   end
 
   test "should handle job enqueueing errors gracefully" do
     excel_data = [["Name"], ["John Doe"]]
     file = create_test_excel_file(excel_data)
 
-    # Mock job enqueueing to raise an error
-    ImportProcessingJob.stub(:perform_later, ->(*_args) { raise StandardError.new("Queue unavailable") }) do
-      post import_file_import_template_url(@import_template), params: { excel_file: file }
-    end
+    with_test_temp_dir do
+      # Mock job enqueueing to raise an error
+      ImportProcessingJob.stub(:perform_later, ->(*_args) { raise StandardError.new("Queue unavailable") }) do
+        post import_file_import_template_url(@import_template), params: { excel_file: file }
+      end
 
-    assert_redirected_to import_form_import_template_url(@import_template)
-    assert_match(/Failed to start background import.*Queue unavailable/, flash[:alert])
+      assert_redirected_to import_form_import_template_url(@import_template)
+      assert_match(/Failed to start background import.*Queue unavailable/, flash[:alert])
+    end
   end
 
   test "should clean up temporary file on error" do
     excel_data = [["Name"], ["John Doe"]]
     file = create_test_excel_file(excel_data)
 
-    # Track temp files before and after error
-    temp_files_before = Dir.glob(Rails.root.join("tmp", "imports", "*")).length
+    with_test_temp_dir do
+      # Track temp files before and after error in test-specific directory
+      temp_files_before = Dir.glob(@test_temp_dir.join("*")).length
 
-    # Mock job enqueueing to raise an error after file is saved
-    ImportProcessingJob.stub(:perform_later, ->(*_args) { raise StandardError.new("Queue error") }) do
-      post import_file_import_template_url(@import_template), params: { excel_file: file }
+      # Mock job enqueueing to raise an error after file is saved
+      ImportProcessingJob.stub(:perform_later, ->(*_args) { raise StandardError.new("Queue error") }) do
+        post import_file_import_template_url(@import_template), params: { excel_file: file }
+      end
+
+      # Verify no extra temp files remain in test-specific directory
+      temp_files_after = Dir.glob(@test_temp_dir.join("*")).length
+      assert_equal temp_files_before, temp_files_after, "Temporary files should be cleaned up on error"
     end
-
-    # Verify no extra temp files remain
-    temp_files_after = Dir.glob(Rails.root.join("tmp", "imports", "*")).length
-    assert_equal temp_files_before, temp_files_after, "Temporary files should be cleaned up on error"
   end
 
   test "should save file with correct naming pattern" do
@@ -298,39 +333,43 @@ class ImportTemplatesControllerTest < ActionDispatch::IntegrationTest
     file = create_test_excel_file(excel_data)
     original_filename = file.original_filename
 
-    # Capture the file path passed to the job
-    file_path = nil
-    ImportProcessingJob.stub(:perform_later, ->(_template_id, job_id, captured_file_path) {
-      file_path = captured_file_path
-      # Verify file path follows expected pattern: job_id_originalname
-      expected_pattern = /tmp\/imports\/[a-f0-9]{16}_.*\.xlsx$/
-      assert_match expected_pattern, captured_file_path
-      assert_includes captured_file_path, job_id
-    }) do
-      post import_file_import_template_url(@import_template), params: { excel_file: file }
-    end
+    with_test_temp_dir do
+      # Capture the file path passed to the job
+      file_path = nil
+      ImportProcessingJob.stub(:perform_later, ->(_template_id, job_id, captured_file_path) {
+        file_path = captured_file_path
+        # Verify file path follows expected pattern: job_id_originalname
+        expected_pattern = /test_imports_.*\/[a-f0-9]{16}_.*\.xlsx$/
+        assert_match expected_pattern, captured_file_path
+        assert_includes captured_file_path, job_id
+      }) do
+        post import_file_import_template_url(@import_template), params: { excel_file: file }
+      end
 
-    assert_not_nil file_path
+      assert_not_nil file_path
+    end
   end
 
   test "should pass correct parameters to ImportProcessingJob" do
     excel_data = [["Name"], ["Test Data"]]
     file = create_test_excel_file(excel_data)
 
-    # Verify exact parameters passed to job
-    job_called_with = nil
-    ImportProcessingJob.stub(:perform_later, ->(*args) {
-      job_called_with = args
-    }) do
-      post import_file_import_template_url(@import_template), params: { excel_file: file }
-    end
+    with_test_temp_dir do
+      # Verify exact parameters passed to job
+      job_called_with = nil
+      ImportProcessingJob.stub(:perform_later, ->(*args) {
+        job_called_with = args
+      }) do
+        post import_file_import_template_url(@import_template), params: { excel_file: file }
+      end
 
-    assert_not_nil job_called_with
-    assert_equal 3, job_called_with.length
-    assert_equal @import_template.id, job_called_with[0] # template_id
-    assert_instance_of String, job_called_with[1] # job_id
-    assert_instance_of String, job_called_with[2] # file_path
-    assert_match /\.xlsx$/, job_called_with[2] # file_path ends with .xlsx
+      assert_not_nil job_called_with
+      assert_equal 3, job_called_with.length
+      assert_equal @import_template.id, job_called_with[0] # template_id
+      assert_instance_of String, job_called_with[1] # job_id
+      assert_instance_of String, job_called_with[2] # file_path
+      assert_match /\.xlsx$/, job_called_with[2] # file_path ends with .xlsx
+    end
   end
 
   # Task 3.10: Error handling tests
@@ -343,15 +382,17 @@ class ImportTemplatesControllerTest < ActionDispatch::IntegrationTest
 
     uploaded_file = fixture_file_upload(text_file.path, "text/plain")
 
-    # Mock job to verify it gets enqueued even with invalid files
-    job_enqueued = false
-    ImportProcessingJob.stub(:perform_later, ->(*_args) { job_enqueued = true }) do
-      post import_file_import_template_url(@import_template), params: { excel_file: uploaded_file }
-    end
+    with_test_temp_dir do
+      # Mock job to verify it gets enqueued even with invalid files
+      job_enqueued = false
+      ImportProcessingJob.stub(:perform_later, ->(*_args) { job_enqueued = true }) do
+        post import_file_import_template_url(@import_template), params: { excel_file: uploaded_file }
+      end
 
-    # Should enqueue job (validation happens in background)
-    assert_response :redirect
-    assert job_enqueued, "Job should be enqueued even for invalid files"
+      # Should enqueue job (validation happens in background)
+      assert_response :redirect
+      assert job_enqueued, "Job should be enqueued even for invalid files"
+    end
   end
 
   test "should handle corrupted Excel files gracefully" do
@@ -362,13 +403,15 @@ class ImportTemplatesControllerTest < ActionDispatch::IntegrationTest
 
     uploaded_file = fixture_file_upload(corrupted_file.path, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 
-    # Mock job to raise an error during processing
-    ImportProcessingJob.stub(:perform_later, ->(*_args) { raise StandardError.new("Corrupted file") }) do
-      post import_file_import_template_url(@import_template), params: { excel_file: uploaded_file }
-    end
+    with_test_temp_dir do
+      # Mock job to raise an error during processing
+      ImportProcessingJob.stub(:perform_later, ->(*_args) { raise StandardError.new("Corrupted file") }) do
+        post import_file_import_template_url(@import_template), params: { excel_file: uploaded_file }
+      end
 
-    assert_redirected_to import_form_import_template_url(@import_template)
-    assert_match(/Failed to start background import.*Corrupted file/, flash[:alert])
+      assert_redirected_to import_form_import_template_url(@import_template)
+      assert_match(/Failed to start background import.*Corrupted file/, flash[:alert])
+    end
   end
 
   test "should handle file size limits" do
@@ -380,23 +423,27 @@ class ImportTemplatesControllerTest < ActionDispatch::IntegrationTest
 
     uploaded_file = fixture_file_upload(large_file.path, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 
-    post import_file_import_template_url(@import_template), params: { excel_file: uploaded_file }
+    with_test_temp_dir do
+      post import_file_import_template_url(@import_template), params: { excel_file: uploaded_file }
 
-    # Should handle appropriately - either process or reject based on app limits
-    assert_response :redirect
+      # Should handle appropriately - either process or reject based on app limits
+      assert_response :redirect
+    end
   end
 
   test "should handle file writing errors during save" do
     excel_data = [["Name"], ["Test Data"]]
     file = create_test_excel_file(excel_data)
 
-    # Mock FileUtils.mkdir_p to raise a permission error
-    FileUtils.stub(:mkdir_p, ->(*_args) { raise Errno::EACCES.new("Permission denied") }) do
-      post import_file_import_template_url(@import_template), params: { excel_file: file }
-    end
+    with_test_temp_dir do
+      # Mock FileUtils.mkdir_p to raise a permission error
+      FileUtils.stub(:mkdir_p, ->(*_args) { raise Errno::EACCES.new("Permission denied") }) do
+        post import_file_import_template_url(@import_template), params: { excel_file: file }
+      end
 
-    assert_redirected_to import_form_import_template_url(@import_template)
-    assert_match(/Failed to start background import.*Permission denied/, flash[:alert])
+      assert_redirected_to import_form_import_template_url(@import_template)
+      assert_match(/Failed to start background import.*Permission denied/, flash[:alert])
+    end
   end
 
   private

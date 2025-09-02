@@ -91,27 +91,30 @@ class ImportTemplatesController < ApplicationController
   def process_excel_import_async
     # Generate unique job_id for cache key generation
     job_id = SecureRandom.hex(8)
+    temp_file_path = nil
     
-    # Save uploaded file to temporary location
-    temp_file_path = Rails.root.join("tmp", "imports", "#{job_id}_#{params[:excel_file].original_filename}")
-    FileUtils.mkdir_p(File.dirname(temp_file_path))
-    
-    File.open(temp_file_path, "wb") do |file|
-      file.write(params[:excel_file].read)
+    begin
+      # Save uploaded file to temporary location
+      temp_file_path = Rails.root.join("tmp", "imports", "#{job_id}_#{params[:excel_file].original_filename}")
+      FileUtils.mkdir_p(File.dirname(temp_file_path))
+      
+      File.open(temp_file_path, "wb") do |file|
+        file.write(params[:excel_file].read)
+      end
+      
+      # Initialize job status in cache using JobStatusService
+      JobStatusService.update_status(job_id, :pending, created_at: Time.current)
+      
+      # Enqueue ImportProcessingJob with (template_id, job_id, file_path) parameters
+      ImportProcessingJob.perform_later(@import_template.id, job_id, temp_file_path.to_s)
+      
+      # Redirect to job status page
+      redirect_to import_template_job_path(@import_template, job_id)
+    rescue StandardError => e
+      # Handle file saving and job enqueueing failures
+      File.delete(temp_file_path) if temp_file_path && File.exist?(temp_file_path)
+      redirect_with_error("Failed to start background import: #{e.message}")
     end
-    
-    # Initialize job status in cache using JobStatusService
-    JobStatusService.update_status(job_id, :pending, created_at: Time.current)
-    
-    # Enqueue ImportProcessingJob with (template_id, job_id, file_path) parameters
-    ImportProcessingJob.perform_later(@import_template.id, job_id, temp_file_path.to_s)
-    
-    # Redirect to job status page
-    redirect_to import_template_job_path(@import_template, job_id)
-  rescue StandardError => e
-    # Handle file saving and job enqueueing failures
-    File.delete(temp_file_path) if defined?(temp_file_path) && File.exist?(temp_file_path)
-    redirect_with_error("Failed to start background import: #{e.message}")
   end
 
   def process_excel_import
