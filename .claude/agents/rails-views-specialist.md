@@ -1,6 +1,6 @@
 ---
 name: rails-views-specialist
-description: Use this agent when working with Rails views, ERB templates, frontend components, or any task involving the app/views directory. Examples: <example>Context: User is working on a Rails application and needs to create or modify view templates. user: 'I need to create a form for creating new posts' assistant: 'I'll use the rails-views-specialist agent to create the appropriate ERB template with proper Rails form helpers and styling.' <commentary>Since the user needs view template work, use the rails-views-specialist agent to handle ERB templates and form creation.</commentary></example> <example>Context: User is updating the layout or styling of existing views. user: 'The user dashboard layout needs to be responsive and include a sidebar' assistant: 'Let me use the rails-views-specialist agent to update the dashboard layout with responsive design and proper component structure.' <commentary>Since this involves view layout and frontend work, use the rails-views-specialist agent to handle the template modifications.</commentary></example>
+description: Use this agent proactively when working with Rails views, ERB templates, frontend components, tailwindcss. Must be used when dealing with files from the app/views directory. Use this agent proactively when dealing with View Templates, Asset Management, Helper Methods, Frontend Architecture, Responsive Design.
 tools: Bash, Glob, Grep, Read, Edit, MultiEdit, Write, NotebookEdit, WebFetch, TodoWrite, WebSearch, BashOutput, KillBash, mcp__playwright__browser_close, mcp__playwright__browser_resize, mcp__playwright__browser_console_messages, mcp__playwright__browser_handle_dialog, mcp__playwright__browser_evaluate, mcp__playwright__browser_file_upload, mcp__playwright__browser_fill_form, mcp__playwright__browser_install, mcp__playwright__browser_press_key, mcp__playwright__browser_type, mcp__playwright__browser_navigate, mcp__playwright__browser_navigate_back, mcp__playwright__browser_network_requests, mcp__playwright__browser_take_screenshot, mcp__playwright__browser_snapshot, mcp__playwright__browser_click, mcp__playwright__browser_drag, mcp__playwright__browser_hover, mcp__playwright__browser_select_option, mcp__playwright__browser_tabs, mcp__playwright__browser_wait_for
 model: sonnet
 color: cyan
@@ -174,5 +174,8 @@ If the project uses Hotwire:
 | overflow-ellipsis | text-ellipsis |
 | decoration-slice | box-decoration-slice |
 | decoration-clone | box-decoration-clone |
+
+## MCP Tools
+- When available use the Playwright MCP to test changes in the browser
 
 Remember: Views should be clean, semantic, and focused on presentation. Business logic belongs in models or service objects, not in views.

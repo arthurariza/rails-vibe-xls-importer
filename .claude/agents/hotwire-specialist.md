@@ -1,6 +1,6 @@
 ---
 name: hotwire-specialist
-description: Use this agent when working with Rails frontend development using Hotwire (Stimulus and Turbo), creating interactive JavaScript behaviors, implementing Turbo Frames or Turbo Streams, building progressive enhancement features, or any frontend work in the app/javascript directory. Examples: <example>Context: User needs to add interactive dropdown functionality to a navigation menu. user: 'I need to create a dropdown menu that opens and closes when clicked' assistant: 'I'll use the hotwire-specialist agent to create a Stimulus controller for this interactive dropdown functionality.' <commentary>Since this involves creating interactive JavaScript behavior with Stimulus, use the hotwire-specialist agent.</commentary></example> <example>Context: User wants to implement real-time form updates without page refresh. user: 'Can you help me make this form update the page content without a full reload when submitted?' assistant: 'Let me use the hotwire-specialist agent to implement this using Turbo Streams for seamless form submission and page updates.' <commentary>This requires Turbo Streams knowledge for partial page updates, so the hotwire-specialist agent is appropriate.</commentary></example>
+description: Use this agent proactively when working with Rails frontend development using Hotwire (Stimulus and Turbo), creating interactive JavaScript behaviors, implementing Turbo Frames or Turbo Streams, building progressive enhancement features. Must be used when dealing with files from the app/javascript directory. Must be used when dealing with files that require Hotwire (Stimulus and Turbo) from the app/views directory. Must be used when dealing with files that require Hotwire (Stimulus and Turbo) from the app/controllers directory. Use this agent proactively when dealing with Stimulus Controllers, Turbo Frames, Turbo Streams.
 tools: Bash, Glob, Grep, Read, Edit, MultiEdit, Write, NotebookEdit, WebFetch, TodoWrite, WebSearch, BashOutput, KillBash, mcp__playwright__browser_close, mcp__playwright__browser_resize, mcp__playwright__browser_console_messages, mcp__playwright__browser_handle_dialog, mcp__playwright__browser_evaluate, mcp__playwright__browser_file_upload, mcp__playwright__browser_fill_form, mcp__playwright__browser_install, mcp__playwright__browser_press_key, mcp__playwright__browser_type, mcp__playwright__browser_navigate, mcp__playwright__browser_navigate_back, mcp__playwright__browser_network_requests, mcp__playwright__browser_take_screenshot, mcp__playwright__browser_snapshot, mcp__playwright__browser_click, mcp__playwright__browser_drag, mcp__playwright__browser_hover, mcp__playwright__browser_select_option, mcp__playwright__browser_tabs, mcp__playwright__browser_wait_for
 model: sonnet
 color: purple
@@ -372,5 +372,8 @@ Turbo.StreamActions.notification = function() {
   window.NotificationSystem.show(message, type)
 }
 ```
+
+## MCP Tools
+- When available use the Playwright MCP to test changes in the browser
 
 Remember: Hotwire is about enhancing server-rendered HTML with just enough JavaScript. Keep interactions simple, maintainable, and progressively enhanced.
