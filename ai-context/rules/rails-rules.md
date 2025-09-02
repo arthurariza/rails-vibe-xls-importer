@@ -10,10 +10,6 @@
 - Inject dependencies in the initializer with key word arguments
 - Use @variable instead of defining attr_reader
 
-## Control Flow
-- **Happy path last**: Handle error conditions first, success case last
-- **Avoid else**: Use early returns instead of nested conditions  
-- **Separate conditions**: Prefer multiple if statements over compound conditions
 
 ## Rails Conventions
 
@@ -52,19 +48,6 @@ Remember: Controllers should be thin coordinators. Business logic belongs in mod
 
 ### Models
 - When creating new models, create useful factories/fixtures and seeders for them too.
-
-## Comments
-- Add `# frozen_string_literal: true` comment at the top of each .rb file
-- **Avoid comments** - write expressive code instead
-- When needed, use proper formatting:
-  ```ruby
-  # Single line with space after
-  
-  # Multi
-  # Line
-  # Comment
-  ```
-- Refactor comments into descriptive function names
 
 ## Service Objects
 - **Inheritance**: services should inherit from ApplicationService
@@ -141,7 +124,3 @@ end
 - Consider database views for complex queries
 - Implement efficient bulk operations
 - Monitor slow queries
-
-## Version Specific Issues
-- **Ruby Version Compatibility:** Ensure code is compatible with the target Ruby version.
-- **Rails Version Compatibility:** Ensure code is compatible with the target Rails version.
