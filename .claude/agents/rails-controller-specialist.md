@@ -1,6 +1,6 @@
 ---
 name: rails-controller-specialist
-description: Use this agent proactively when working with Rails controllers, routing configurations, or any task involving HTTP request handling and URL mapping. Must be used when dealing with files from the app/controllers directory. Must be used when dealing with the config/routes.rb file.  Use this agent proactively when dealing with Controller Design, Routing Configuration, Request Handling.
+description: Use this agent proactively when working with Rails controllers, routing configurations, or any task involving HTTP request handling and URL mapping. Must be used when dealing with files from the app/controllers directory. Must be used when dealing with the config/routes.rb file. Use this agent proactively when dealing with Controller Design, Routing Configuration, Request Handling, or when the user mentions HTTP errors, routing issues, or controller problems. This agent can and should be used with other agents.
 tools: Bash, Glob, Grep, Read, Edit, MultiEdit, Write, NotebookEdit, WebFetch, TodoWrite, WebSearch, BashOutput, KillBash
 model: sonnet
 color: red

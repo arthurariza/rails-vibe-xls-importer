@@ -1,6 +1,6 @@
 ---
 name: rails-jobs-specialist
-description: Use this agent proactively when you need to create, modify, or troubleshoot Rails background jobs, implement async processing patterns, configure job queues, handle job failures and retries, or optimize job performance. Must be used when dealing with files from the app/jobs directory. Use this agent proactively when dealing with Job Design, Queue Management.
+description: Use this agent proactively when you need to create, modify, or troubleshoot Rails background jobs, implement async processing patterns, configure job queues, handle job failures and retries, or optimize job performance. Must be used when dealing with files from the app/jobs directory. Use this agent proactively when dealing with Job Design, Queue Management, Background Processing, or when the user mentions async tasks, job failures, or background processing issues. This agent can and should be used with other agents.
 tools: Bash, Glob, Grep, Read, Edit, MultiEdit, Write, NotebookEdit, WebFetch, TodoWrite, WebSearch, BashOutput, KillBash
 model: sonnet
 color: blue

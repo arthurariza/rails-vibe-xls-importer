@@ -1,6 +1,6 @@
 ---
 name: rails-models-specialist
-description: Use this agent proactively when working with ActiveRecord models, database schema design, migrations, associations, validations, or any database-related tasks in Rails applications. Must be used when dealing with files from the app/models/ directory. Must be used when dealing with files from the db/ directory. Use this agent proactively when dealing with Model Design, Associations, Migrations, Query Optimization, Database Design.
+description: Use this agent proactively when working with ActiveRecord models, database schema design, migrations, associations, validations, or any database-related tasks in Rails applications. Must be used when dealing with files from the app/models/ directory. Must be used when dealing with files from the db/ directory. Use this agent proactively when dealing with Model Design, Associations, Migrations, Query Optimization, Database Design, or when the user mentions data modeling, database issues, or ActiveRecord problems. This agent can and should be used with other agents.
 tools: Bash, Glob, Grep, Read, Edit, MultiEdit, Write, NotebookEdit, WebFetch, TodoWrite, WebSearch, BashOutput, KillBash
 model: sonnet
 color: green

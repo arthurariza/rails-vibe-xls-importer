@@ -1,6 +1,6 @@
 ---
 name: rails-service-architect
-description: Use this agent proactively when you need to create, refactor, or optimize Rails service objects and business logic. This includes extracting complex controller logic into services, implementing business rules, handling multi-step operations, or designing service layer architecture. Must be used when dealing with files from the app/services/ directory.
+description: Use this agent proactively when you need to create, refactor, or optimize Rails service objects and business logic. This includes extracting complex controller logic into services, implementing business rules, handling multi-step operations, or designing service layer architecture. Must be used when dealing with files from the app/services/ directory or related service tasks. Use this agent proactively when dealing with Service Object Design, Business Logic Extraction, Multi-step Operations, or when the user mentions service-related tasks or refactoring needs. This agent can and should be used with other agents.
 tools: Bash, Glob, Grep, Read, Edit, MultiEdit, Write, NotebookEdit, WebFetch, TodoWrite, WebSearch, BashOutput, KillBash
 model: sonnet
 color: yellow

@@ -1,6 +1,6 @@
 ---
 name: rails-test-specialist
-description: Use this agent when working on tests. Must be used when dealing with files from the test directory. Must be used when dealing with files from the specs directory. Use proactively when dealing with Test Coverage, Test Types, Test Quality, Test Performance, TDD, Test Fixing, Test Development.
+description: Use this agent proactively when working on tests or test-related tasks. Must be used when dealing with files from the test directory. Must be used when dealing with files from the specs directory. Use proactively when dealing with Test Coverage, Test Types, Test Quality, Test Performance, TDD, Test Fixing, Test Development, Debugging Test Failures. Proactively use this agent when the user mentions test-related issues or errors. This agent can and should be used with other agents to achieve multi-agent collaboration.
 tools: Bash, Glob, Grep, Read, Edit, MultiEdit, Write, NotebookEdit, WebFetch, TodoWrite, WebSearch, BashOutput, KillBash
 model: sonnet
 color: orange
