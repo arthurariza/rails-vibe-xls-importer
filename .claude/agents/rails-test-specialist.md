@@ -127,6 +127,10 @@ end
 - Avoid dependencies between tests
 - Clean up after tests
 
+### When a test fails
+- Don't always assume that the tests are correct
+- Identify if the test is outdated or the new implementation is correct
+
 ### Edge Cases
 - **Handling Empty Datasets:** Ensure code handles empty datasets gracefully.
 - **Handling Large Datasets:** Optimize code to handle large datasets efficiently.
