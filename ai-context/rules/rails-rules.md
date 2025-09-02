@@ -17,11 +17,11 @@
 
 ## Rails Conventions
 
-### Controllers
+<!-- ### Controllers
 - Plural resource names (`posts_controller`)
 - Stick to CRUD methods (`index`, `show`, `new`, `create`, `edit`, `update`, `destroy`)
 - Extract new controllers for non-CRUD actions
-- Keep controllers thin **delegate business logic to services**
+- Keep controllers thin **delegate business logic to services** -->
 
 #### Security Considerations
 - Always use strong parameters
