@@ -4,13 +4,12 @@ require "test_helper"
 require "minitest/mock"
 
 class ImportProcessingJobTest < ActiveJob::TestCase
+  include ExcelFixtureHelper
+
   def setup
     @import_template = import_templates(:one)
-    @job_id = "test_job_123"
-    @temp_file_path = Rails.root.join("tmp", "test_import_#{@job_id}.xlsx").to_s
-
-    # Create a test Excel file
-    create_test_excel_file(@temp_file_path)
+    @job_id = SecureRandom.hex(8)  # Unique job ID per test
+    @temp_file_paths = []  # Track all temp files created in this test
 
     # Setup cache for JobStatusService
     @original_cache_store = Rails.cache
@@ -18,11 +17,21 @@ class ImportProcessingJobTest < ActiveJob::TestCase
   end
 
   def teardown
-    # Clean up test file
-    File.delete(@temp_file_path) if File.exist?(@temp_file_path)
+    # Clean up all test files created during the test
+    @temp_file_paths.each do |path|
+      File.delete(path) if File.exist?(path)
+    end
 
     # Restore cache
     Rails.cache = @original_cache_store
+  end
+
+  private
+
+  def get_temp_file_path
+    path = excel_fixture_file_path("mixed_update_create.xlsx")
+    @temp_file_paths << path
+    path
   end
 
   test "perform updates status to processing at job start" do
@@ -30,9 +39,11 @@ class ImportProcessingJobTest < ActiveJob::TestCase
     mock_service_result = create_mock_service_result(success: true)
     mock_service = Minitest::Mock.new
     mock_service.expect(:process_import, mock_service_result)
+    
+    temp_file_path = get_temp_file_path
 
     ExcelImportService.stub(:new, mock_service) do
-      ImportProcessingJob.new.perform(@import_template.id, @job_id, @temp_file_path)
+      ImportProcessingJob.new.perform(@import_template.id, @job_id, temp_file_path)
     end
 
     # Check that status was set to processing
@@ -59,7 +70,7 @@ class ImportProcessingJobTest < ActiveJob::TestCase
     end
 
     begin
-      ImportProcessingJob.new.perform(@import_template.id, @job_id, @temp_file_path)
+      ImportProcessingJob.new.perform(@import_template.id, @job_id, get_temp_file_path)
 
       # Verify correct template was passed
       assert_equal 1, service_args.length
@@ -71,6 +82,7 @@ class ImportProcessingJobTest < ActiveJob::TestCase
 
   test "perform creates ActionDispatch::Http::UploadedFile with correct attributes" do
     mock_service_result = create_mock_service_result(success: true)
+    temp_file_path = get_temp_file_path
 
     # Capture the file argument passed to ExcelImportService.new
     uploaded_files = []
@@ -84,14 +96,14 @@ class ImportProcessingJobTest < ActiveJob::TestCase
     end
 
     begin
-      ImportProcessingJob.new.perform(@import_template.id, @job_id, @temp_file_path)
+      ImportProcessingJob.new.perform(@import_template.id, @job_id, temp_file_path)
 
       # Verify uploaded file was created correctly
       assert_equal 1, uploaded_files.length
       uploaded_file = uploaded_files.first
 
       assert_instance_of ActionDispatch::Http::UploadedFile, uploaded_file
-      assert_equal File.basename(@temp_file_path), uploaded_file.original_filename
+      assert_equal File.basename(temp_file_path), uploaded_file.original_filename
       assert_equal "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", uploaded_file.content_type
     ensure
       ExcelImportService.define_singleton_method(:new, original_new)
@@ -114,7 +126,7 @@ class ImportProcessingJobTest < ActiveJob::TestCase
     end
 
     begin
-      ImportProcessingJob.new.perform(@import_template.id, @job_id, @temp_file_path)
+      ImportProcessingJob.new.perform(@import_template.id, @job_id, get_temp_file_path)
 
       # Verify service was called
       assert_includes service_calls, :process_import_called
@@ -134,7 +146,7 @@ class ImportProcessingJobTest < ActiveJob::TestCase
     mock_service.expect(:process_import, mock_service_result)
 
     ExcelImportService.stub(:new, mock_service) do
-      ImportProcessingJob.new.perform(@import_template.id, @job_id, @temp_file_path)
+      ImportProcessingJob.new.perform(@import_template.id, @job_id, get_temp_file_path)
     end
 
     # Check final status
@@ -158,7 +170,7 @@ class ImportProcessingJobTest < ActiveJob::TestCase
     mock_service.expect(:process_import, mock_service_result)
 
     ExcelImportService.stub(:new, mock_service) do
-      ImportProcessingJob.new.perform(@import_template.id, @job_id, @temp_file_path)
+      ImportProcessingJob.new.perform(@import_template.id, @job_id, get_temp_file_path)
     end
 
     # Check final status
@@ -179,7 +191,7 @@ class ImportProcessingJobTest < ActiveJob::TestCase
     end
 
     ExcelImportService.stub(:new, mock_service) do
-      ImportProcessingJob.new.perform(@import_template.id, @job_id, @temp_file_path)
+      ImportProcessingJob.new.perform(@import_template.id, @job_id, get_temp_file_path)
     end
 
     # Check final status
@@ -196,16 +208,18 @@ class ImportProcessingJobTest < ActiveJob::TestCase
     mock_service_result = create_mock_service_result(success: true)
     mock_service = Minitest::Mock.new
     mock_service.expect(:process_import, mock_service_result)
+    
+    temp_file_path = get_temp_file_path
 
     # Verify file exists before job
-    assert_path_exists @temp_file_path
+    assert_path_exists temp_file_path
 
     ExcelImportService.stub(:new, mock_service) do
-      ImportProcessingJob.new.perform(@import_template.id, @job_id, @temp_file_path)
+      ImportProcessingJob.new.perform(@import_template.id, @job_id, temp_file_path)
     end
 
     # Verify file is cleaned up after job
-    assert_not File.exist?(@temp_file_path)
+    assert_not File.exist?(temp_file_path)
 
     mock_service.verify
   end
@@ -214,16 +228,18 @@ class ImportProcessingJobTest < ActiveJob::TestCase
     mock_service_result = create_mock_service_result(success: false, errors: ["Test error"])
     mock_service = Minitest::Mock.new
     mock_service.expect(:process_import, mock_service_result)
+    
+    temp_file_path = get_temp_file_path
 
     # Verify file exists before job
-    assert_path_exists @temp_file_path
+    assert_path_exists temp_file_path
 
     ExcelImportService.stub(:new, mock_service) do
-      ImportProcessingJob.new.perform(@import_template.id, @job_id, @temp_file_path)
+      ImportProcessingJob.new.perform(@import_template.id, @job_id, temp_file_path)
     end
 
     # Verify file is cleaned up after job
-    assert_not File.exist?(@temp_file_path)
+    assert_not File.exist?(temp_file_path)
 
     mock_service.verify
   end
@@ -233,16 +249,18 @@ class ImportProcessingJobTest < ActiveJob::TestCase
     mock_service.expect(:process_import, nil) do
       raise StandardError.new("Test exception")
     end
+    
+    temp_file_path = get_temp_file_path
 
     # Verify file exists before job
-    assert_path_exists @temp_file_path
+    assert_path_exists temp_file_path
 
     ExcelImportService.stub(:new, mock_service) do
-      ImportProcessingJob.new.perform(@import_template.id, @job_id, @temp_file_path)
+      ImportProcessingJob.new.perform(@import_template.id, @job_id, temp_file_path)
     end
 
     # Verify file is cleaned up after job even on exception
-    assert_not File.exist?(@temp_file_path)
+    assert_not File.exist?(temp_file_path)
 
     mock_service.verify
   end
@@ -250,7 +268,7 @@ class ImportProcessingJobTest < ActiveJob::TestCase
   test "perform handles missing import template gracefully" do
     invalid_template_id = 99_999
 
-    ImportProcessingJob.new.perform(invalid_template_id, @job_id, @temp_file_path)
+    ImportProcessingJob.new.perform(invalid_template_id, @job_id, get_temp_file_path)
 
     # Check final status
     cached_status = Rails.cache.read("job_status:#{@job_id}")
@@ -276,7 +294,7 @@ class ImportProcessingJobTest < ActiveJob::TestCase
       mock_service.expect(:process_import, mock_service_result)
 
       ExcelImportService.stub(:new, mock_service) do
-        ImportProcessingJob.new.perform(@import_template.id, @job_id, @temp_file_path)
+        ImportProcessingJob.new.perform(@import_template.id, @job_id, get_temp_file_path)
       end
 
       # Verify status update sequence
@@ -304,34 +322,16 @@ class ImportProcessingJobTest < ActiveJob::TestCase
   end
 
   test "job can be enqueued with correct arguments" do
+    temp_file_path = get_temp_file_path
     assert_enqueued_with(
       job: ImportProcessingJob,
-      args: [@import_template.id, @job_id, @temp_file_path]
+      args: [@import_template.id, @job_id, temp_file_path]
     ) do
-      ImportProcessingJob.perform_later(@import_template.id, @job_id, @temp_file_path)
+      ImportProcessingJob.perform_later(@import_template.id, @job_id, temp_file_path)
     end
   end
 
   private
-
-  def create_test_excel_file(file_path)
-    # Create directory if it doesn't exist
-    FileUtils.mkdir_p(File.dirname(file_path))
-
-    # Create a minimal Excel file for testing
-    require "caxlsx"
-
-    package = Axlsx::Package.new
-    workbook = package.workbook
-
-    workbook.add_worksheet(name: "Test Sheet") do |sheet|
-      sheet.add_row(%w[Name Age City])
-      sheet.add_row(["John", 30, "New York"])
-      sheet.add_row(["Jane", 25, "Los Angeles"])
-    end
-
-    package.serialize(file_path)
-  end
 
   def create_mock_service_result(success:, summary: "", processed_count: 0, errors: [])
     result = Object.new

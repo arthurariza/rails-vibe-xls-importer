@@ -5,6 +5,7 @@ require "minitest/mock"
 
 class ImportTemplatesControllerTest < ActionDispatch::IntegrationTest
   include Devise::Test::IntegrationHelpers
+  include ExcelFixtureHelper
 
   def setup
     @user = users(:one)

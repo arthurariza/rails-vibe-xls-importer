@@ -3,6 +3,7 @@
 require "test_helper"
 
 class SynchronousServiceCompatibilityTest < ActiveSupport::TestCase
+  include ExcelFixtureHelper
   def setup
     @user = users(:one)
     @template = ImportTemplate.create!(
@@ -343,14 +344,8 @@ class SynchronousServiceCompatibilityTest < ActiveSupport::TestCase
   private
 
   def create_test_excel_file(data)
-    # Use fixture file to avoid race conditions in parallel tests
-    if data.any? { |row| row.include?("invalid") }
-      uploaded_excel_fixture("invalid_number_data.xlsx")
-    elsif data.size <= 2 # Simple test data
-      uploaded_excel_fixture("edge_case_base.xlsx")
-    else
-      uploaded_excel_fixture("large_dataset.xlsx")
-    end
+    # Create a file with the exact data needed for the test
+    create_simple_excel_file(data, "sync_compat_test")
   end
 
   def save_excel_to_temp_location(excel_data, job_id)

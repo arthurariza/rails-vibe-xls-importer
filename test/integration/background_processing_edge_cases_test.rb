@@ -3,6 +3,7 @@
 require "test_helper"
 
 class BackgroundProcessingEdgeCasesTest < ActiveSupport::TestCase
+  include ExcelFixtureHelper
   def setup
     # Use MemoryStore for consistent cache behavior in tests
     @original_cache_store = Rails.cache
@@ -282,30 +283,14 @@ class BackgroundProcessingEdgeCasesTest < ActiveSupport::TestCase
   # === Service Robustness in Background Job Context ===
 
   test "services maintain consistent error reporting in background vs synchronous contexts" do
-    # Create identical problematic data
-    problematic_data = [
-      ["Name", "Age", "Active"],
-      ["", "invalid", "maybe"], # Multiple validation issues
-      ["Valid User", "25", "true"], # This one should be valid but transaction will roll back
-      ["Another Bad", "also_invalid", "perhaps"] # More issues
-    ]
-    
-    # Test 1: Synchronous execution
-    sync_file = create_test_excel_file(problematic_data)
+    # Test 1: Synchronous execution with problematic data fixture
+    sync_file = uploaded_excel_fixture("problematic_validation_data.xlsx")
     sync_service = ExcelImportService.new(sync_file, @template)  
     sync_result = sync_service.process_import
     
-    # Test 2: Background job execution
-    job_id = SecureRandom.hex(8)
-    bg_file_path = create_valid_excel_file(problematic_data, job_id)
-    
-    bg_uploaded_file = ActionDispatch::Http::UploadedFile.new(
-      tempfile: File.open(bg_file_path),
-      filename: File.basename(bg_file_path),
-      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    )
-    
-    bg_service = ExcelImportService.new(bg_uploaded_file, @template)
+    # Test 2: Background job execution with same problematic data
+    bg_file = uploaded_excel_fixture("problematic_validation_data.xlsx")
+    bg_service = ExcelImportService.new(bg_file, @template)
     bg_result = bg_service.process_import
     
     # Both should fail with similar error patterns
@@ -321,8 +306,8 @@ class BackgroundProcessingEdgeCasesTest < ActiveSupport::TestCase
     assert bg_result.created_records.empty?
     
     # Cleanup
-    bg_uploaded_file.tempfile.close
-    File.delete(bg_file_path) if File.exist?(bg_file_path)
+    sync_file.tempfile.close
+    bg_file.tempfile.close
   end
 
   test "export service maintains consistency under background memory pressure" do
@@ -591,8 +576,14 @@ class BackgroundProcessingEdgeCasesTest < ActiveSupport::TestCase
     elsif excel_data.first && excel_data.first.size > 50  # Wide spreadsheet
       excel_fixture_file_path("very_wide_spreadsheet.xlsx")
     elsif excel_data.any? { |row| row.include?("invalid") && row.include?("maybe") && row.include?("perhaps") }
-      # Specific pattern for problematic validation data
-      excel_fixture_file_path("problematic_validation_data.xlsx")
+      # Specific pattern for problematic validation data - create exactly what the test needs
+      temp_file = create_simple_excel_file(excel_data, "bg_edge_case_test")
+      # Convert to a file path for this specific usage
+      temp_path = Rails.root.join("tmp", "bg_edge_case_#{job_id}.xlsx")
+      FileUtils.mkdir_p(File.dirname(temp_path))
+      File.binwrite(temp_path, temp_file.tempfile.read)
+      temp_file.tempfile.close
+      temp_path.to_s
     else
       excel_fixture_file_path("edge_case_base.xlsx")
     end
@@ -609,8 +600,8 @@ class BackgroundProcessingEdgeCasesTest < ActiveSupport::TestCase
     elsif data.first && data.first.size > 50  # Wide spreadsheet
       uploaded_excel_fixture("very_wide_spreadsheet.xlsx")
     elsif data.any? { |row| row.include?("invalid") && row.include?("maybe") && row.include?("perhaps") }
-      # Specific pattern for problematic validation data
-      uploaded_excel_fixture("problematic_validation_data.xlsx")
+      # Specific pattern for problematic validation data - create exactly what the test needs
+      create_simple_excel_file(data, "edge_case_test")
     elsif data.size <= 2 # Header + 1 row
       uploaded_excel_fixture("edge_case_base.xlsx")
     else
