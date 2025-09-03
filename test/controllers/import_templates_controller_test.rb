@@ -446,6 +446,91 @@ class ImportTemplatesControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "should update import template with template columns" do
+    # Test data: updating existing column and adding new column
+    update_params = {
+      import_template: {
+        name: "Updated Template Name",
+        description: "Updated description"
+      },
+      template_columns: {
+        # Update existing column (using its ID)
+        @import_template.template_columns.first.id.to_s => {
+          id: @import_template.template_columns.first.id,
+          name: "Updated Name",
+          data_type: "string",
+          required: "1"
+        },
+        # Add new column (using new_ prefix)
+        "new_12345" => {
+          name: "Email",
+          data_type: "string",
+          required: "0"
+        }
+      }
+    }
+
+    assert_no_difference "ImportTemplate.count" do
+      assert_difference "TemplateColumn.count", 1 do
+        patch import_template_url(@import_template), params: update_params
+      end
+    end
+
+    assert_redirected_to @import_template
+    assert_match "Template was successfully updated", flash[:notice]
+
+    # Verify template was updated
+    @import_template.reload
+    assert_equal "Updated Template Name", @import_template.name
+    assert_equal "Updated description", @import_template.description
+
+    # Verify existing column was updated
+    updated_column = @import_template.template_columns.find_by(name: "Updated Name")
+    assert_not_nil updated_column
+    assert_equal "string", updated_column.data_type
+    assert updated_column.required?
+
+    # Verify new column was created
+    new_column = @import_template.template_columns.find_by(name: "Email")
+    assert_not_nil new_column
+    assert_equal "string", new_column.data_type
+    assert_not new_column.required?
+  end
+
+  test "should handle forbidden attributes error with proper strong parameters" do
+    # This test ensures that the strong parameters are working correctly
+    # and we don't get ForbiddenAttributesError
+    update_params = {
+      import_template: {
+        name: "Test Template"
+      },
+      template_columns: {
+        "new_test" => {
+          name: "Test Column",
+          data_type: "string",
+          required: "1",
+          # This should be filtered out by strong parameters
+          malicious_param: "should_not_be_permitted"
+        }
+      }
+    }
+
+    assert_difference "TemplateColumn.count", 1 do
+      patch import_template_url(@import_template), params: update_params
+    end
+
+    assert_redirected_to @import_template
+    
+    # Verify the new column was created with only permitted attributes
+    new_column = @import_template.template_columns.find_by(name: "Test Column")
+    assert_not_nil new_column
+    assert_equal "string", new_column.data_type
+    assert new_column.required?
+    
+    # Verify malicious parameter was not persisted (it shouldn't exist as an attribute anyway)
+    assert_not_respond_to new_column, :malicious_param
+  end
+
   private
 
   def create_test_excel_file(data)

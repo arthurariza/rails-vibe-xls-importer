@@ -141,7 +141,16 @@ class ImportTemplatesController < ApplicationController
   end
 
   def template_columns_params
-    params.fetch(:template_columns, {})
+    return {} unless params[:template_columns].present?
+    
+    permitted_params = {}
+    params[:template_columns].each do |key, attributes|
+      # Convert to ActionController::Parameters if not already
+      attr_params = attributes.is_a?(ActionController::Parameters) ? attributes : ActionController::Parameters.new(attributes)
+      permitted_params[key] = attr_params.permit(:id, :name, :data_type, :required, :column_number).to_h
+    end
+    
+    permitted_params
   end
 
   def handle_template_columns
@@ -149,12 +158,14 @@ class ImportTemplatesController < ApplicationController
 
     template_columns_params.each do |key, column_attrs|
       if key.to_s.start_with?("new_")
-        # Create new column
-        @import_template.template_columns.create!(column_attrs.except(:id))
-      elsif column_attrs[:id].present?
-        # Update existing column
-        column = @import_template.template_columns.find(column_attrs[:id])
-        column.update!(column_attrs.except(:id))
+        # Create new column - remove :id from hash
+        create_attrs = column_attrs.except("id")
+        @import_template.template_columns.create!(create_attrs)
+      elsif column_attrs["id"].present?
+        # Update existing column - remove :id from hash
+        column = @import_template.template_columns.find(column_attrs["id"])
+        update_attrs = column_attrs.except("id")
+        column.update!(update_attrs)
       end
     end
 
