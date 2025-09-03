@@ -4,6 +4,9 @@
 
 import { application } from "./application"
 
+import ColumnManagerController from "./column_manager_controller"
+application.register("column-manager", ColumnManagerController)
+
 import FileUploadController from "./file_upload_controller"
 application.register("file-upload", FileUploadController)
 
