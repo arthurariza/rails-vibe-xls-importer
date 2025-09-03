@@ -50,17 +50,15 @@
       </div>
       <% if @import_template.column_headers.any? %>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <% (1..5).each do |i| %>
-            <% column_def = @import_template.column_definition(i) %>
-            <% if column_def.present? %>
+          <% @import_template.template_columns.each do |column| %>
               <div class="bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-200 rounded-xl p-6 hover:shadow-md transition-all duration-200">
                 <div class="flex items-center justify-between mb-3">
-                  <span class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Column <%= i %></span>
+                  <span class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Column <%= column.column_number %></span>
                   <div class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
-                    <%= column_def["data_type"]&.capitalize %>
+                    <%= column.data_type&.capitalize %>
                   </div>
                 </div>
-                <h3 class="text-lg font-semibold text-gray-900 mb-2"><%= column_def["name"] %></h3>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2"><%= column.name %></h3>
                 <div class="text-sm text-gray-600">
                   <div class="flex items-center gap-1">
                     <svg class="h-3 w-3 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
@@ -70,7 +68,6 @@
                   </div>
                 </div>
               </div>
-            <% end %>
           <% end %>
         </div>
       <% else %>
@@ -147,17 +144,15 @@
               <tbody class="bg-white divide-y divide-gray-200">
                 <% @data_records.each_with_index do |record, index| %>
                   <tr class="hover:bg-blue-50 transition-colors duration-150 <%= 'bg-gray-50' if index.even? %>">
-                    <% (1..5).each do |i| %>
-                      <% if @import_template.column_definition(i).present? %>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          <% value = record.column_value(i) %>
-                          <% if value.present? %>
-                            <span class="font-medium"><%= value %></span>
-                          <% else %>
-                            <span class="text-gray-400 italic">Empty</span>
-                          <% end %>
-                        </td>
-                      <% end %>
+                    <% @import_template.template_columns.each do |column| %>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        <% value = record.column_value(column.column_number) %>
+                        <% if value.present? %>
+                          <span class="font-medium"><%= value %></span>
+                        <% else %>
+                          <span class="text-gray-400 italic">Empty</span>
+                        <% end %>
+                      </td>
                     <% end %>
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <div class="flex items-center gap-3">
